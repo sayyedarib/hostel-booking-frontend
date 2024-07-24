@@ -1,4 +1,4 @@
 export interface Guest {
-    persons: number;
-    rooms: number;
+  persons: number;
+  rooms: number;
 }

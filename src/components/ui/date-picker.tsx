@@ -1,45 +1,58 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { addDays, format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-import { DateRange } from "react-day-picker"
+import * as React from "react";
+import { addDays, format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { DateRange } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 export default function DatePickerWithRange({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const [date, setDate] = React.useState<DateRange | undefined>({
-    from: new Date(2022, 0, 20),
-    to: addDays(new Date(2022, 0, 20), 20),
-  })
+    from: new Date(),
+    to: addDays(new Date(), 30),
+  });
 
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
         <PopoverTrigger asChild>
+          {/* NOTE: I have merged parent className also in the button that may cause problem. */}
           <Button
             id="date"
             variant={"ghost"}
             className={cn(
-              "w-full h-full rounded-[40px] text-lg",
-              !date && "text-muted-foreground"
+              "w-full h-full rounded-[40px] text-lg text-start",
+              !date && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} -{" "}
-                  {format(date.to, "LLL dd, y")}
+                  <div className="flex gap-14">
+                    <div className="flex flex-col">
+                      <span>Check in</span>
+                      <span className="text-sm text-neutral-500">
+                        {format(date.from, "LLL dd, y")}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span>Check out</span>
+                      <span className="text-sm text-neutral-500">
+                        {format(date.to, "LLL dd, y")}
+                      </span>
+                    </div>
+                  </div>
                 </>
               ) : (
                 format(date.from, "LLL dd, y")
@@ -61,5 +74,5 @@ export default function DatePickerWithRange({
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }

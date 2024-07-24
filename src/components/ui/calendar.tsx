@@ -1,12 +1,17 @@
-"use client"
+"use client";
 
-import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from "lucide-react"
-import { DayPicker, type DayPickerProps } from "react-day-picker"
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+} from "lucide-react";
+import { DayPicker, type DayPickerProps } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 
-export type CalendarProps = DayPickerProps
+export type CalendarProps = DayPickerProps;
 
 function Calendar({
   className,
@@ -62,23 +67,23 @@ function Calendar({
             orientation === "left"
               ? ChevronLeft
               : orientation === "right"
-              ? ChevronRight
-              : orientation === "up"
-              ? ChevronUp
-              : ChevronDown
+                ? ChevronRight
+                : orientation === "up"
+                  ? ChevronUp
+                  : ChevronDown;
 
           return (
             <Component
               className={cn("size-4", className)}
               aria-disabled={disabled}
             />
-          )
+          );
         },
       }}
       {...props}
     />
-  )
+  );
 }
-Calendar.displayName = "Calendar"
+Calendar.displayName = "Calendar";
 
-export { Calendar }
+export { Calendar };
