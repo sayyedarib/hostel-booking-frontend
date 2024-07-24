@@ -30,7 +30,7 @@ export default function AddGuest({
             variant={"ghost"}
             className={cn(
               "w-full h-full rounded-[40px] text-lg",
-              !guest && "text-muted-foreground"
+              !guest && "text-muted-foreground",
             )}
           >
             <UserRound className="mr-2 h-4 w-4" />
@@ -47,7 +47,10 @@ export default function AddGuest({
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[400px] px-5 py-3 h-36 flex flex-col justify-center" align="center">
+        <PopoverContent
+          className="w-[400px] px-5 py-3 h-36 flex flex-col justify-center"
+          align="center"
+        >
           <div className="flex justify-between border-b ">
             <span>
               <h3>Person</h3>
