@@ -26,7 +26,6 @@ export default function DatePickerWithRange({
     <div className={cn("grid gap-2", className)}>
       <Popover>
         <PopoverTrigger asChild>
-          {/* NOTE: I have merged parent className also in the button that may cause problem. */}
           <Button
             id="date"
             variant={"ghost"}
@@ -35,11 +34,11 @@ export default function DatePickerWithRange({
               !date && "text-muted-foreground",
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-2 h-4 w-4 hidden md:block" />
             {date?.from ? (
               date.to ? (
                 <>
-                  <div className="flex gap-14">
+                  <div className="flex gap-2 md:gap-6 lg:gap-14">
                     <div className="flex flex-col">
                       <span>Check in</span>
                       <span className="text-sm text-neutral-500">
