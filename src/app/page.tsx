@@ -4,6 +4,7 @@ import Header from "@/components/header";
 import OurServices from "@/components/our-services";
 import { Gallery } from "@/components/gallery";
 import { Testimonials } from "@/components/testimonials";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
@@ -32,6 +33,7 @@ export default function Home() {
         <OurServices />
         <Gallery />
         <Testimonials />
+        <Footer />
       </div>
     </>
   );
