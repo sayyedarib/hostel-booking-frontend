@@ -3,14 +3,14 @@ import { Home, Phone } from "lucide-react";
 export default function Footer() {
   return (
     <>
-      <footer className="w-full flex flex-wrap items-center justify-between px-14 gap-4 bg-green-100 p-4">
+      <footer className="w-full flex flex-wrap items-center justify-between px-14 gap-4 bg-black">
         <div className="flex flex-col gap-3">
-          <span className="text-3xl lg:text-6xl">Contact Us</span>
-          <div className="text-lg flex items-center gap-1">
+          <h3 className="text-3xl lg:text-6xl text-red-500">Contact Us</h3>
+          <div className="text-lg flex items-center gap-1 text-neutral-300">
             <Phone />
             <p>+91 8791476473</p>
           </div>
-          <div className="text-lg flex items-center gap-1">
+          <div className="text-lg flex items-center gap-1 text-neutral-300">
             <Home />
             <p>
               Campus View Appartment, beside Kings Academy, Saheh bagh, Aligarh,

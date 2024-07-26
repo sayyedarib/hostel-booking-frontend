@@ -24,57 +24,36 @@ export default function AddGuest({
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
-        <PopoverTrigger asChild>
-          <>
-            {/* for medium and large screen */}
-            <Button
-              id="guest"
-              variant={"ghost"}
-              className={cn(
-                "hidden md:block w-full h-full rounded-[40px] text-lg",
-                !guest && "text-muted-foreground",
-              )}
-            >
-              {guest?.persons ? (
-                guest?.rooms ? (
-                  <span className="flex items-center justify-center">
+        <PopoverTrigger className="p-0 h-full" asChild>
+          <Button
+            id="guest"
+            variant={"ghost"}
+            className={cn(
+              "flex w-full h-full rounded-[40px] text-lg px-4",
+              !guest && "text-muted-foreground",
+            )}
+          >
+            {guest?.persons ? (
+              guest?.rooms ? (
+                <span className="flex items-center justify-center gap-4">
+                  <span className="flex gap-1">
                     <UserRound />
-                    {guest.persons} Person, {guest.rooms} Room
+                    {guest.persons}{" "}
+                    <span className="hidden md:block">Person</span>,
                   </span>
-                ) : (
-                  <>{guest.persons} Person</>
-                )
+                  <span className="flex gap-1">
+                    <BedDouble />
+                    {guest.rooms}
+                  </span>
+                  <span className="hidden md:block">Room</span>
+                </span>
               ) : (
-                <span>Add Guest</span>
-              )}
-            </Button>
-            {/* for small screen */}
-            <Button
-              id="guest"
-              variant={"ghost"}
-              className={cn(
-                "md:hidden w-full h-full rounded-[40px] text-lg gap-3 lg:gap-6",
-                !guest && "text-muted-foreground",
-              )}
-            >
-              {guest?.persons ? (
-                guest?.rooms ? (
-                  <>
-                    <span className="flex items-center justify-center gap-1">
-                      <UserRound size={14} /> {guest.persons}
-                    </span>
-                    <span className="flex items-center justify-center gap-1">
-                      <BedDouble /> {guest.rooms}
-                    </span>
-                  </>
-                ) : (
-                  <>{guest.persons} Person</>
-                )
-              ) : (
-                <span>Add Guest</span>
-              )}
-            </Button>
-          </>
+                <>{guest.persons} Person</>
+              )
+            ) : (
+              <span>Add Guest</span>
+            )}
+          </Button>
         </PopoverTrigger>
         <PopoverContent
           className="w-[400px] px-5 py-3 h-36 flex flex-col justify-center"

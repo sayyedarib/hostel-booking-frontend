@@ -14,14 +14,16 @@ import {
 } from "@/components/ui/carousel";
 import { gallery } from "@/constant";
 
-export function Gallery() {
+export default function Gallery() {
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true }),
   );
 
   return (
-    <section className="w-[calc(100% - 20rem)] mx-24 space-y-8 flex flex-col items-center">
-      <h3 className="text-2xl md:text-6xl">Look inside before you get in...</h3>
+    <section className="w-[calc(100% - 20rem)] mx-24 space-y-14 mt-10 flex flex-col items-center">
+      <h3 className="text-2xl md:text-6xl text-red-500">
+        Look inside before you get in...
+      </h3>
       <Carousel
         plugins={[plugin.current]}
         opts={{
