@@ -47,12 +47,12 @@ export const services = [
     description:
       "We provide security service to our students. We ensure the student get secure environment",
   },
-  {
-    title: "Lift",
-    icon: "/img/lift.png",
-    description:
-      "We provide lift service to our students. We ensure the student get lift facility.",
-  }
+  // {
+  //   title: "Lift",
+  //   icon: "/img/lift.png",
+  //   description:
+  //     "We provide lift service to our students. We ensure the student get lift facility.",
+  // }
 ];
 
 

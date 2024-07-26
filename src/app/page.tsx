@@ -3,6 +3,7 @@ import SearchBar from "@/components/search-bar";
 import Header from "@/components/header";
 import OurServices from "@/components/our-services";
 import { Gallery } from "@/components/gallery";
+import { Testimonials } from "@/components/testimonials";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
         </section>
         <OurServices />
         <Gallery />
+        <Testimonials/>
       </div>
     </>
   );
