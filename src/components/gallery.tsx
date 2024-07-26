@@ -20,29 +20,26 @@ export function Gallery() {
   );
 
   return (
-    <section className="w-full mx-24 md:space-y-4 flex flex-col items-center">
+    <section className="w-full mx-24 space-y-8 flex flex-col items-center">
       <h3 className="text-2xl md:text-6xl">Look inside before you get in...</h3>
       <Carousel
         plugins={[plugin.current]}
         opts={{
           align: "start",
         }}
-        className="w-2/3"
+        className="w-4/5 lg:w-3/4"
       >
         <CarouselContent>
           {gallery.map((src, index) => (
-            <CarouselItem
-              key={index}
-              className="md:basis-1/2 lg:basis-1/3 hover:translate-z-4"
-            >
+            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
               <Card className="border-none">
-                <CardContent className="flex aspect-square items-center justify-center p-6">
+                <CardContent className="flex items-center justify-center w-full h-full">
                   <Image
                     src={src}
                     alt="room"
                     layout="intrinsic"
-                    width={2000}
-                    height={2000}
+                    width={4000}
+                    height={4000}
                   />
                 </CardContent>
               </Card>

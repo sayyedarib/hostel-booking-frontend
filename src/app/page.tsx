@@ -11,11 +11,11 @@ export default function Home() {
       <div className="flex flex-col gap-10 items-center">
         <section className="w-full relative min-h-screen w-100vw flex flex-col gap-10 items-start justify-center bg-green-100">
           <Header />
-          <div className="md:w-[60%] ml-14 space-y-5 relative z-10">
-            <h1 className="text-6xl font-extrabold text-red-500">
+          <div className="md:w-[60%] ml-4 lg:ml-14 space-y-5 relative z-10">
+            <h1 className="text-4xl lg:text-6xl font-extrabold text-red-500">
               Looking for a hostel?
             </h1>
-            <p className="text-neutral-900 text-xl">
+            <p className="text-gray-700 text-xl">
               We have for you the cheapest and best hostel in Aligarh at your
               fingertip.
             </p>

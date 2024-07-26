@@ -25,13 +25,13 @@ export default function ServiceCard({
           </CardItem>
           <CardItem
             translateZ={20}
-            className="px-4 py-2 rounded-xl text-s font-normal dark:text-white flex items-center w-full justify-center"
+            className="px-4 py-2 rounded-xl text-s font-normal flex items-center w-full justify-center"
           >
             {title}
           </CardItem>
           {/* <CardItem
             translate={20}
-            className="px-4 py-2 flex items-center gap-2 text-neutral-500 dark:text-white w-[350px]"
+            className="px-4 py-2 flex items-center gap-2 text-neutral-500 w-[350px]"
           >
             {description}
           </CardItem> */}
