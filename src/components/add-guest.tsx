@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  BedDouble,
-  MinusCircle,
-  PlusCircle,
-  UserRound,
-} from "lucide-react";
+import { BedDouble, MinusCircle, PlusCircle, UserRound } from "lucide-react";
 
 import type { Guest } from "@/interface";
 
@@ -37,7 +32,7 @@ export default function AddGuest({
               variant={"ghost"}
               className={cn(
                 "hidden md:block w-full h-full rounded-[40px] text-lg",
-                !guest && "text-muted-foreground"
+                !guest && "text-muted-foreground",
               )}
             >
               {guest?.persons ? (
@@ -59,7 +54,7 @@ export default function AddGuest({
               variant={"ghost"}
               className={cn(
                 "md:hidden w-full h-full rounded-[40px] text-lg gap-3 lg:gap-6",
-                !guest && "text-muted-foreground"
+                !guest && "text-muted-foreground",
               )}
             >
               {guest?.persons ? (

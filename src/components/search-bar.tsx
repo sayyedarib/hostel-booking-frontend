@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { Search } from "lucide-react";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export default function SearchBar({
       <div
         className={cn(
           className,
-          "w-full lg:w-1/2 bg-white rounded-[40px] h-16 flex items-center justify-evenly md:justify-normal shadow-xl border-gray-100 border-[1px]"
+          "w-full lg:w-1/2 bg-white rounded-[40px] h-16 flex items-center justify-evenly md:justify-normal shadow-xl border-gray-100 border-[1px]",
         )}
       >
         <DatePickerWithRange className="h-full rounded-[40px] w-[55%] md:w-1/3" />

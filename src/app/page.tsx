@@ -31,7 +31,7 @@ export default function Home() {
         </section>
         <OurServices />
         <Gallery />
-        <Testimonials/>
+        <Testimonials />
       </div>
     </>
   );

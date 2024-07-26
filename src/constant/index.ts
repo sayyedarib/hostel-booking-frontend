@@ -55,7 +55,6 @@ export const services = [
   // }
 ];
 
-
 export const gallery = [
   "/img/rooms/room0.jpg",
   "/img/rooms/room1.jpeg",
@@ -63,4 +62,4 @@ export const gallery = [
   "/img/rooms/room3.jpeg",
   "/img/rooms/room4.jpeg",
   "/img/rooms/room5.jpeg",
-]
+];
