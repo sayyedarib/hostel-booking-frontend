@@ -30,7 +30,7 @@ export default function AddGuest({
             variant={"ghost"}
             className={cn(
               "flex w-full h-full rounded-[40px] text-lg px-4",
-              !guest && "text-muted-foreground",
+              !guest && "text-muted-foreground"
             )}
           >
             {guest?.persons ? (
@@ -103,13 +103,13 @@ export default function AddGuest({
                 onClick={() =>
                   setGuest((prev) => ({
                     persons: prev?.persons ?? 1,
-                    rooms: Math.max(prev?.rooms ?? 1 - 1, 1),
+                    rooms: Math.max(1, (prev?.rooms ?? 1) - 1),
                   }))
                 }
               >
                 <MinusCircle />
               </Button>
-              <span>{guest?.persons || 1}</span>
+              <span>{guest?.rooms || 1}</span>
               <Button
                 variant="ghost"
                 onClick={() =>
