@@ -60,7 +60,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 50 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
-        className="w-full flex flex-wrap items-center justify-between px-14 py-4 gap-4 bg-black"
+        className="w-full flex flex-wrap items-center justify-between px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 bg-neutral-100 backdrop-blur-3xl shadow-md"
       >
         <Footer />
       </motion.footer>

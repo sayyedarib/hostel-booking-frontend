@@ -16,10 +16,10 @@ export default function Header({
       >
         <Link href="/" className="text-red-500 text-3xl">AligarhHostel</Link >
 
-        <Avatar>
+        {/* <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
           <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
+        </Avatar> */}
       </div>
     </>
   );
