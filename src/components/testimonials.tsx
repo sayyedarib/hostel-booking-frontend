@@ -27,13 +27,26 @@ const testimonials = [
   },
   {
     quote:
-      "To be, or not to be, that is the question: Whether 'tis nobler in the mind to suffer The slings and arrows of outrageous fortune, Or to take Arms against a Sea of troubles, And by opposing end them: to die, to sleep.",
-    name: "William Shakespeare",
-    title: "Hamlet",
+      "The room was clean and well-maintained. The staff was friendly and always ready to help. Great value for money!",
+    name: "Ravi Kumar",
+    title: "",
   },
   {
-    quote: "All that we see or seem is but a dream within a dream.",
-    name: "Edgar Allan Poe",
-    title: "A Dream Within a Dream",
+    quote:
+      "I had a comfortable stay at the hostel. The amenities were good, and the location was convenient for my needs.",
+    name: "Priya Sharma",
+    title: "",
+  },
+  {
+    quote:
+      "The hostel room was spacious and had all the necessary facilities. The common areas were also well-kept and inviting.",
+    name: "Anjali Verma",
+    title: "",
+  },
+  {
+    quote:
+      "A decent place to stay for a short trip. The room was tidy, and the Wi-Fi connection was strong. Would stay here again.",
+    name: "Vikram Singh",
+    title: "",
   },
 ];
