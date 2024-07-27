@@ -391,9 +391,9 @@ export default function PayingGuestAgreement() {
             />
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-4">
           <h2 className="text-lg font-semibold">Agreement Clauses</h2>
-          <div className="space-y-1">
+          <div className="space-y-3">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="clause5"

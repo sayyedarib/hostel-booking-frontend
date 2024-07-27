@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Lobster } from "next/font/google";
+import { Playfair_Display } from "next/font/google";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
 
-const inter = Lobster({ subsets: ["latin"], weight: "400" });
+const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
 
 export const metadata: Metadata = {
   title: "Hostel in Aligarh",
