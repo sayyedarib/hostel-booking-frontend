@@ -2,10 +2,8 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-
 import Header from "@/components/header";
-import SearchBar from "@/components/search-bar";
+import SearchBar from "@/components/search-bar"; // Updated import
 import HeroSection from "@/components/hero-section";
 import OurServices from "@/components/our-services";
 import Gallery from "@/components/gallery";
@@ -25,10 +23,9 @@ export default function Home() {
       transition={{ duration: 0.5 }}
       className="flex flex-col gap-10 items-center"
     >
-      <section className="w-full relative min-h-screen flex flex-col gap-10 items-start justify-center">
-        <Header className="fixed top-0 z-9999" />
+      <section className="w-full relative max-h-screen flex flex-col gap-10 items-start justify-center">
         <HeroSection />
-        <SearchBar className="absolute lg:left-[25%] bottom-36 z-10" />
+        <SearchBar className="hidden md:flex" />
       </section>
 
       <motion.div
@@ -45,6 +42,7 @@ export default function Home() {
         initial={{ opacity: 0, y: 50 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
+        className="max-w-full flex flex-col items-center gap-8"
       >
         <Gallery />
       </motion.div>
@@ -66,6 +64,8 @@ export default function Home() {
       >
         <Footer />
       </motion.footer>
+
+      <SearchBar className="md:hidden relative shadow-2xl border-t border-neutral-100" />
     </motion.div>
   );
 }

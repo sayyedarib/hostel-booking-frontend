@@ -14,29 +14,23 @@ export default function SearchBar({
 }: React.HTMLAttributes<HTMLDivElement>) {
   const router = useRouter();
   return (
-    <>
-      <div
-        className={cn(
-          className,
-          "w-full lg:w-1/2 relative bg-white rounded-[40px] h-16 flex items-center shadow-xl border-gray-100 border-[1px]",
-        )}
+    <div
+      className={cn(
+        className,
+        "fixed md:absolute bottom-0 md:bottom-36 left-0 md:left-[15%] lg:left-[30%] right-0 lg:right-[30%] md:right-[15%] bg-white md:rounded-[40px] h-16 flex md:gap-4 items-center shadow-2xl border-gray-100 z-50",
+      )}
+    >
+      <DatePickerWithRange className="h-full rounded-[40px] w-[55%] md:w-1/3" />
+      <AddGuest className="md:w-1/3 h-full" />
+      <Button
+        onClick={() => router.push("/coming-soon")}
+        className="bg-red-500 text-white hidden lg:block md:w-1/3 flex-grow h-full rounded-[40px]"
       >
-        <DatePickerWithRange className="h-full rounded-[40px] w-[55%] md:w-1/3" />
-        <AddGuest className="md:w-1/3 h-full" />
-
-        {/* for large screen only */}
-        <Button
-          onClick={() => router.push("/coming-soon")}
-          className=" bg-red-500 text-white hidden lg:block md:w-1/3 h-full rounded-[40px]"
-        >
-          Search
-        </Button>
-
-        {/* for small and medium screen */}
-        <Link href="/coming-soon">
-          <Search className="md:hidden absolute right-5 bottom-5" />
-        </Link>
-      </div>
-    </>
+        Search
+      </Button>
+      <Link href="/coming-soon" className="lg:hidden">
+        <Search className="absolute right-2 md:right-10 bottom-5" />
+      </Link>
+    </div>
   );
 }

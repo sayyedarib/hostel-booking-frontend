@@ -20,7 +20,7 @@ export default function Gallery() {
   );
 
   return (
-    <section className="w-[calc(100% - 20rem)] mx-24 space-y-14 mt-10 flex flex-col items-center">
+    <>
       <h3 className="text-2xl md:text-6xl text-red-500">
         Look inside before you get in...
       </h3>
@@ -29,7 +29,7 @@ export default function Gallery() {
         opts={{
           align: "start",
         }}
-        className="w-4/5 lg:w-3/4"
+        className="w-full"
       >
         <CarouselContent>
           {gallery.map((src, index) => (
@@ -48,9 +48,9 @@ export default function Gallery() {
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious />
-        <CarouselNext />
+        <CarouselPrevious className="left-4" />
+        <CarouselNext className="right-4" />
       </Carousel>
-    </section>
+    </>
   );
 }
