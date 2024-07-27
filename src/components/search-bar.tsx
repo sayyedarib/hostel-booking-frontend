@@ -23,12 +23,12 @@ export default function SearchBar({
       <DatePickerWithRange className="h-full rounded-[40px] w-[55%] md:w-1/3" />
       <AddGuest className="md:w-1/3 h-full" />
       <Button
-        onClick={() => router.push("/coming-soon")}
+        onClick={() => router.push("/form")}
         className="bg-red-500 text-white hidden lg:block md:w-1/3 flex-grow h-full rounded-[40px]"
       >
-        Search
+        Book Now
       </Button>
-      <Link href="/coming-soon" className="lg:hidden">
+      <Link href="/form" className="lg:hidden">
         <Search className="absolute right-2 md:right-10 bottom-5" />
       </Link>
     </div>
