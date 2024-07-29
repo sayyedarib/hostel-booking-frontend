@@ -10,7 +10,7 @@ export default function Footer() {
           <p>+91 8791476473</p>
         </div>
         <div className="text-lg flex items-center gap-1 ">
-          <Home size="24"/>
+          <Home size="24" />
           <p>
             Campus View Appartment, beside Kings Academy, Saheh bagh, Aligarh,
             UP

@@ -30,7 +30,7 @@ export default function AddGuest({
             variant={"ghost"}
             className={cn(
               "flex w-full h-full rounded-[40px] text-lg px-4",
-              !guest && "text-muted-foreground"
+              !guest && "text-muted-foreground",
             )}
           >
             {guest?.persons ? (
