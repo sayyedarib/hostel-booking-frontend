@@ -10,9 +10,9 @@ import { HoverBorderGradient } from "./hover-border-gradient";
 
 export default function HeroSection() {
   const images = [
-    "/img/rooms/room6.jpg",
-    "/img/rooms/room7.jpg",
-    "/img/rooms/room5.jpeg",
+    "/img/rooms/room6.webp",
+    "/img/rooms/room7.webp",
+    "/img/rooms/room5.webp",
   ];
   return (
     <ImagesSlider className="min-h-screen" images={images}>
