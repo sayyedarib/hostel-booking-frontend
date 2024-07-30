@@ -98,6 +98,7 @@ export default function AddGuest({
           className="w-[400px] px-5 py-3 h-44 flex flex-col justify-center"
           align="center"
         >
+          {/* male counts */}
           <div className="flex justify-between border-b">
             <span>
               <h3>Male</h3>

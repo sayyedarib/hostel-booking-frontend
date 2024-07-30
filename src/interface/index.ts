@@ -4,8 +4,8 @@ export interface CurrentBooking {
   male: number;
   female: number;
   room: number;
-  checkInDate: Date;
-  checkOutDate: Date;
+  checkIn: Date;
+  checkOut: Date;
 }
 
 export interface CurrentBookingContextType {

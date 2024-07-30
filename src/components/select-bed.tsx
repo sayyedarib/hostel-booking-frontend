@@ -25,7 +25,7 @@ export function SelectBed() {
           <DrawerHeader>
             <DrawerTitle>Select your bed</DrawerTitle>
           </DrawerHeader>
-          <RoomMaps type={"4-bed"} />
+          <RoomMaps type={"2-bed"} />
           <DrawerFooter>
             <DrawerClose asChild>
               <Button>Proceed to Checkout</Button>

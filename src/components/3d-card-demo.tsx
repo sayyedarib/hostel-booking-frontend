@@ -11,14 +11,18 @@ import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import { RoomCard } from "@/interface";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
-  const checkIn = useSearchParams().get("checkIn");
-  const checkOut = useSearchParams().get("checkOut");
+  const searchParams = useSearchParams();
+  const checkIn = searchParams.get("checkIn");
+  const checkOut = searchParams.get("checkOut");
   const duration = differenceInDays(checkOut!, checkIn!);
+
+  const searchParamsString = searchParams.toString();
+  const roomUrl = `/rooms/${roomData.id}?${searchParamsString}`;
 
   return (
     <CardContainer
       as={Link}
-      href={`/rooms/${roomData.id}`}
+      href={roomUrl}
       className="inter-var"
     >
       <CardBody className="bg-gray-50 relative group/card  shadow-lg hover:shadow:2xl w-auto sm:w-[30rem] h-auto rounded-xl border">
@@ -59,7 +63,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
         >
           <IndianRupee size={16} />{" "}
           {Math.max(roomData.totalBedPrice, roomData.bedInfo[0].dailyPrice)} for{" "}
-          {duration ? duration : 1} night{duration > 1 ? "s" : ""}
+          {duration ? duration : duration} night{duration > 1 ? "s" : ""}
         </CardItem>
       </CardBody>
     </CardContainer>

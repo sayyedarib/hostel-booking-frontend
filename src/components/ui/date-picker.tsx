@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useContext, useState } from "react";
 import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
@@ -13,11 +13,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 
 export default function DatePickerWithRange({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [date, setDate] = React.useState<DateRange | undefined>({
+  const { currentBooking, setCurrentBooking } = useContext(
+    CurrentBookingContext
+  );
+
+  const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 30),
   });
@@ -31,7 +36,7 @@ export default function DatePickerWithRange({
             variant={"ghost"}
             className={cn(
               "w-full h-full rounded-[40px] text-lg text-start",
-              !date && "text-muted-foreground",
+              !date && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 hidden md:block" />
@@ -67,7 +72,14 @@ export default function DatePickerWithRange({
             mode="range"
             defaultMonth={date?.from}
             selected={date}
-            onSelect={setDate}
+            onSelect={(date) => {
+              setDate(date);
+              setCurrentBooking((prev) => ({
+                ...prev,
+                checkIn: date?.from || prev.checkIn,
+                checkOut: date?.to || prev.checkOut,
+              }));
+            }}
             numberOfMonths={2}
           />
         </PopoverContent>

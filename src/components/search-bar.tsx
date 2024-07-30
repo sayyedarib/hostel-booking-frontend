@@ -18,8 +18,8 @@ export default function SearchBar({
 
   const handleSearch = () => {
     const queryParams = new URLSearchParams({
-      checkIn: currentBooking.checkInDate.toISOString(),
-      checkOut: currentBooking.checkOutDate.toISOString(),
+      checkIn: currentBooking.checkIn.toISOString(),
+      checkOut: currentBooking.checkOut.toISOString(),
       male: currentBooking.male.toString(),
       female: currentBooking.female.toString(),
       rooms: currentBooking.room.toString(),

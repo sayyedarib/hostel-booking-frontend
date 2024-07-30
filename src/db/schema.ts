@@ -10,6 +10,7 @@ import {
   date,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
+import { stat } from "fs";
 
 export const buildingTable = pgTable("building", {
   id: serial("id").primaryKey(),
@@ -58,6 +59,7 @@ export const bedTable = pgTable("bed", {
     .notNull()
     .references(() => roomTable.id),
   bedType: text("bed_type").notNull(),
+  status: text("status").notNull().default("available"), //available, occupied, under_maintenance
   dailyPrice: numeric("daily_price").notNull(),
   monthlyPrice: numeric("monthly_price").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
