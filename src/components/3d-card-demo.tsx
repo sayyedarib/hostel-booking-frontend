@@ -24,7 +24,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
       <CardBody className="bg-gray-50 relative group/card  shadow-lg hover:shadow:2xl w-auto sm:w-[30rem] h-auto rounded-xl border">
         <CardItem translateZ="100" className="w-full">
           <Image
-            src="/bg.jpg"
+            src="/bg.webp"
             height="1000"
             width="1000"
             className="h-64 w-full object-cover rounded-xl group-hover/card:shadow-xl"
