@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import { Button } from "@/components/ui/button";
 
 export default function RoomMaps({
@@ -47,23 +46,26 @@ export default function RoomMaps({
 
   return (
     <div className="max-w-md mx-auto p-4 border">
-      <div className="flex justify-center space-x-8 mb-8">
+      <div className="flex justify-center space-x-0 mb-8">
         {beds.map((column, columnIndex) => (
-          <div key={columnIndex} className="flex flex-col space-y-2">
-            {column.map((bed, bedIndex) => (
-              <Button
-                key={bed}
-                className={`w-20 h-16 rounded-lg ${getBedStyle(getBedStatus(bed))}`}
-                onClick={() => handleBedClick(bed)}
-                disabled={getBedStatus(bed) === "occupied"}
-              >
-                <div className="text-sm">
-                  {bedIndex === 0 ? "Upper" : "Lower"}
-                </div>
-                <div className="font-bold">{bed}</div>
-              </Button>
-            ))}
-          </div>
+          <React.Fragment key={columnIndex}>
+<div className={`flex flex-col space-y-2 bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? 'scale-x-[-1]' : ''}`}>
+              {column.map((bed, bedIndex) => (
+                <Button
+                  key={bed}
+                  className={`w-32 h-16 rounded-lg bg-contain opacity-35 ${getBedStyle(getBedStatus(bed))}`}
+                  // className={`w-32 h-16 rounded-lg bg-[url('/img/bedbg.webp')] bg-contain ${getBedStyle(getBedStatus(bed))}`}
+                  onClick={() => handleBedClick(bed)}
+                  disabled={getBedStatus(bed) === "occupied"}
+                >
+                  {/* <div className="text-sm">
+                    {bedIndex === 0 ? "Upper" : "Lower"}
+                  </div> */}
+                  {/* <div className="font-bold">{bed}</div> */}
+                </Button>
+              ))}
+            </div>
+          </React.Fragment>
         ))}
       </div>
       <div className="flex justify-center space-x-4">
