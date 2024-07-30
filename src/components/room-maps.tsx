@@ -29,18 +29,18 @@ export default function RoomMaps({
 
   const getBedStatus = (bed: string) => {
     if (selectedBeds.includes(bed)) return "selected";
-    if (["A2", "B1"].includes(bed)) return "occupied";
+    if (["B2"].includes(bed)) return "occupied";
     return "available";
   };
 
   const getBedStyle = (status: string) => {
     switch (status) {
       case "selected":
-        return "bg-green-500 text-white";
+        return "bg-green-500/40 hover:bg-green-500/40 text-white";
       case "occupied":
-        return "bg-red-500 text-white cursor-not-allowed";
+        return "bg-red-500/40 hover:bg-red-500/40 text-white cursor-not-allowed";
       default:
-        return "hover:border-green-500 border-2";
+        return "hover:border-green-500 hover:bg-green-500/20";
     }
   };
 
@@ -49,20 +49,16 @@ export default function RoomMaps({
       <div className="flex justify-center space-x-0 mb-8">
         {beds.map((column, columnIndex) => (
           <React.Fragment key={columnIndex}>
-<div className={`flex flex-col space-y-2 bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? 'scale-x-[-1]' : ''}`}>
+            <div
+              className={`flex flex-col bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}
+            >
               {column.map((bed, bedIndex) => (
                 <Button
                   key={bed}
-                  className={`w-32 h-16 rounded-lg bg-contain opacity-35 ${getBedStyle(getBedStatus(bed))}`}
-                  // className={`w-32 h-16 rounded-lg bg-[url('/img/bedbg.webp')] bg-contain ${getBedStyle(getBedStatus(bed))}`}
+                  className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
                   onClick={() => handleBedClick(bed)}
                   disabled={getBedStatus(bed) === "occupied"}
-                >
-                  {/* <div className="text-sm">
-                    {bedIndex === 0 ? "Upper" : "Lower"}
-                  </div> */}
-                  {/* <div className="font-bold">{bed}</div> */}
-                </Button>
+                ></Button>
               ))}
             </div>
           </React.Fragment>
