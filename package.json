@@ -33,6 +33,7 @@
     "lucide-react": "^0.414.0",
     "next": "14.2.5",
     "next-themes": "^0.3.0",
+    "pnpm": "^9.6.0",
     "postgres": "^3.4.4",
     "prettier": "^3.3.3",
     "react": "^18",

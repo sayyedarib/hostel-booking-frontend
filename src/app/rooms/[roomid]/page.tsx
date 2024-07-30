@@ -25,22 +25,22 @@ export default function Room({ params }: { params: { roomid: string } }) {
             <Image
               height={2000}
               width={2000}
-              src="/bg.jpg"
+              src="/bg.webp"
               className="md:col-span-2 md:row-span-2"
               alt=""
             />
-            <Image height={2000} width={2000} src="/bg.jpg" alt="" />
-            <Image height={2000} width={2000} src="/bg.jpg" alt="" />
-            <Image height={2000} width={2000} src="/bg.jpg" alt="" />
-            <Image height={2000} width={2000} src="/bg.jpg" alt="" />
+            <Image height={2000} width={2000} src="/bg.webp" alt="" />
+            <Image height={2000} width={2000} src="/bg.webp" alt="" />
+            <Image height={2000} width={2000} src="/bg.webp" alt="" />
+            <Image height={2000} width={2000} src="/bg.webp" alt="" />
           </div>
           <div className="flex justify-between">
             <span className="text-4xl">Room 66</span>
             <Share />
           </div>
 
-          <div className="flex w-full gap-2">
-            <div className="w-2/3 flex">
+          <div className="flex w-full flex-col lg:flex-row gap-2">
+            <div className="lg:w-[66%] w-full flex">
               <div className="w-1/3">
                 <h2 className="text-2xl mb-3 text-neutral-900">
                   Free Services
@@ -102,7 +102,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 </ul>
               </div>
             </div>
-            <BedReservationCard className="w-1/3" />
+            <BedReservationCard className="lg:w-[33%] w-full" />
           </div>
         </div>
       </div>

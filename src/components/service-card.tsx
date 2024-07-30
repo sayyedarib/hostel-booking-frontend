@@ -12,7 +12,7 @@ export default function ServiceCard({
 }) {
   return (
     <>
-      <CardContainer className="w-[300px] -my-16 lg:-my-14">
+      <CardContainer className="w-[300px] max-w-full -my-16 lg:-my-14">
         <CardBody className="relative group/card  dark:hover:shadow-2xl min-w-full w-auto sm:w-[30rem] h-auto rounded-xl border">
           <CardItem translateZ="100" translateY="-25" className="mx-auto">
             <Image
