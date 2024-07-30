@@ -1,22 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import React from "react";
-import {
-  IndianRupee,
-  Star,
-  BedSingle,
-  ShowerHead,
-  Fan,
-  Wifi,
-} from "lucide-react";
-import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
 import Link from "next/link";
+import React from "react";
+import { useSearchParams } from "next/navigation";
+import { IndianRupee, Star } from "lucide-react";
+import { differenceInDays } from "date-fns";
 
-export function ThreeDCardDemo() {
+import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card";
+import { RoomCard } from "@/interface";
+
+export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
+  const checkIn = useSearchParams().get("checkIn");
+  const checkOut = useSearchParams().get("checkOut");
+  const duration = differenceInDays(checkOut!, checkIn!);
+
   return (
-    <CardContainer className="inter-var">
-      <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-black dark:border-white/[0.2] border-black/[0.1] w-auto sm:w-[30rem] h-auto rounded-xl border">
+    <CardContainer
+      as={Link}
+      href={`/rooms/${roomData.id}`}
+      className="inter-var"
+    >
+      <CardBody className="bg-gray-50 relative group/card  shadow-lg hover:shadow:2xl w-auto sm:w-[30rem] h-auto rounded-xl border">
         <CardItem translateZ="100" className="w-full">
           <Image
             src="/bg.jpg"
@@ -26,20 +31,17 @@ export function ThreeDCardDemo() {
             alt="thumbnail"
           />
         </CardItem>
-        <div className="flex justify-between items-center py-1 px-2">
+        <div className="flex justify-between items-center">
           <CardItem
             translateZ={0}
-            as={Link}
-            href="https://twitter.com/mannupaaji"
-            target="__blank"
-            className="px-4 py-2 rounded-xl text-s font-normal dark:text-white flex items-center"
+            className="px-4 mt-4 rounded-xl text-s font-normal flex items-center"
           >
-            Room C4-66
+            {roomData.buildingName}
           </CardItem>
           <CardItem
             translateZ={0}
             as="button"
-            className="px-4 py-2 flex items-center gap-2"
+            className="px-4 flex items-center gap-2"
           >
             <Star fill="" size={14} /> 4.2
           </CardItem>
@@ -47,23 +49,17 @@ export function ThreeDCardDemo() {
         <CardItem
           translateZ={0}
           as="button"
-          className="px-4 py-2 flex items-center gap-2 text-neutral-500 dark:text-white"
+          className="px-4 flex items-center gap-2 text-neutral-500"
         >
-          <span className="flex">
-            <BedSingle />4 beds
-          </span>
-          <ShowerHead />
-          <Fan />
-          <Wifi />
+          Room: {roomData.roomNumber}
         </CardItem>
         <CardItem
           translateZ={0}
-          as={Link}
-          href="https://twitter.com/mannupaaji"
-          target="__blank"
-          className="px-4 py-2 rounded-xl text-s font-normal dark:text-white flex items-center"
+          className="px-4 rounded-xl text-s font-normal flex items-center mb-2"
         >
-          <IndianRupee size={16} /> 399/bed/night
+          <IndianRupee size={16} />{" "}
+          {Math.max(roomData.totalBedPrice, roomData.bedInfo[0].dailyPrice)} for{" "}
+          {duration ? duration : 1} night{duration > 1 ? "s" : ""}
         </CardItem>
       </CardBody>
     </CardContainer>

@@ -24,10 +24,15 @@ export default function AddGuest({
   const [isRoomModified, setIsRoomModified] = useState<number | boolean>(false);
 
   const handleIncrement = (key: keyof CurrentBooking) => {
-    setCurrentBooking((prev: CurrentBooking) => ({
-      ...prev,
-      [key]: (prev[key] ?? 0) + 1,
-    }));
+    setCurrentBooking((prev: CurrentBooking) => {
+      if (typeof prev[key] === "number") {
+        return {
+          ...prev,
+          [key]: (prev[key] as number) + 1,
+        };
+      }
+      return prev;
+    });
     if (key === "room") {
       setIsRoomModified(true);
     }
@@ -35,17 +40,23 @@ export default function AddGuest({
 
   const handleDecrement = (key: keyof CurrentBooking) => {
     setCurrentBooking((prev: CurrentBooking) => {
-      const updatedGuest = {
-        ...prev,
-        [key]: Math.max(0, prev[key] - 1),
-      };
-
-      if (key === "room") {
-        setIsRoomModified(updatedGuest.room);
+      if (typeof prev[key] === "number") {
+        return {
+          ...prev,
+          [key]: Math.max(0, (prev[key] as number) - 1),
+        };
       }
-
-      return updatedGuest;
+      return prev;
     });
+
+    if (key === "room") {
+      setCurrentBooking((prev: CurrentBooking) => {
+        if (typeof prev.room === "number") {
+          setIsRoomModified(prev.room > 0);
+        }
+        return prev;
+      });
+    }
   };
 
   return (

@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   pgTable,
   serial,
@@ -7,6 +8,7 @@ import {
   numeric,
   boolean,
   date,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const buildingTable = pgTable("building", {
@@ -21,7 +23,7 @@ export const buildingTable = pgTable("building", {
 
 export const roomTypeTable = pgTable("room_type", {
   id: serial("id").primaryKey(),
-  name: text("name").notNull(), // '2 seater', '3 seater', '4 seater', etc.
+  name: text("name").notNull(),
   capacity: integer("capacity").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -40,11 +42,14 @@ export const roomTable = pgTable("room", {
   roomNumber: text("room_number").notNull(),
   dailyPrice: numeric("daily_price").notNull(),
   monthlyPrice: numeric("monthly_price").notNull(),
-  genderRestriction: text("gender_restriction"), // 'male', 'female', or null for no restriction
+  genderRestriction: text("gender_restriction"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
+  imageUrls: text("image_urls")
+    .notNull()
+    .default(sql`'{}'::text[]`),
 });
 
 export const bedTable = pgTable("bed", {
@@ -52,7 +57,7 @@ export const bedTable = pgTable("bed", {
   roomId: integer("room_id")
     .notNull()
     .references(() => roomTable.id),
-  bedType: text("bed_type").notNull(), // 'lower_A', 'lower_B', 'upper_A', 'upper_B'
+  bedType: text("bed_type").notNull(),
   dailyPrice: numeric("daily_price").notNull(),
   monthlyPrice: numeric("monthly_price").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -61,32 +66,27 @@ export const bedTable = pgTable("bed", {
     .$onUpdate(() => new Date()),
 });
 
-export const bedOccupancyTable = pgTable("bed_occupancy", {
-  id: serial("id").primaryKey(),
-  bedId: integer("bed_id")
-    .notNull()
-    .references(() => bedTable.id)
-    .unique(),
-  isOccupied: boolean("is_occupied").notNull().default(false),
-  currentBookingId: integer("current_booking_id").references(
-    () => bookingTable.id,
-  ),
-  lastUpdated: timestamp("last_updated").notNull().defaultNow(),
-});
-
-export const guestTable = pgTable("guest", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  userName: text("user_name").notNull().unique(),
-  email: text("email").notNull(),
-  phone: text("phone").notNull().default(""),
-  dob: date("dob"),
-  gender: text("gender").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
+export const guestTable = pgTable(
+  "guest",
+  {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull(),
+    userName: text("user_name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone").notNull().default(""),
+    dob: date("dob"),
+    gender: text("gender").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at")
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (table) => {
+    return {
+      userNameUnique: uniqueIndex("user_name_unique").on(table.userName),
+    };
+  },
+);
 
 export const bookingTable = pgTable("booking", {
   id: serial("id").primaryKey(),
@@ -97,12 +97,12 @@ export const bookingTable = pgTable("booking", {
     .notNull()
     .references(() => roomTable.id),
   bedId: integer("bed_id").references(() => bedTable.id),
-  bookingType: text("booking_type").notNull(), // 'bed', 'room'
+  bookingType: text("booking_type").notNull(),
   checkInDate: date("check_in_date").notNull(),
   checkOutDate: date("check_out_date").notNull(),
-  bookingInterval: text("booking_interval").notNull(), // 'check_in - check_out'
-  status: text("status").notNull().default("active"), // 'active', 'cancelled', 'completed'
-  pricingType: text("pricing_type").notNull(), // 'daily', 'monthly'
+  bookingInterval: text("booking_interval").notNull(),
+  status: text("status").notNull().default("active"),
+  pricingType: text("pricing_type").notNull(),
   totalAmount: numeric("total_amount").notNull(),
   securityDeposit: numeric("security_deposit").notNull(),
   isActive: boolean("is_active").notNull().default(true),
@@ -112,6 +112,26 @@ export const bookingTable = pgTable("booking", {
     .$onUpdate(() => new Date()),
 });
 
+export const bedOccupancyTable = pgTable(
+  "bed_occupancy",
+  {
+    id: serial("id").primaryKey(),
+    bedId: integer("bed_id")
+      .notNull()
+      .references(() => bedTable.id),
+    isOccupied: boolean("is_occupied").notNull().default(false),
+    currentBookingId: integer("current_booking_id").references(
+      () => bookingTable.id,
+    ),
+    lastUpdated: timestamp("last_updated").notNull().defaultNow(),
+  },
+  (table) => {
+    return {
+      bedIdUnique: uniqueIndex("bed_id_unique").on(table.bedId),
+    };
+  },
+);
+
 export const paymentTable = pgTable("payment", {
   id: serial("id").primaryKey(),
   bookingId: integer("booking_id")
@@ -119,7 +139,7 @@ export const paymentTable = pgTable("payment", {
     .references(() => bookingTable.id),
   amount: numeric("amount").notNull(),
   paymentDate: date("payment_date").notNull(),
-  paymentType: text("payment_type").notNull(), // 'security_deposit', 'rent', 'extra'
+  paymentType: text("payment_type").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()

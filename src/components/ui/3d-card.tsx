@@ -18,10 +18,16 @@ export const CardContainer = ({
   children,
   className,
   containerClassName,
+  as: Component = "div",
+  href,
+  ...rest
 }: {
   children?: React.ReactNode;
   className?: string;
   containerClassName?: string;
+  as?: React.ElementType;
+  href?: string;
+  [key: string]: any;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMouseEntered, setIsMouseEntered] = useState(false);
@@ -56,7 +62,7 @@ export const CardContainer = ({
           perspective: "1000px",
         }}
       >
-        <div
+        <Component
           ref={containerRef}
           onMouseEnter={handleMouseEnter}
           onMouseMove={handleMouseMove}
@@ -68,9 +74,11 @@ export const CardContainer = ({
           style={{
             transformStyle: "preserve-3d",
           }}
+          href={href}
+          {...rest}
         >
           {children}
-        </div>
+        </Component>
       </div>
     </MouseEnterContext.Provider>
   );
