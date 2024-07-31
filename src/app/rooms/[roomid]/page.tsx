@@ -7,8 +7,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -75,8 +74,8 @@ export default function Room({ params }: { params: { roomid: string } }) {
   return (
     <>
       <div className="w-2/3 flex justify-center mx-auto">
-        <div className="mt-32 border-neutral-600 p-2 space-y-4">
-          <div className="w-full min-h-[450px]">
+        <div className="mt-32 border-neutral-600 py-2 space-y-4">
+          <div className="w-full min-h-[400px] px-2">
             {roomData?.imageUrls.length === 1 && (
               <Image
                 height={0}
@@ -87,21 +86,21 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 alt="room-image"
               />
             )}
-            <div
-              className={`grid-cols-2 ${roomData?.imageUrls.length! <= 1 ? "hidden" : "md:grid hidden"}`}
-            >
-              {roomData?.imageUrls.map((imgURL) => (
-                <Image
-                  height={0}
-                  width={0}
-                  key={imgURL}
-                  sizes="100vw"
-                  src={imgURL}
-                  className="w-full h-auto"
-                  alt="room-image"
-                />
-              ))}
-            </div>
+            {roomData?.imageUrls.length! > 1 && (
+              <div className="md:grid-cols-4 md:grid-rows-2 gap-2 rounded-xl md:grid hidden">
+                {roomData?.imageUrls.map((imgURL, index) => (
+                  <Image
+                    height={0}
+                    width={0}
+                    key={imgURL}
+                    sizes="100vw"
+                    src={imgURL}
+                    className={`w-full h-auto ${index === 0 ? "md:col-span-2 md:row-span-2" : ""}`}
+                    alt="room-image"
+                  />
+                ))}
+              </div>
+            )}
             {roomData?.imageUrls.length! > 1 && (
               <Carousel className="md:hidden">
                 <CarouselContent>
@@ -124,12 +123,12 @@ export default function Room({ params }: { params: { roomid: string } }) {
             )}
           </div>
 
-          <div className="flex justify-between">
+          <div className="flex justify-between px-2">
             <div className="flex flex-col">
               {!roomData?.buildingName && !roomData?.roomNumber ? (
                 <div className="flex flex-col gap-2">
-                  <Skeleton height={30} width={100} />
-                  <Skeleton height={20} width={50} />
+                  <Skeleton className="w-[100px] h-[30px]" />
+                  <Skeleton className="w-[50px] h-[20px]" />
                 </div>
               ) : (
                 <>
@@ -190,7 +189,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
             </Dialog>
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_300px] gap-8">
+          <div className="grid lg:grid-cols-[1fr_300px] gap-8 px-2">
             <div className="w-full grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6">
               <div className="flex flex-col gap-2">
                 <h2 className="text-2xl mb-3 text-neutral-900">
@@ -252,7 +251,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 </ul>
               </div>
             </div>
-            <BedReservationCard />
+            <BedReservationCard className="md:static md:w-full w-screen fixed bottom-0 left-0 right-0" />
           </div>
         </div>
       </div>
