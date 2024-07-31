@@ -54,7 +54,6 @@ export default function AddGuest({
           className="w-[400px] px-5 py-3 flex flex-col justify-center"
           align="center"
         >
-          {/* male counts */}
           <div className="flex justify-between items-center">
             <span>
               <h3>Bed</h3>
@@ -72,7 +71,7 @@ export default function AddGuest({
               <span>
                 <Button
                   variant="ghost"
-                  onClick={() => handleBed(currBedCount - 1)}
+                  onClick={() => handleBed(Math.max(currBedCount - 1, 1))}
                 >
                   <MinusCircle />
                 </Button>

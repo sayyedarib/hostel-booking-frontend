@@ -1,29 +1,10 @@
 "use client";
-import { usePathname } from "next/navigation";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
+import { usePathname, useSearchParams } from "next/navigation";
+import { useContext, useEffect, useState } from "react";
+import Image from "next/image";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Copy } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import Image from "next/image";
 import {
   Share,
   Zap,
@@ -37,25 +18,59 @@ import {
   Soup,
   GraduationCap,
 } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
 
 import type { Room as RoomDataType } from "@/interface";
 
+import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import BedReservationCard from "@/components/bed-reservation-card";
 import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 import { getRoomById } from "@/db/queries";
 
+import { calculateBedPrice, calculateRoomPrice } from "@/lib/utils";
+
 export default function Room({ params }: { params: { roomid: string } }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const checkIn = new Date(searchParams.get("checkIn")!);
+  const checkOut = new Date(searchParams.get("checkOut")!);
   const { setCurrentBooking } = useContext(CurrentBookingContext);
+
   const [roomData, setRoomData] = useState<RoomDataType | null>(null);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
+  const [bedPrice, setBedPrice] = useState(0);
+  const [roomPrice, setRoomPrice] = useState(0);
+
   useEffect(() => {
     const fetchCurrentRoom = async () => {
-      const roomData = await getRoomById(Number(params.roomid));
+      let roomData = await getRoomById(Number(params.roomid));
       setRoomData(roomData);
-      setCurrentBooking((prev) => ({ ...prev, roomData }));
+      setRoomPrice(calculateRoomPrice(roomData, new Date(), new Date()));
+      setBedPrice(calculateBedPrice(roomData, new Date(), new Date()));
+
+      setCurrentBooking((prev) => ({
+        ...prev,
+        roomData,
+      }));
     };
 
     fetchCurrentRoom();
@@ -255,7 +270,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 </ul>
               </div>
             </div>
-            <BedReservationCard />
+            <BedReservationCard roomData={roomData!} />
           </div>
         </div>
       </div>

@@ -4,7 +4,7 @@ export interface CurrentBooking {
   bed: number;
   checkIn: Date;
   checkOut: Date;
-  roomData?: RoomCard | null;
+  roomData?: Room | null;
 }
 
 export interface CurrentBookingContextType {

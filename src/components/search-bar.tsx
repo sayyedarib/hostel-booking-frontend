@@ -63,7 +63,9 @@ export default function SearchBar({
       />
       <AddGuest
         currBedCount={Number(bed)}
-        handleBed={(bedCount: number) => setBed(bedCount.toString())}
+        handleBed={(bedCount: number) =>
+          setBed(Math.max(bedCount, 1).toString())
+        }
         girlsOnly={Boolean(girlsOnly)}
         handleGirlsOnly={(girlsOnly: boolean) =>
           setGirlsOnly(girlsOnly.toString())

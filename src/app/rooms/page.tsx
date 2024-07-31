@@ -18,10 +18,13 @@ function RoomsContent() {
   );
   useEffect(() => {
     const fetchRooms = async () => {
-      const checkIn =
-        new Date(searchParams.get("checkIn")!) ?? Date.now().toString();
-      const checkOut =
-        new Date(searchParams.get("checkOut")!) ?? addDays(new Date(), 30);
+      const checkInParam = searchParams.get("checkIn");
+      const checkOutParam = searchParams.get("checkOut");
+
+      const checkIn = checkInParam ? new Date(checkInParam) : new Date();
+      const checkOut = checkOutParam
+        ? new Date(checkOutParam)
+        : addDays(new Date(), 30);
       const allRooms = await getAllRooms();
 
       const roomsWithPrices = allRooms.map((room) => ({

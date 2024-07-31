@@ -5,6 +5,8 @@ import { MinusCircle, PlusCircle } from "lucide-react";
 import { useQueryParam } from "nextjs-query-param";
 import { z } from "zod";
 
+import type { Room } from "@/interface";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -29,9 +31,15 @@ export const MaleSchema = z.string();
 export const FemaleSchema = z.string();
 export const RoomSchema = z.string();
 
+interface BedReservationCardProps {
+  className?: string;
+  roomData: Room;
+}
+
 export default function BedReservationCard({
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+  roomData,
+}: BedReservationCardProps) {
   const [checkIn, setCheckIn] = useQueryParam(
     "checkIn",
     (value) => value?.toString() ?? "",
@@ -43,10 +51,6 @@ export default function BedReservationCard({
   const [bed, setBed] = useQueryParam(
     "bed",
     (value) => value?.toString() ?? "",
-  );
-  const [girlsOnly, setGirlsOnly] = useQueryParam(
-    "girlsOnly",
-    (value) => value?.toString() ?? "false",
   );
 
   return (
@@ -62,23 +66,14 @@ export default function BedReservationCard({
           />
           <div className="hidden md:flex md:flex-col md:items-stretch items-center gap-2">
             <div className="flex justify-between items-center">
-              <span>
-                <h3>Bed</h3>
-                <div className="flex items-center space-x-2">
-                  <Checkbox onClick={() => setGirlsOnly("true")} id="girls" />
-                  <label
-                    htmlFor="girls"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Girls only
-                  </label>
-                </div>
-              </span>
+              <h3>Bed</h3>
               <div className="flex items-center">
                 <span>
                   <Button
                     variant="ghost"
-                    onClick={() => setBed((Number(bed) - 1).toString())}
+                    onClick={() =>
+                      setBed(Math.max(Number(bed) - 1, 1).toString())
+                    }
                   >
                     <MinusCircle />
                   </Button>
@@ -87,7 +82,17 @@ export default function BedReservationCard({
                 <span>{bed}</span>
 
                 <span>
-                  <Button variant="ghost" onClick={() => setBed(bed + 1)}>
+                  <Button
+                    variant="ghost"
+                    onClick={() =>
+                      setBed(
+                        Math.min(
+                          Number(bed) + 1,
+                          roomData.roomCapacity,
+                        ).toString(),
+                      )
+                    }
+                  >
                     <PlusCircle />
                   </Button>
                 </span>

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { bookBed } from "@/db/queries";
-import { BedInfo, RoomCard } from "@/interface";
+import { BedInfo, Room } from "@/interface";
 
-export default function RoomMaps({ roomData }: { roomData: RoomCard }) {
+export default function RoomMaps({ roomData }: { roomData: Room }) {
   const [selectedBeds, setSelectedBeds] = useState<number[]>([]);
 
   const handleBedClick = async (bedId: number) => {
@@ -13,6 +13,21 @@ export default function RoomMaps({ roomData }: { roomData: RoomCard }) {
     } else {
       setSelectedBeds([...selectedBeds, bedId]);
       await bookBed(bedId);
+    }
+  };
+
+  const getBedImage = (roomCapacity: number) => {
+    switch (roomCapacity) {
+      case 1:
+        return "/img/single-bed.webp";
+      case 2:
+        return "/img/double-bed.webp";
+      case 3:
+        return "/img/triple-bed.webp";
+      case 4:
+        return "/img/quad-bed.webp";
+      default:
+        return "/img/single-bed.webp";
     }
   };
 
@@ -42,7 +57,7 @@ export default function RoomMaps({ roomData }: { roomData: RoomCard }) {
         {Array.from({ length: columns }).map((_, columnIndex) => (
           <div
             key={columnIndex}
-            className={`flex flex-col bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}
+            className={`flex flex-col bg-[url('/img/quad-bed.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}
           >
             {beds.slice(columnIndex * 2, columnIndex * 2 + 2).map((bed) => (
               <Button
