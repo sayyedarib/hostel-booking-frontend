@@ -19,6 +19,11 @@ import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 import DatePickerWithRange from "@/components/ui/date-picker";
 import { SelectBed } from "@/components/select-bed";
 import { Separator } from "./ui/separator";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 export default function BedReservationCard({
   className,
@@ -69,86 +74,185 @@ export default function BedReservationCard({
   return (
     <>
       <Card className={cn("w-full shadow-xl", className)}>
-        <CardContent>
+        <CardContent className="flex md:flex-col md:items-stretch items-center gap-2">
           <DatePickerWithRange className="hover:bg-white rounded-none" />
-          {/* male counts */}
-          <div className="flex justify-between">
-            <h3>Male</h3>
+          <div className="hidden md:flex md:flex-col md:items-stretch items-center gap-2">
+            {/* male counts */}
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <h3>Male</h3>
 
-            <div className="flex items-center">
-              <span>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleDecrement("male")}
-                  disabled={isRoomModified as boolean}
-                >
-                  <MinusCircle size={16}/>
-                </Button>
-              </span>
+              <div className="flex items-center">
+                <span>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleDecrement("male")}
+                    disabled={isRoomModified as boolean}
+                  >
+                    <MinusCircle size={16} />
+                  </Button>
+                </span>
 
-              <span>{currentBooking?.male}</span>
+                <span>{currentBooking?.male}</span>
 
-              <span>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleIncrement("male")}
-                  disabled={isRoomModified as boolean}
-                >
-                  <PlusCircle size={16} />
-                </Button>
-              </span>
+                <span>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleIncrement("male")}
+                    disabled={isRoomModified as boolean}
+                  >
+                    <PlusCircle size={16} />
+                  </Button>
+                </span>
+              </div>
             </div>
-          </div>
 
-          {/* female counts*/}
-          <div className="flex justify-between">
-            <h3>Female</h3>
+            {/* female counts*/}
+            <div className="flex justify-between flex-col md:flex-row items-center">
+              <h3>Female</h3>
 
-            <div className="flex items-center">
+              <div className="flex items-center">
+                <span>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleDecrement("female")}
+                    disabled={isRoomModified as boolean}
+                  >
+                    <MinusCircle size={16} />
+                  </Button>
+                </span>
+
+                <span>{currentBooking?.female}</span>
+
+                <span>
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleIncrement("female")}
+                    disabled={isRoomModified as boolean}
+                  >
+                    <PlusCircle size={16} />
+                  </Button>
+                </span>
+              </div>
+            </div>
+
+            <div className="relative flex py-5 items-center">
+              <div className="flex-grow border-t border-gray-400"></div>
+              <span className="flex-shrink mx-4 text-gray-400">OR</span>
+              <div className="flex-grow border-t border-gray-400"></div>
+            </div>
+
+            {/* room counts */}
+            <div className="flex justify-between flex-col md:flex-row items-center">
               <span>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleDecrement("female")}
-                  disabled={isRoomModified as boolean}
-                >
+                <h3>Room</h3>
+              </span>
+
+              <div className="flex items-center">
+                <Button variant="ghost" onClick={() => handleDecrement("room")}>
                   <MinusCircle size={16} />
                 </Button>
-              </span>
-
-              <span>{currentBooking?.female}</span>
-
-              <span>
-                <Button
-                  variant="ghost"
-                  onClick={() => handleIncrement("female")}
-                  disabled={isRoomModified as boolean}
-                >
+                <span>{currentBooking?.room}</span>
+                <Button variant="ghost" onClick={() => handleIncrement("room")}>
                   <PlusCircle size={16} />
                 </Button>
-              </span>
+              </div>
             </div>
           </div>
+          <div className="flex md:hidden">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline">Open Details</Button>
+              </PopoverTrigger>
 
-          {/* TODO: fix UI @sayyid */}
-          <div className="flex w-fit text-neutral-500">
-              <Separator/> OR <Separator/> 
-          </div>
-          
-          {/* room counts */}
-          <div className="flex justify-between">
-            <span>
-              <h3>Room</h3>
-            </span>
+              <PopoverContent>
+                {/* male counts */}
+                <div className="flex flex-col md:flex-row justify-between items-center">
+                  <h3>Male</h3>
 
-            <div className="flex items-center">
-              <Button variant="ghost" onClick={() => handleDecrement("room")}>
-                <MinusCircle size={16} />
-              </Button>
-              <span>{currentBooking?.room}</span>
-              <Button variant="ghost" onClick={() => handleIncrement("room")}>
-                <PlusCircle size={16} />
-              </Button>
-            </div>
+                  <div className="flex items-center">
+                    <span>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleDecrement("male")}
+                        disabled={isRoomModified as boolean}
+                      >
+                        <MinusCircle size={16} />
+                      </Button>
+                    </span>
+
+                    <span>{currentBooking?.male}</span>
+
+                    <span>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleIncrement("male")}
+                        disabled={isRoomModified as boolean}
+                      >
+                        <PlusCircle size={16} />
+                      </Button>
+                    </span>
+                  </div>
+                </div>
+
+                {/* female counts*/}
+                <div className="flex justify-between flex-col md:flex-row items-center">
+                  <h3>Female</h3>
+
+                  <div className="flex items-center">
+                    <span>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleDecrement("female")}
+                        disabled={isRoomModified as boolean}
+                      >
+                        <MinusCircle size={16} />
+                      </Button>
+                    </span>
+
+                    <span>{currentBooking?.female}</span>
+
+                    <span>
+                      <Button
+                        variant="ghost"
+                        onClick={() => handleIncrement("female")}
+                        disabled={isRoomModified as boolean}
+                      >
+                        <PlusCircle size={16} />
+                      </Button>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="relative flex py-5 items-center">
+                  <div className="flex-grow border-t border-gray-400"></div>
+                  <span className="flex-shrink mx-4 text-gray-400">OR</span>
+                  <div className="flex-grow border-t border-gray-400"></div>
+                </div>
+
+                {/* room counts */}
+                <div className="flex justify-between flex-col md:flex-row items-center">
+                  <span>
+                    <h3>Room</h3>
+                  </span>
+
+                  <div className="flex items-center">
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleDecrement("room")}
+                    >
+                      <MinusCircle size={16} />
+                    </Button>
+                    <span>{currentBooking?.room}</span>
+                    <Button
+                      variant="ghost"
+                      onClick={() => handleIncrement("room")}
+                    >
+                      <PlusCircle size={16} />
+                    </Button>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
           <SelectBed />
         </CardContent>
