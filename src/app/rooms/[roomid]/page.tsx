@@ -43,25 +43,52 @@ export default function Room({ params }: { params: { roomid: string } }) {
     <>
       <div className="w-2/3 flex justify-center mx-auto">
         <div className="mt-32 border-neutral-600 p-2 space-y-4">
-          <Carousel>
-            <CarouselContent>
-              {/* TODO: These images should be from image roomData.imageUrls and in smaller screen these should come one by in  carousel. */}
-              {roomData?.imageUrls.map((imgURL) => (
-                <CarouselItem key={imgURL}>
-                  <Image
-                    height={0}
-                    width={0}
-                    sizes="100vw"
-                    src={imgURL}
-                    className="w-full h-auto"
-                    alt="room-image"
-                  />
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious />
-            <CarouselNext />
-          </Carousel>
+          {roomData?.imageUrls.length === 1 && (
+            <Image
+              height={0}
+              width={0}
+              sizes="100vw"
+              src={roomData?.imageUrls[0]}
+              className="w-full h-auto"
+              alt="room-image"
+            />
+          )}
+          <div
+            className={`grid-cols-2 ${roomData?.imageUrls.length! <= 1 ? "hidden" : "md:grid hidden"}`}
+          >
+            {roomData?.imageUrls.map((imgURL) => (
+              <Image
+                height={0}
+                width={0}
+                key={imgURL}
+                sizes="100vw"
+                src={imgURL}
+                className="w-full h-auto"
+                alt="room-image"
+              />
+            ))}
+          </div>
+          {roomData?.imageUrls.length! > 1 && (
+            <Carousel className="md:hidden">
+              <CarouselContent>
+                {/* TODO: These images should be from image roomData.imageUrls and in smaller screen these should come one by in  carousel. */}
+                {roomData?.imageUrls.map((imgURL) => (
+                  <CarouselItem key={imgURL}>
+                    <Image
+                      height={0}
+                      width={0}
+                      sizes="100vw"
+                      src={imgURL}
+                      className="w-full h-auto"
+                      alt="room-image"
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          )}
 
           <div className="flex justify-between">
             <div className="flex flex-col">
