@@ -11,8 +11,9 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import RoomMaps from "@/components/room-maps";
+import type { Room as RoomDataType } from "@/interface";
 
-export function SelectBed() {
+export function SelectBed({ roomData }: { roomData: RoomDataType }) {
   return (
     <Drawer>
       <DrawerTrigger asChild>
@@ -25,7 +26,7 @@ export function SelectBed() {
           <DrawerHeader>
             <DrawerTitle>Select your bed</DrawerTitle>
           </DrawerHeader>
-          <RoomMaps type={"2-bed"} />
+          <RoomMaps roomData={roomData} type={"2-bed"} />
           <DrawerFooter>
             <DrawerClose asChild>
               <Button>Proceed to Checkout</Button>

@@ -24,10 +24,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import type { Room as RoomDataType } from "@/interface";
 
-export default function BedReservationCard({
-  className,
-}: React.HTMLAttributes<HTMLDivElement>) {
+type Props = {
+  className: React.HTMLAttributes<HTMLDivElement>;
+  roomData: RoomDataType;
+};
+
+export default function BedReservationCard({ className, roomData }: Props) {
   const [guest, setGuest] = useState<number>(1);
   const { currentBooking, setCurrentBooking } = useContext(
     CurrentBookingContext
@@ -253,7 +257,7 @@ export default function BedReservationCard({
             </PopoverContent>
           </Popover>
         </div>
-        <SelectBed />
+        <SelectBed roomData={roomData} />
       </CardContent>
     </Card>
   );
