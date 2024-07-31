@@ -69,10 +69,10 @@ export default function BedReservationCard({
   return (
     <>
       <Card className={cn("w-full shadow-xl", className)}>
-        <CardContent>
+        <CardContent className="flex md:flex-col md:items-stretch items-center">
           <DatePickerWithRange className="hover:bg-white rounded-none" />
           {/* male counts */}
-          <div className="flex justify-between">
+          <div className="flex flex-col md:flex-row justify-between items-center">
             <h3>Male</h3>
 
             <div className="flex items-center">
@@ -101,7 +101,7 @@ export default function BedReservationCard({
           </div>
 
           {/* female counts*/}
-          <div className="flex justify-between">
+          <div className="flex justify-between flex-col md:flex-row items-center">
             <h3>Female</h3>
 
             <div className="flex items-center">
@@ -130,12 +130,12 @@ export default function BedReservationCard({
           </div>
 
           {/* TODO: fix UI @sayyid */}
-          <div className="flex w-fit text-neutral-500">
+          <div className="flex w-fit text-neutral-500 flex-col md:flex-row items-center">
               <Separator/> OR <Separator/> 
           </div>
           
           {/* room counts */}
-          <div className="flex justify-between">
+          <div className="flex justify-between flex-col md:flex-row items-center">
             <span>
               <h3>Room</h3>
             </span>

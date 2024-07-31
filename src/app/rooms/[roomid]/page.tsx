@@ -128,7 +128,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 </ul>
               </div>
             </div>
-            <BedReservationCard className="lg:w-[33%] w-full" />
+            <BedReservationCard className="lg:w-[33%] md:static md:w-full w-screen fixed bottom-0 left-0 right-0" />
           </div>
         </div>
       </div>
