@@ -56,7 +56,7 @@ export default function BedReservationCard({
   return (
     <>
       <Card className={cn("w-full shadow-xl", className)}>
-        <CardContent className="flex md:flex-col md:items-stretch items-center gap-2">
+        <CardContent className="flex md:flex-col md:items-stretch items-center gap-2 pb-0 w-full">
           <DatePickerWithRange
             currCheckIn={checkIn}
             currCheckOut={checkOut}
