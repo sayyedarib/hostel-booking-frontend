@@ -1,4 +1,5 @@
 "use client";
+import { usePathname } from "next/navigation";
 import {
   Carousel,
   CarouselContent,
@@ -6,6 +7,22 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import { Copy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import Image from "next/image";
 import {
   Share,
@@ -28,7 +45,9 @@ import BedReservationCard from "@/components/bed-reservation-card";
 import { getRoomById } from "@/db/queries";
 
 export default function Room({ params }: { params: { roomid: string } }) {
+  const pathname = usePathname();
   const [roomData, setRoomData] = useState<RoomDataType | null>(null);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
 
   useEffect(() => {
     const fetchCurrentRoom = async () => {
@@ -39,73 +58,141 @@ export default function Room({ params }: { params: { roomid: string } }) {
     fetchCurrentRoom();
   }, [params.roomid]);
 
+  const copyLink = (link: string) => {
+    navigator.clipboard.writeText(link);
+    setIsLinkCopied(true);
+  };
+
+  useEffect(() => {
+    if (!isLinkCopied) return;
+    const timeout = setTimeout(() => {
+      setIsLinkCopied(false);
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, [isLinkCopied]);
+
   return (
     <>
       <div className="w-2/3 flex justify-center mx-auto">
         <div className="mt-32 border-neutral-600 p-2 space-y-4">
-          {roomData?.imageUrls.length === 1 && (
-            <Image
-              height={0}
-              width={0}
-              sizes="100vw"
-              src={roomData?.imageUrls[0]}
-              className="w-full h-auto"
-              alt="room-image"
-            />
-          )}
-          <div
-            className={`grid-cols-2 ${roomData?.imageUrls.length! <= 1 ? "hidden" : "md:grid hidden"}`}
-          >
-            {roomData?.imageUrls.map((imgURL) => (
+          <div className="w-full min-h-[450px]">
+            {roomData?.imageUrls.length === 1 && (
               <Image
                 height={0}
                 width={0}
-                key={imgURL}
                 sizes="100vw"
-                src={imgURL}
+                src={roomData?.imageUrls[0]}
                 className="w-full h-auto"
                 alt="room-image"
               />
-            ))}
+            )}
+            <div
+              className={`grid-cols-2 ${roomData?.imageUrls.length! <= 1 ? "hidden" : "md:grid hidden"}`}
+            >
+              {roomData?.imageUrls.map((imgURL) => (
+                <Image
+                  height={0}
+                  width={0}
+                  key={imgURL}
+                  sizes="100vw"
+                  src={imgURL}
+                  className="w-full h-auto"
+                  alt="room-image"
+                />
+              ))}
+            </div>
+            {roomData?.imageUrls.length! > 1 && (
+              <Carousel className="md:hidden">
+                <CarouselContent>
+                  {roomData?.imageUrls.map((imgURL) => (
+                    <CarouselItem key={imgURL}>
+                      <Image
+                        height={0}
+                        width={0}
+                        sizes="100vw"
+                        src={imgURL}
+                        className="w-full h-auto"
+                        alt="room-image"
+                      />
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious />
+                <CarouselNext />
+              </Carousel>
+            )}
           </div>
-          {roomData?.imageUrls.length! > 1 && (
-            <Carousel className="md:hidden">
-              <CarouselContent>
-                {/* TODO: These images should be from image roomData.imageUrls and in smaller screen these should come one by in  carousel. */}
-                {roomData?.imageUrls.map((imgURL) => (
-                  <CarouselItem key={imgURL}>
-                    <Image
-                      height={0}
-                      width={0}
-                      sizes="100vw"
-                      src={imgURL}
-                      className="w-full h-auto"
-                      alt="room-image"
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
-            </Carousel>
-          )}
 
           <div className="flex justify-between">
             <div className="flex flex-col">
-              {/* TODO: Add skeleton here untill fetching */}
-              <span className="text-3xl">{roomData?.buildingName}</span>
-              <span className="text-xl text-neutral-500">
-                Room: {roomData?.roomNumber}
-              </span>
+              {!roomData?.buildingName && !roomData?.roomNumber ? (
+                <div className="flex flex-col gap-2">
+                  <Skeleton height={30} width={100} />
+                  <Skeleton height={20} width={50} />
+                </div>
+              ) : (
+                <>
+                  <span className="text-3xl">{roomData?.buildingName}</span>
+                  <span className="text-xl text-neutral-500">
+                    Room: {roomData?.roomNumber}
+                  </span>
+                </>
+              )}
             </div>
-            {/* TODO: Use Dialogue component from shadcn ui, show the url and copy button */}
-            <Share />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Share className="cursor-pointer" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Share link</DialogTitle>
+                  <DialogDescription>Share room</DialogDescription>
+                </DialogHeader>
+                <div className="flex items-center space-x-2">
+                  <div className="grid flex-1 gap-2">
+                    <Label htmlFor="link" className="sr-only">
+                      Link
+                    </Label>
+                    <Input
+                      id="link"
+                      defaultValue={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`}
+                      readOnly
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    onClick={() =>
+                      copyLink(
+                        `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`
+                      )
+                    }
+                    size="sm"
+                    className="px-3"
+                  >
+                    <span className="sr-only">Copy</span>
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                </div>
+                {isLinkCopied && (
+                  <p className="text-blue-500">Link is copied!</p>
+                )}
+                <DialogFooter className="sm:justify-start">
+                  <DialogClose asChild>
+                    <Button type="button" variant="secondary">
+                      Close
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
 
-          <div className="flex w-full flex-col lg:flex-row gap-2">
-            {/* TODO: Make it responsive. */}
-            <div className="lg:w-[66%] w-full flex">
-              <div className="w-1/3">
+          <div className="grid lg:grid-cols-[1fr_300px] gap-8">
+            <div className="w-full grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6">
+              <div className="flex flex-col gap-2">
                 <h2 className="text-2xl mb-3 text-neutral-900">
                   Free Services
                 </h2>
@@ -128,7 +215,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                   </li>
                 </ul>
               </div>
-              <div className="w-1/3">
+              <div className="flex flex-col gap-2">
                 <h2 className="text-2xl mb-3 text-neutral-900">Inside Room</h2>
                 <ul className="text-md font-thin space-y-2 text-neutral-500">
                   <li className="flex gap-2">
@@ -149,8 +236,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                   </li>
                 </ul>
               </div>
-
-              <div className="w-1/3">
+              <div className="flex flex-col gap-2">
                 <h2 className="text-2xl mb-3 text-neutral-900">
                   At walking distance
                 </h2>
@@ -166,7 +252,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 </ul>
               </div>
             </div>
-            <BedReservationCard className="lg:w-[33%] md:static md:w-full w-screen fixed bottom-0 left-0 right-0" />
+            <BedReservationCard />
           </div>
         </div>
       </div>

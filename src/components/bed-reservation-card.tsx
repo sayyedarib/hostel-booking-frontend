@@ -135,9 +135,10 @@ export default function BedReservationCard({
               </div>
             </div>
 
-            {/* TODO: fix UI @sayyid */}
-            <div className="flex w-fit text-neutral-500 flex-col md:flex-row items-center">
-              <Separator /> OR <Separator />
+            <div className="relative flex py-5 items-center">
+              <div className="flex-grow border-t border-gray-400"></div>
+              <span className="flex-shrink mx-4 text-gray-400">OR</span>
+              <div className="flex-grow border-t border-gray-400"></div>
             </div>
 
             {/* room counts */}
@@ -222,9 +223,10 @@ export default function BedReservationCard({
                   </div>
                 </div>
 
-                {/* TODO: fix UI @sayyid */}
-                <div className="flex w-fit text-neutral-500 flex-col md:flex-row items-center">
-                  <Separator /> OR <Separator />
+                <div className="relative flex py-5 items-center">
+                  <div className="flex-grow border-t border-gray-400"></div>
+                  <span className="flex-shrink mx-4 text-gray-400">OR</span>
+                  <div className="flex-grow border-t border-gray-400"></div>
                 </div>
 
                 {/* room counts */}
