@@ -1,5 +1,11 @@
 "use client";
-
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import Image from "next/image";
 import {
   Share,
@@ -25,33 +31,38 @@ export default function Room({ params }: { params: { roomid: string } }) {
   const [roomData, setRoomData] = useState<RoomDataType | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      const roomData = await getRoomById(parseInt(params.roomid));
+    const fetchCurrentRoom = async () => {
+      const roomData = await getRoomById(Number(params.roomid));
       setRoomData(roomData);
-      console.log("roomData", roomData);
-    }
+    };
 
-    fetchData();
+    fetchCurrentRoom();
   }, [params.roomid]);
 
   return (
     <>
       <div className="w-2/3 flex justify-center mx-auto">
         <div className="mt-32 border-neutral-600 p-2 space-y-4">
-          <div className="grid md:grid-cols-4 md:grid-rows-2 gap-2 rounded-xl">
-            {/* TODO: These images should be from image roomData.imageUrls and in smaller screen these should come one by in  carousel. */}
-            <Image
-              height={2000}
-              width={2000}
-              src="/bg.webp"
-              className="md:col-span-2 md:row-span-2"
-              alt=""
-            />
-            <Image height={2000} width={2000} src="/bg.webp" alt="" />
-            <Image height={2000} width={2000} src="/bg.webp" alt="" />
-            <Image height={2000} width={2000} src="/bg.webp" alt="" />
-            <Image height={2000} width={2000} src="/bg.webp" alt="" />
-          </div>
+          <Carousel>
+            <CarouselContent>
+              {/* TODO: These images should be from image roomData.imageUrls and in smaller screen these should come one by in  carousel. */}
+              {roomData?.imageUrls.map((imgURL) => (
+                <CarouselItem key={imgURL}>
+                  <Image
+                    height={0}
+                    width={0}
+                    sizes="100vw"
+                    src={imgURL}
+                    className="w-full h-auto"
+                    alt="room-image"
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+
           <div className="flex justify-between">
             <div className="flex flex-col">
               {/* TODO: Add skeleton here untill fetching */}
