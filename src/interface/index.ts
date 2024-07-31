@@ -6,6 +6,7 @@ export interface CurrentBooking {
   room: number;
   checkIn: Date;
   checkOut: Date;
+  roomData?: RoomCard | null;
 }
 
 export interface CurrentBookingContextType {
@@ -33,4 +34,5 @@ export interface BedInfo {
   id: number;
   dailyPrice: number;
   monthlyPrice: number;
+  occupied?: boolean;
 }

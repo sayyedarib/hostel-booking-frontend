@@ -64,7 +64,8 @@ export const getRoomById = async (roomId: number) => {
           JSON_BUILD_OBJECT(
             'id', ${bedTable.id},
             'dailyPrice', CAST(${bedTable.dailyPrice} AS NUMERIC),
-            'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC)
+            'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC),
+            'occupied', ${bedTable.occupied}
           )
         )
         FILTER (WHERE ${bedTable.id} IS NOT NULL)
@@ -82,5 +83,20 @@ export const getRoomById = async (roomId: number) => {
       roomTypeTable.capacity,
     );
 
+    console.log("roomData", roomData[0].bedInfo);
   return roomData[0];
+}
+
+export const bookBed = async (bedId: number) => {
+  console.log("booking bed...");
+
+  const bedData = await db
+    .update(bedTable)
+    .set({
+      occupied: true,
+    })
+    .where(eq(bedTable.id, bedId));
+
+  console.log("bedData", bedData);
+  return bedData;
 }

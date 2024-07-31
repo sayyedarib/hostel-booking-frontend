@@ -14,6 +14,7 @@ const CurrentBookingContext = createContext<CurrentBookingContextType>({
     room: 0,
     checkIn: new Date(),
     checkOut: addDays(new Date(), 30),
+    roomData: null,
   },
   setCurrentBooking: () => {},
 });
@@ -27,6 +28,7 @@ const CurrentBookingProvider: React.FC<{ children: ReactNode }> = ({
     room: 0,
     checkIn: new Date(),
     checkOut: addDays(new Date(), 30),
+    roomData: null,
   });
 
   useEffect(() => {

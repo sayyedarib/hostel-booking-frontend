@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import { useContext } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -11,8 +11,11 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import RoomMaps from "@/components/room-maps";
+import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 
 export function SelectBed() {
+  const { currentBooking } = useContext(CurrentBookingContext);
+
   return (
     <Drawer>
       <DrawerTrigger asChild>
@@ -25,7 +28,7 @@ export function SelectBed() {
           <DrawerHeader>
             <DrawerTitle>Select your bed</DrawerTitle>
           </DrawerHeader>
-          <RoomMaps type={"2-bed"} />
+          <RoomMaps roomData={currentBooking?.roomData!} />
           <DrawerFooter>
             <DrawerClose asChild>
               <Button>Proceed to Checkout</Button>

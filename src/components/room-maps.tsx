@@ -1,35 +1,24 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { bookBed } from "@/db/queries";
+import { BedInfo, RoomCard } from "@/interface";
 
-export default function RoomMaps({
-  type,
-}: {
-  type: "1-bed" | "2-bed" | "4-bed";
-}) {
-  const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
+export default function RoomMaps({ roomData } : {roomData: RoomCard}) {
+  const [selectedBeds, setSelectedBeds] = useState<number[]>([]);
 
-  const roomLayout = {
-    "1-bed": [["A1", "A2"]],
-    "2-bed": [["A1", "A2"]],
-    "4-bed": [
-      ["A1", "A2"],
-      ["B1", "B2"],
-    ],
+  const handleBedClick = async (bedId: number) => {
+    console.log("bedId", bedId);
+    if (selectedBeds.includes(bedId)) {
+      setSelectedBeds(selectedBeds.filter(id => id !== bedId));
+    } else {
+      setSelectedBeds([...selectedBeds, bedId]);
+      await bookBed(bedId);
+    }
   };
 
-  const beds = roomLayout[type] ?? [];
-
-  const handleBedClick = (bed: string) => {
-    setSelectedBeds((prev) =>
-      prev.includes(bed)
-        ? prev.filter((selectedBed) => selectedBed !== bed)
-        : [...prev, bed],
-    );
-  };
-
-  const getBedStatus = (bed: string) => {
-    if (selectedBeds.includes(bed)) return "selected";
-    if (["B2"].includes(bed)) return "occupied";
+  const getBedStatus = (bed: BedInfo) => {
+    if (selectedBeds.includes(bed.id)) return "selected";
+    if (bed.occupied) return "occupied";
     return "available";
   };
 
@@ -44,24 +33,23 @@ export default function RoomMaps({
     }
   };
 
+  const beds = roomData?.bedInfo || [];
+  const columns = Math.ceil(beds.length / 2);
+
   return (
     <div className="max-w-md mx-auto p-4 border">
       <div className="flex justify-center space-x-0 mb-8">
-        {beds.map((column, columnIndex) => (
-          <React.Fragment key={columnIndex}>
-            <div
-              className={`flex flex-col bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}
-            >
-              {column.map((bed, bedIndex) => (
-                <Button
-                  key={bed}
-                  className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
-                  onClick={() => handleBedClick(bed)}
-                  disabled={getBedStatus(bed) === "occupied"}
-                ></Button>
-              ))}
-            </div>
-          </React.Fragment>
+        {Array.from({ length: columns }).map((_, columnIndex) => (
+          <div key={columnIndex} className={`flex flex-col bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}>
+            {beds.slice(columnIndex * 2, columnIndex * 2 + 2).map((bed) => (
+              <Button
+                key={bed.id}
+                className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
+                onClick={() => handleBedClick(bed.id)}
+                disabled={bed.occupied}
+              ></Button>
+            ))}
+          </div>
         ))}
       </div>
       <div className="flex justify-center space-x-4">

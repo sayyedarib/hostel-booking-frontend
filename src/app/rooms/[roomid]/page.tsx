@@ -14,20 +14,24 @@ import {
   Soup,
   GraduationCap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import type { Room as RoomDataType } from "@/interface";
 
 import BedReservationCard from "@/components/bed-reservation-card";
+import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 import { getRoomById } from "@/db/queries";
 
 export default function Room({ params }: { params: { roomid: string } }) {
+
+  const { setCurrentBooking } = useContext(CurrentBookingContext);
   const [roomData, setRoomData] = useState<RoomDataType | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const roomData = await getRoomById(parseInt(params.roomid));
       setRoomData(roomData);
+      setCurrentBooking(prev => ({ ...prev, roomData }));
       console.log("roomData", roomData);
     }
 

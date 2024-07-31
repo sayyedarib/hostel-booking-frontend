@@ -23,7 +23,6 @@ import { Separator } from "./ui/separator";
 export default function BedReservationCard({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
-  const [guest, setGuest] = useState<number>(1);
   const { currentBooking, setCurrentBooking } = useContext(
     CurrentBookingContext
   );
