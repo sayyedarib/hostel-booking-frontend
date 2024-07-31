@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 export default function RoomMaps({
   type,
 }: {
-  type: "1-bed" | "2-bed" | "4-bed";
+  type: "1-bed" | "2-bed" | "3-bed" | "4-bed";
 }) {
   const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
 
   const roomLayout = {
-    "1-bed": [["A1", "A2"]],
+    "1-bed": [["A1"]],
     "2-bed": [["A1", "A2"]],
+    "3-bed": [["A1"], ["B1", "B2"]],
     "4-bed": [
       ["A1", "A2"],
       ["B1", "B2"],
@@ -23,7 +24,7 @@ export default function RoomMaps({
     setSelectedBeds((prev) =>
       prev.includes(bed)
         ? prev.filter((selectedBed) => selectedBed !== bed)
-        : [...prev, bed],
+        : [...prev, bed]
     );
   };
 
@@ -44,15 +45,24 @@ export default function RoomMaps({
     }
   };
 
+  const getBedBackgroundImage = () => {
+    if (type === "3-bed") {
+      return "bg-[url('/img/bedbg3.webp')]";
+    }
+    return "bg-[url('/img/bedbg.webp')]";
+  };
+
   return (
     <div className="max-w-md mx-auto p-4 border">
       <div className="flex justify-center space-x-0 mb-8">
         {beds.map((column, columnIndex) => (
           <React.Fragment key={columnIndex}>
             <div
-              className={`flex flex-col bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}
+              className={`flex flex-col ${getBedBackgroundImage()} bg-contain ${
+                columnIndex % 2 !== 0 && type !== "3-bed" ? "scale-x-[-1]" : ""
+              }`}
             >
-              {column.map((bed, bedIndex) => (
+              {column.map((bed) => (
                 <Button
                   key={bed}
                   className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
