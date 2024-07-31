@@ -19,7 +19,7 @@ export default function DatePickerWithRange({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const { currentBooking, setCurrentBooking } = useContext(
-    CurrentBookingContext
+    CurrentBookingContext,
   );
 
   const [date, setDate] = useState<DateRange | undefined>({
@@ -36,7 +36,7 @@ export default function DatePickerWithRange({
             variant={"ghost"}
             className={cn(
               "w-full h-full rounded-[40px] text-lg text-start",
-              !date && "text-muted-foreground"
+              !date && "text-muted-foreground",
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 hidden md:block" />

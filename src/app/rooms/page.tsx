@@ -13,7 +13,7 @@ function RoomsContent() {
   const [rooms, setRooms] = useState<RoomCard[]>([]);
   console.log(
     "🚀 ~ file: page.tsx ~ line 31 ~ RoomsContent ~ searchParams",
-    searchParams.get("checkIn")
+    searchParams.get("checkIn"),
   );
   useEffect(() => {
     const fetchRooms = async () => {

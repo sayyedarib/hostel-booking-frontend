@@ -24,7 +24,7 @@ export default function BedReservationCard({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const { currentBooking, setCurrentBooking } = useContext(
-    CurrentBookingContext
+    CurrentBookingContext,
   );
 
   const [isRoomModified, setIsRoomModified] = useState<number | boolean>(false);
@@ -81,7 +81,7 @@ export default function BedReservationCard({
                   onClick={() => handleDecrement("male")}
                   disabled={isRoomModified as boolean}
                 >
-                  <MinusCircle size={16}/>
+                  <MinusCircle size={16} />
                 </Button>
               </span>
 
@@ -130,9 +130,9 @@ export default function BedReservationCard({
 
           {/* TODO: fix UI @sayyid */}
           <div className="flex w-fit text-neutral-500">
-              <Separator/> OR <Separator/> 
+            <Separator /> OR <Separator />
           </div>
-          
+
           {/* room counts */}
           <div className="flex justify-between">
             <span>

@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { bookBed } from "@/db/queries";
 import { BedInfo, RoomCard } from "@/interface";
 
-export default function RoomMaps({ roomData } : {roomData: RoomCard}) {
+export default function RoomMaps({ roomData }: { roomData: RoomCard }) {
   const [selectedBeds, setSelectedBeds] = useState<number[]>([]);
 
   const handleBedClick = async (bedId: number) => {
     console.log("bedId", bedId);
     if (selectedBeds.includes(bedId)) {
-      setSelectedBeds(selectedBeds.filter(id => id !== bedId));
+      setSelectedBeds(selectedBeds.filter((id) => id !== bedId));
     } else {
       setSelectedBeds([...selectedBeds, bedId]);
       await bookBed(bedId);
@@ -40,7 +40,10 @@ export default function RoomMaps({ roomData } : {roomData: RoomCard}) {
     <div className="max-w-md mx-auto p-4 border">
       <div className="flex justify-center space-x-0 mb-8">
         {Array.from({ length: columns }).map((_, columnIndex) => (
-          <div key={columnIndex} className={`flex flex-col bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}>
+          <div
+            key={columnIndex}
+            className={`flex flex-col bg-[url('/img/bedbg.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}
+          >
             {beds.slice(columnIndex * 2, columnIndex * 2 + 2).map((bed) => (
               <Button
                 key={bed.id}

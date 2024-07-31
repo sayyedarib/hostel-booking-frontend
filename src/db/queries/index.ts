@@ -83,9 +83,9 @@ export const getRoomById = async (roomId: number) => {
       roomTypeTable.capacity,
     );
 
-    console.log("roomData", roomData[0].bedInfo);
+  console.log("roomData", roomData[0].bedInfo);
   return roomData[0];
-}
+};
 
 export const bookBed = async (bedId: number) => {
   console.log("booking bed...");
@@ -99,4 +99,4 @@ export const bookBed = async (bedId: number) => {
 
   console.log("bedData", bedData);
   return bedData;
-}
+};

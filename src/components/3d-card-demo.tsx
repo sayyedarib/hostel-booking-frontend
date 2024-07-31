@@ -20,11 +20,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   const roomUrl = `/rooms/${roomData.id}?${searchParamsString}`;
 
   return (
-    <CardContainer
-      as={Link}
-      href={roomUrl}
-      className="inter-var"
-    >
+    <CardContainer as={Link} href={roomUrl} className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  shadow-lg hover:shadow:2xl w-auto sm:w-[30rem] h-auto rounded-xl border">
         <CardItem translateZ="100" className="w-full">
           <Image
