@@ -2,10 +2,9 @@
 import { usePathname, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 import Image from "next/image";
-import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css";
-import { Copy } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
+  Copy,
   Share,
   Zap,
   Wifi,
@@ -29,9 +28,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Copy } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -187,7 +183,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                     type="submit"
                     onClick={() =>
                       copyLink(
-                        `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`,
+                        `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`
                       )
                     }
                     size="sm"
@@ -273,7 +269,10 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 </ul>
               </div>
             </div>
-            <BedReservationCard className="md:static md:w-full w-screen fixed bottom-0 left-0 right-0" roomData={roomData!} />
+            <BedReservationCard
+              className="md:static md:w-full w-screen fixed bottom-0 left-0 right-0"
+              roomData={roomData!}
+            />
           </div>
         </div>
       </div>
