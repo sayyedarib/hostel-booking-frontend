@@ -1,9 +1,7 @@
 import { Dispatch, SetStateAction } from "react";
 
 export interface CurrentBooking {
-  male: number;
-  female: number;
-  room: number;
+  bed: number;
   checkIn: Date;
   checkOut: Date;
   roomData?: RoomCard | null;

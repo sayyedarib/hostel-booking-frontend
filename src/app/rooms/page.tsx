@@ -1,6 +1,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
+import { addDays } from "date-fns";
 
 import type { RoomCard } from "@/interface";
 
@@ -17,8 +18,10 @@ function RoomsContent() {
   );
   useEffect(() => {
     const fetchRooms = async () => {
-      const checkIn = new Date(searchParams.get("checkIn")!);
-      const checkOut = new Date(searchParams.get("checkOut")!);
+      const checkIn =
+        new Date(searchParams.get("checkIn")!) ?? Date.now().toString();
+      const checkOut =
+        new Date(searchParams.get("checkOut")!) ?? addDays(new Date(), 30);
       const allRooms = await getAllRooms();
 
       const roomsWithPrices = allRooms.map((room) => ({

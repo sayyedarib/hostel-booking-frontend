@@ -4,6 +4,8 @@ import { useContext, useState } from "react";
 import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
+import { useQueryParam } from "nextjs-query-param";
+import { z } from "zod";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -13,15 +15,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
+
+interface DatePickerWithRangeProps {
+  className?: string;
+  currCheckIn: string;
+  currCheckOut: string;
+  handleCheckIn: (date: string) => void;
+  handleCheckOut: (date: string) => void;
+}
 
 export default function DatePickerWithRange({
   className,
-}: React.HTMLAttributes<HTMLDivElement>) {
-  const { currentBooking, setCurrentBooking } = useContext(
-    CurrentBookingContext,
-  );
-
+  currCheckIn,
+  currCheckOut,
+  handleCheckIn,
+  handleCheckOut,
+}: DatePickerWithRangeProps) {
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 30),
@@ -73,12 +82,9 @@ export default function DatePickerWithRange({
             defaultMonth={date?.from}
             selected={date}
             onSelect={(date) => {
+              handleCheckIn(date?.from?.toISOString() ?? "");
+              handleCheckOut(date?.to?.toISOString() ?? "");
               setDate(date);
-              setCurrentBooking((prev) => ({
-                ...prev,
-                checkIn: date?.from || prev.checkIn,
-                checkOut: date?.to || prev.checkOut,
-              }));
             }}
             numberOfMonths={2}
           />

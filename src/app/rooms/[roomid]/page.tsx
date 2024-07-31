@@ -169,7 +169,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                     type="submit"
                     onClick={() =>
                       copyLink(
-                        `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`
+                        `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`,
                       )
                     }
                     size="sm"
@@ -193,7 +193,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
             </Dialog>
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_300px] gap-8">
+          <div className="grid lg:grid-cols-[1fr_400px] gap-8">
             <div className="w-full grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6">
               <div className="flex flex-col gap-2">
                 <h2 className="text-2xl mb-3 text-neutral-900">
