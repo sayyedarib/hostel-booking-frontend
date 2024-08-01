@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { bookBed } from "@/db/queries";
-import { BedInfo, Room as RoomDataType } from "@/interface";
+import type { Room as RoomDataType } from "@/interface";
 
 export default function RoomMaps({
   type,
   roomData,
 }: {
-  type: string;
+  type: "1-bed" | "2-bed" | "3-bed" | "4-bed";
   roomData: RoomDataType;
 }) {
   const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
@@ -33,9 +32,9 @@ export default function RoomMaps({
     );
   };
 
-  const getBedStatus = (bed: BedInfo) => {
-    if (selectedBeds.includes(bed.id.toString())) return "selected";
-    if (bed.occupied) return "occupied";
+  const getBedStatus = (bed: string) => {
+    if (selectedBeds.includes(bed)) return "selected";
+    if (["B2"].includes(bed)) return "occupied";
     return "available";
   };
 
@@ -74,7 +73,6 @@ export default function RoomMaps({
                     <Button
                       key={bed}
                       className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
-                      // TODO: here bed is an string that is bed type e.g. 2-b 3-bed but that's not correct how can we update the database just based on bedtype(that is 2-bed, 3-bed) instead we need complete bed info like id, occupied, etc. from database
                       onClick={() => handleBedClick(bed)}
                       disabled={getBedStatus(bed) === "occupied"}
                     ></Button>

@@ -1,10 +1,11 @@
 import { Dispatch, SetStateAction } from "react";
 
 export interface CurrentBooking {
-  bed: number;
+  male: number;
+  female: number;
+  room: number;
   checkIn: Date;
   checkOut: Date;
-  roomData?: Room | null;
 }
 
 export interface CurrentBookingContextType {
@@ -32,5 +33,4 @@ export interface BedInfo {
   id: number;
   dailyPrice: number;
   monthlyPrice: number;
-  occupied?: boolean;
 }

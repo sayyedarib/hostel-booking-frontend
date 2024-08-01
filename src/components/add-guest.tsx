@@ -1,6 +1,9 @@
 "use client";
 
-import { BedDouble, MinusCircle, PlusCircle } from "lucide-react";
+import { useState, useContext } from "react";
+import { BedDouble, MinusCircle, PlusCircle, UserRound } from "lucide-react";
+
+import type { CurrentBooking } from "@/interface";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -9,23 +12,53 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Checkbox } from "./ui/checkbox";
-
-interface AddGuestProps {
-  className?: string;
-  currBedCount: number;
-  handleBed: (bedCount: number) => void;
-  girlsOnly: boolean;
-  handleGirlsOnly: (girlsOnly: boolean) => void;
-}
+import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 
 export default function AddGuest({
   className,
-  currBedCount,
-  handleBed,
-  girlsOnly,
-  handleGirlsOnly,
-}: AddGuestProps) {
+}: React.HTMLAttributes<HTMLDivElement>) {
+  const { currentBooking, setCurrentBooking } = useContext(
+    CurrentBookingContext,
+  );
+
+  const [isRoomModified, setIsRoomModified] = useState<number | boolean>(false);
+
+  const handleIncrement = (key: keyof CurrentBooking) => {
+    setCurrentBooking((prev: CurrentBooking) => {
+      if (typeof prev[key] === "number") {
+        return {
+          ...prev,
+          [key]: (prev[key] as number) + 1,
+        };
+      }
+      return prev;
+    });
+    if (key === "room") {
+      setIsRoomModified(true);
+    }
+  };
+
+  const handleDecrement = (key: keyof CurrentBooking) => {
+    setCurrentBooking((prev: CurrentBooking) => {
+      if (typeof prev[key] === "number") {
+        return {
+          ...prev,
+          [key]: Math.max(0, (prev[key] as number) - 1),
+        };
+      }
+      return prev;
+    });
+
+    if (key === "room") {
+      setCurrentBooking((prev: CurrentBooking) => {
+        if (typeof prev.room === "number") {
+          setIsRoomModified(prev.room > 0);
+        }
+        return prev;
+      });
+    }
+  };
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>
@@ -33,14 +66,25 @@ export default function AddGuest({
           <Button
             id="currentBooking"
             variant={"ghost"}
-            className={cn("flex w-full h-full rounded-[40px] text-lg px-4")}
+            className={cn(
+              "flex w-full h-full rounded-[40px] text-lg px-4",
+              !currentBooking && "text-muted-foreground",
+            )}
           >
-            {currBedCount ? (
+            {currentBooking?.room ? (
               <span className="flex items-center justify-center gap-4">
                 <span className="flex gap-1">
-                  <BedDouble /> {currBedCount}
+                  <BedDouble /> {currentBooking.room}
                 </span>
                 <span className="hidden md:block">Room</span>
+              </span>
+            ) : currentBooking?.male || currentBooking?.female ? (
+              <span className="flex items-center justify-center gap-2">
+                <span className="flex gap-1 items-center text-2xl">
+                  <UserRound />{" "}
+                  {(currentBooking?.male ?? 0) + (currentBooking?.female ?? 0)}
+                </span>
+                <span className="hidden md:block">Head</span>
               </span>
             ) : (
               <>
@@ -51,42 +95,87 @@ export default function AddGuest({
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[400px] px-5 py-3 flex flex-col justify-center"
+          className="w-[400px] px-5 py-3 h-44 flex flex-col justify-center"
           align="center"
         >
-          <div className="flex justify-between items-center">
+          {/* male counts */}
+          <div className="flex justify-between border-b">
             <span>
-              <h3>Bed</h3>
-              <div className="flex items-center space-x-2">
-                <Checkbox onClick={() => handleGirlsOnly(true)} id="girls" />
-                <label
-                  htmlFor="girls"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Girls only
-                </label>
-              </div>
+              <h3>Male</h3>
+              <span className="text-gray-400">Age 13 or above</span>
             </span>
+
             <div className="flex items-center">
               <span>
                 <Button
                   variant="ghost"
-                  onClick={() => handleBed(Math.max(currBedCount - 1, 1))}
+                  onClick={() => handleDecrement("male")}
+                  disabled={isRoomModified as boolean}
                 >
                   <MinusCircle />
                 </Button>
               </span>
 
-              <span>{currBedCount}</span>
+              <span>{currentBooking?.male}</span>
 
               <span>
                 <Button
                   variant="ghost"
-                  onClick={() => handleBed(currBedCount + 1)}
+                  onClick={() => handleIncrement("male")}
+                  disabled={isRoomModified as boolean}
                 >
                   <PlusCircle />
                 </Button>
               </span>
+            </div>
+          </div>
+
+          {/* female counts*/}
+          <div className="flex justify-between border-b">
+            <span>
+              <h3>Female</h3>
+              <span className="text-gray-400">Age 13 or above</span>
+            </span>
+
+            <div className="flex items-center">
+              <span>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleDecrement("female")}
+                  disabled={isRoomModified as boolean}
+                >
+                  <MinusCircle />
+                </Button>
+              </span>
+
+              <span>{currentBooking?.female}</span>
+
+              <span>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleIncrement("female")}
+                  disabled={isRoomModified as boolean}
+                >
+                  <PlusCircle />
+                </Button>
+              </span>
+            </div>
+          </div>
+
+          {/* room counts */}
+          <div className="flex justify-between pt-3">
+            <span>
+              <h3>Room</h3>
+            </span>
+
+            <div className="flex items-center">
+              <Button variant="ghost" onClick={() => handleDecrement("room")}>
+                <MinusCircle />
+              </Button>
+              <span>{currentBooking?.room}</span>
+              <Button variant="ghost" onClick={() => handleIncrement("room")}>
+                <PlusCircle />
+              </Button>
             </div>
           </div>
         </PopoverContent>
