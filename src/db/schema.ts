@@ -59,6 +59,7 @@ export const bedTable = pgTable("bed", {
     .notNull()
     .references(() => roomTable.id),
   bedType: text("bed_type").notNull(),
+  bedCode: text("bed_code").notNull(),
   occupied: boolean("occupied").notNull().default(false),
   dailyPrice: numeric("daily_price").notNull(),
   monthlyPrice: numeric("monthly_price").notNull(),
@@ -144,6 +145,18 @@ export const paymentTable = pgTable("payment", {
   amount: numeric("amount").notNull(),
   paymentDate: date("payment_date").notNull(),
   paymentType: text("payment_type").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const agreementTable = pgTable("agreement", {
+  id: serial("id").primaryKey(),
+  guestName: text("guest_name").notNull(),
+  guestAddress: text("guest_address").notNull(),
+  agreementDate: date("agreement_date").notNull(),
+  duration: integer("duration").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()

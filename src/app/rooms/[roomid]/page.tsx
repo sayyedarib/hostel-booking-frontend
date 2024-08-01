@@ -17,6 +17,7 @@ import {
   Soup,
   GraduationCap,
 } from "lucide-react";
+import { useQueryParam } from "nextjs-query-param";
 
 import type { Room as RoomDataType } from "@/interface";
 
@@ -44,27 +45,18 @@ import BedReservationCard from "@/components/bed-reservation-card";
 import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 import { getRoomById } from "@/db/queries";
 
-import { calculateBedPrice, calculateRoomPrice } from "@/lib/utils";
-
 export default function Room({ params }: { params: { roomid: string } }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const checkIn = new Date(searchParams.get("checkIn")!);
-  const checkOut = new Date(searchParams.get("checkOut")!);
   const { setCurrentBooking } = useContext(CurrentBookingContext);
 
   const [roomData, setRoomData] = useState<RoomDataType | null>(null);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
-  const [bedPrice, setBedPrice] = useState(0);
-  const [roomPrice, setRoomPrice] = useState(0);
-
   useEffect(() => {
     const fetchCurrentRoom = async () => {
       let roomData = await getRoomById(Number(params.roomid));
+      console.log("room id room data", roomData);
       setRoomData(roomData);
-      setRoomPrice(calculateRoomPrice(roomData, new Date(), new Date()));
-      setBedPrice(calculateBedPrice(roomData, new Date(), new Date()));
 
       setCurrentBooking((prev) => ({
         ...prev,
@@ -91,20 +83,10 @@ export default function Room({ params }: { params: { roomid: string } }) {
 
   return (
     <>
-      <div className="w-2/3 flex justify-center mx-auto">
-        <div className="mt-32 border-neutral-600 py-2 space-y-4">
-          <div className="w-full min-h-[400px] px-2">
-            {roomData?.imageUrls.length === 1 && (
-              <Image
-                height={0}
-                width={0}
-                sizes="100vw"
-                src={roomData?.imageUrls[0]}
-                className="w-full h-auto"
-                alt="room-image"
-              />
-            )}
-            {roomData?.imageUrls.length! > 1 && (
+      <div className="max-w-full lg:w-2/3 h-auto flex justify-center mx-auto">
+        <div className="mt-24 md:mt-32 border-neutral-600 py-2 space-y-4 px-4">
+          <div className="max-w-[calc(100%-5rem)] h-auto md:h-[400px] px-2 mx-auto">
+            {roomData?.imageUrls.length! >= 1 && (
               <div className="md:grid-cols-4 md:grid-rows-2 gap-2 rounded-xl md:grid hidden">
                 {roomData?.imageUrls.map((imgURL, index) => (
                   <Image
@@ -119,7 +101,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                 ))}
               </div>
             )}
-            {roomData?.imageUrls.length! > 1 && (
+            {roomData?.imageUrls.length! >= 1 && (
               <Carousel className="md:hidden">
                 <CarouselContent>
                   {roomData?.imageUrls.map((imgURL) => (
@@ -141,7 +123,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
             )}
           </div>
 
-          <div className="flex justify-between px-2">
+          <div className="flex justify-between">
             <div className="flex flex-col">
               {!roomData?.buildingName && !roomData?.roomNumber ? (
                 <div className="flex flex-col gap-2">
@@ -207,8 +189,8 @@ export default function Room({ params }: { params: { roomid: string } }) {
             </Dialog>
           </div>
 
-          <div className="grid lg:grid-cols-[1fr_400px] gap-8">
-            <div className="w-full grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-6">
+          <div className="flex flex-wrap justify-between w-full gap-8">
+            <div className="flex flex-wrap gap-8">
               <div className="flex flex-col gap-2">
                 <h2 className="text-2xl mb-3 text-neutral-900">
                   Free Services
@@ -270,7 +252,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
               </div>
             </div>
             <BedReservationCard
-              className="md:static md:w-full w-screen fixed bottom-0 left-0 right-0"
+              className="md:w-[400px] w-full"
               roomData={roomData!}
             />
           </div>

@@ -40,7 +40,9 @@ export default function AddGuest({
                 <span className="flex gap-1">
                   <BedDouble /> {currBedCount}
                 </span>
-                <span className="hidden md:block">Room</span>
+                <span className="hidden md:block">
+                  Bed{currBedCount > 1 ? "s" : ""}
+                </span>
               </span>
             ) : (
               <>

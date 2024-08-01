@@ -74,10 +74,10 @@ export default function RoomMaps({
                   {column.map((bed) => (
                     <Button
                       key={bed}
-                      className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
+                      // className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
                       // TODO: here bed is an string that is bed type e.g. 2-b 3-bed but that's not correct how can we update the database just based on bedtype(that is 2-bed, 3-bed) instead we need complete bed info like id, occupied, etc. from database
                       onClick={() => handleBedClick(bed)}
-                      disabled={getBedStatus(bed) === "occupied"}
+                      // disabled={getBedStatus(bed) === "occupied"}
                     ></Button>
                   ))}
                 </div>

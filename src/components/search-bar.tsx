@@ -10,12 +10,6 @@ import DatePickerWithRange from "@/components/ui/date-picker";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export const CheckInSchema = z.string();
-export const CheckOutSchema = z.string();
-export const MaleSchema = z.string();
-export const FemaleSchema = z.string();
-export const RoomSchema = z.string();
-
 export default function SearchBar({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
@@ -31,7 +25,7 @@ export default function SearchBar({
   );
   const [bed, setBed] = useQueryParam(
     "bed",
-    (value) => value?.toString() ?? "",
+    (value) => value?.toString() ?? "1",
   );
   const [girlsOnly, setGirlsOnly] = useQueryParam(
     "girlsOnly",
@@ -62,7 +56,7 @@ export default function SearchBar({
         className="h-full rounded-[40px] w-[55%] md:w-1/3"
       />
       <AddGuest
-        currBedCount={Number(bed)}
+        currBedCount={Math.max(Number(bed), 1)}
         handleBed={(bedCount: number) =>
           setBed(Math.max(bedCount, 1).toString())
         }

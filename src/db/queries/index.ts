@@ -29,7 +29,8 @@ export const getAllRooms = async () => {
           JSON_BUILD_OBJECT(
             'id', ${bedTable.id},
             'dailyPrice', CAST(${bedTable.dailyPrice} AS NUMERIC),
-            'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC)
+            'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC),
+            'bedCode', ${bedTable.bedCode}
           )
         )
         FILTER (WHERE ${bedTable.id} IS NOT NULL)
@@ -71,7 +72,8 @@ export const getRoomById = async (roomId: number) => {
             'id', ${bedTable.id},
             'dailyPrice', CAST(${bedTable.dailyPrice} AS NUMERIC),
             'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC),
-            'occupied', ${bedTable.occupied}
+            'occupied', ${bedTable.occupied},
+            'bedCode', ${bedTable.bedCode}
           )
         )
         FILTER (WHERE ${bedTable.id} IS NOT NULL)

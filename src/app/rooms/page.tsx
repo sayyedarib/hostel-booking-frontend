@@ -20,17 +20,19 @@ function RoomsContent() {
     const fetchRooms = async () => {
       const checkInParam = searchParams.get("checkIn");
       const checkOutParam = searchParams.get("checkOut");
+      const bedParam = searchParams.get("bed");
 
       const checkIn = checkInParam ? new Date(checkInParam) : new Date();
       const checkOut = checkOutParam
         ? new Date(checkOutParam)
         : addDays(new Date(), 30);
+      const bed = bedParam ? parseInt(bedParam) : 1;
       const allRooms = await getAllRooms();
 
       const roomsWithPrices = allRooms.map((room) => ({
         ...room,
         totalRoomPrice: calculateRoomPrice(room, checkIn, checkOut),
-        totalBedPrice: calculateBedPrice(room, checkIn, checkOut),
+        totalBedPrice: calculateBedPrice(room, checkIn, checkOut, bed),
       }));
 
       setRooms(roomsWithPrices);

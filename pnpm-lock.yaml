@@ -88,6 +88,9 @@ importers:
       nextjs-query-param:
         specifier: ^1.0.3
         version: 1.0.3(next@14.2.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+      number-to-words:
+        specifier: ^1.2.4
+        version: 1.2.4
       pnpm:
         specifier: ^9.6.0
         version: 9.6.0
@@ -137,6 +140,9 @@ importers:
       "@types/node":
         specifier: ^20
         version: 20.14.11
+      "@types/number-to-words":
+        specifier: ^1.2.3
+        version: 1.2.3
       "@types/react":
         specifier: ^18
         version: 18.3.3
@@ -1643,6 +1649,12 @@ packages:
     resolution:
       {
         integrity: sha512-kprQpL8MMeszbz6ojB5/tU8PLN4kesnN8Gjzw349rDlNgsSzg90lAVj3llK99Dh7JON+t9AuscPPFW6mPbTnSA==,
+      }
+
+  "@types/number-to-words@1.2.3":
+    resolution:
+      {
+        integrity: sha512-ruSA/QZ6JQofoEEN2zKmN9oihZmrCBgcw0zEzN0UA9Mw0pU5remTddZmrbHjsa99qz12Uxl82x+XkVpHu87oXw==,
       }
 
   "@types/phoenix@1.6.5":
@@ -3667,6 +3679,12 @@ packages:
         integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==,
       }
     engines: { node: ">=0.10.0" }
+
+  number-to-words@1.2.4:
+    resolution:
+      {
+        integrity: sha512-/fYevVkXRcyBiZDg6yzZbm0RuaD6i0qRfn8yr+6D0KgBMOndFPxuW10qCHpzs50nN8qKuv78k8MuotZhcVX6Pw==,
+      }
 
   object-assign@4.1.1:
     resolution:
@@ -5758,6 +5776,8 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
+  "@types/number-to-words@1.2.3": {}
+
   "@types/phoenix@1.6.5": {}
 
   "@types/prop-types@15.7.12": {}
@@ -7107,6 +7127,8 @@ snapshots:
       whatwg-url: 5.0.0
 
   normalize-path@3.0.0: {}
+
+  number-to-words@1.2.4: {}
 
   object-assign@4.1.1: {}
 
