@@ -3,37 +3,36 @@ import { Button } from "@/components/ui/button";
 import { bookBed } from "@/db/queries";
 import { BedInfo, Room } from "@/interface";
 
-export default function RoomMaps({ roomData }: { roomData: Room }) {
-  const [selectedBeds, setSelectedBeds] = useState<number[]>([]);
+export default function RoomMaps({
+  type,
+}: {
+  type: "1-bed" | "2-bed" | "3-bed" | "4-bed";
+}) {
+  const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
 
-  const handleBedClick = async (bedId: number) => {
-    console.log("bedId", bedId);
-    if (selectedBeds.includes(bedId)) {
-      setSelectedBeds(selectedBeds.filter((id) => id !== bedId));
-    } else {
-      setSelectedBeds([...selectedBeds, bedId]);
-      await bookBed(bedId);
-    }
+  const roomLayout = {
+    "1-bed": [["A1"]],
+    "2-bed": [["A1", "A2"]],
+    "3-bed": [["A1"], ["B1", "B2"]],
+    "4-bed": [
+      ["A1", "A2"],
+      ["B1", "B2"],
+    ],
   };
 
-  const getBedImage = (roomCapacity: number) => {
-    switch (roomCapacity) {
-      case 1:
-        return "/img/single-bed.webp";
-      case 2:
-        return "/img/double-bed.webp";
-      case 3:
-        return "/img/triple-bed.webp";
-      case 4:
-        return "/img/quad-bed.webp";
-      default:
-        return "/img/single-bed.webp";
-    }
+  const beds = roomLayout[type] ?? [];
+
+  const handleBedClick = (bed: string) => {
+    setSelectedBeds((prev) =>
+      prev.includes(bed)
+        ? prev.filter((selectedBed) => selectedBed !== bed)
+        : [...prev, bed]
+    );
   };
 
   const getBedStatus = (bed: BedInfo) => {
-    if (selectedBeds.includes(bed.id)) return "selected";
-    if (bed.occupied) return "occupied";
+    if (selectedBeds.includes(bed.id.toString())) return "selected";
+    if (bed.occupied) return "true";
     return "available";
   };
 
@@ -48,26 +47,33 @@ export default function RoomMaps({ roomData }: { roomData: Room }) {
     }
   };
 
-  const beds = roomData?.bedInfo || [];
-  const columns = Math.ceil(beds.length / 2);
+  const getBedBackgroundImage = () => {
+    if (type === "3-bed") {
+      return "bg-[url('/img/bedbg3.webp')]";
+    }
+    return "bg-[url('/img/bedbg.webp')]";
+  };
 
   return (
     <div className="max-w-md mx-auto p-4 border">
       <div className="flex justify-center space-x-0 mb-8">
-        {Array.from({ length: columns }).map((_, columnIndex) => (
-          <div
-            key={columnIndex}
-            className={`flex flex-col bg-[url('/img/quad-bed.webp')] bg-contain ${columnIndex % 2 !== 0 ? "scale-x-[-1]" : ""}`}
-          >
-            {beds.slice(columnIndex * 2, columnIndex * 2 + 2).map((bed) => (
-              <Button
-                key={bed.id}
-                className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
-                onClick={() => handleBedClick(bed.id)}
-                disabled={bed.occupied}
-              ></Button>
-            ))}
-          </div>
+        {beds.map((column, columnIndex) => (
+          <React.Fragment key={columnIndex}>
+            <div
+              className={`flex flex-col ${getBedBackgroundImage()} bg-contain ${
+                columnIndex % 2 !== 0 && type !== "3-bed" ? "scale-x-[-1]" : ""
+              }`}
+            >
+              {column.map((bed) => (
+                <Button
+                  key={bed}
+                  className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
+                  onClick={() => handleBedClick(bed)}
+                  disabled={getBedStatus(bed) === "true"}
+                ></Button>
+              ))}
+            </div>
+          </React.Fragment>
         ))}
       </div>
       <div className="flex justify-center space-x-4">
