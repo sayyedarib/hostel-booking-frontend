@@ -13,6 +13,8 @@ import {
 import RoomMaps from "@/components/room-maps";
 import type { Room as RoomDataType } from "@/interface";
 
+type RoomTypeNameInterface = "1-bed" | "2-bed" | "3-bed" | "4-bed";
+
 export function SelectBed({ roomData }: { roomData: RoomDataType }) {
   return (
     <Drawer>
@@ -26,7 +28,10 @@ export function SelectBed({ roomData }: { roomData: RoomDataType }) {
           <DrawerHeader>
             <DrawerTitle>Select your bed</DrawerTitle>
           </DrawerHeader>
-          <RoomMaps roomData={roomData} type={"2-bed"} />
+          <RoomMaps
+            roomData={roomData}
+            type={(roomData?.roomTypeName as RoomTypeNameInterface) ?? "1-bed"}
+          />
           <DrawerFooter>
             <DrawerClose asChild>
               <Button>Proceed to Checkout</Button>

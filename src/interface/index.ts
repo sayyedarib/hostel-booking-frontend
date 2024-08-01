@@ -33,4 +33,6 @@ export interface BedInfo {
   id: number;
   dailyPrice: number;
   monthlyPrice: number;
+  bedCode: string;
+  occupied: boolean;
 }

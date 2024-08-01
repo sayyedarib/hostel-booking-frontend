@@ -27,7 +27,7 @@ import {
 import type { Room as RoomDataType } from "@/interface";
 
 type Props = {
-  className: React.HTMLAttributes<HTMLDivElement>;
+  className: string;
   roomData: RoomDataType;
 };
 

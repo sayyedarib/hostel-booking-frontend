@@ -252,7 +252,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
               </div>
             </div>
             <BedReservationCard
-              roomData={roomData}
+              roomData={roomData!}
               className="md:static md:w-full w-screen fixed bottom-0 left-0 right-0"
             />
           </div>
