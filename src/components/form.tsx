@@ -302,7 +302,7 @@ export default function PayingGuestAgreement() {
             />
           </div>
           <div>
-            <Label htmlFor="payingGuest">Paying Guest</Label>
+            <Label htmlFor="payingGuest">Guest Name</Label>
             <Input
               id="payingGuest"
               name="payingGuest"
