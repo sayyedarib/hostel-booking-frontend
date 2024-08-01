@@ -23,7 +23,9 @@ export const getAllRooms = async () => {
           JSON_BUILD_OBJECT(
             'id', ${bedTable.id},
             'dailyPrice', CAST(${bedTable.dailyPrice} AS NUMERIC),
-            'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC)
+            'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC),
+            'bedCode', CAST(${bedTable.bedCode} AS TEXT),
+            'occupied', CAST(${bedTable.occupied} AS BOOL) 
           )
         )
         FILTER (WHERE ${bedTable.id} IS NOT NULL)
@@ -65,7 +67,8 @@ export const getRoomById = async (roomId: number) => {
             'id', ${bedTable.id},
             'dailyPrice', CAST(${bedTable.dailyPrice} AS NUMERIC),
             'monthlyPrice', CAST(${bedTable.monthlyPrice} AS NUMERIC),
-            'occupied', ${bedTable.occupied}
+            'bedCode', CAST(${bedTable.bedCode} AS TEXT),
+            'occupied', CAST(${bedTable.occupied} AS BOOL) 
           )
         )
         FILTER (WHERE ${bedTable.id} IS NOT NULL)
@@ -83,20 +86,5 @@ export const getRoomById = async (roomId: number) => {
       roomTypeTable.capacity,
     );
 
-  console.log("roomData", roomData[0].bedInfo);
   return roomData[0];
-};
-
-export const bookBed = async (bedId: number) => {
-  console.log("booking bed...");
-
-  const bedData = await db
-    .update(bedTable)
-    .set({
-      occupied: true,
-    })
-    .where(eq(bedTable.id, bedId));
-
-  console.log("bedData", bedData);
-  return bedData;
-};
+}

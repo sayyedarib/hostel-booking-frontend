@@ -4,8 +4,6 @@ import { useContext, useState } from "react";
 import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { useQueryParam } from "nextjs-query-param";
-import { z } from "zod";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -15,22 +13,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-interface DatePickerWithRangeProps {
-  className?: string;
-  currCheckIn: string;
-  currCheckOut: string;
-  handleCheckIn: (date: string) => void;
-  handleCheckOut: (date: string) => void;
-}
+import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 
 export default function DatePickerWithRange({
   className,
-  currCheckIn,
-  currCheckOut,
-  handleCheckIn,
-  handleCheckOut,
-}: DatePickerWithRangeProps) {
+}: React.HTMLAttributes<HTMLDivElement>) {
+  const { currentBooking, setCurrentBooking } = useContext(
+    CurrentBookingContext
+  );
+
   const [date, setDate] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 30),
@@ -45,7 +36,7 @@ export default function DatePickerWithRange({
             variant={"ghost"}
             className={cn(
               "w-full h-full rounded-[40px] text-lg text-start",
-              !date && "text-muted-foreground",
+              !date && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 hidden md:block" />
@@ -82,9 +73,12 @@ export default function DatePickerWithRange({
             defaultMonth={date?.from}
             selected={date}
             onSelect={(date) => {
-              handleCheckIn(date?.from?.toISOString() ?? "");
-              handleCheckOut(date?.to?.toISOString() ?? "");
               setDate(date);
+              setCurrentBooking((prev) => ({
+                ...prev,
+                checkIn: date?.from || prev.checkIn,
+                checkOut: date?.to || prev.checkOut,
+              }));
             }}
             numberOfMonths={2}
           />
