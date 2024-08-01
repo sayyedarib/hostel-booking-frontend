@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { MinusCircle, PlusCircle } from "lucide-react";
-import { useQueryParam } from "nextjs-query-param";
+import { useQueryParam, StringParam } from "use-query-params";
 import { z } from "zod";
 
 import type { Room } from "@/interface";
@@ -40,26 +40,17 @@ export default function BedReservationCard({
   className,
   roomData,
 }: BedReservationCardProps) {
-  const [checkIn, setCheckIn] = useQueryParam(
-    "checkIn",
-    (value) => value?.toString() ?? ""
-  );
-  const [checkOut, setCheckOut] = useQueryParam(
-    "checkOut",
-    (value) => value?.toString() ?? ""
-  );
-  const [bed, setBed] = useQueryParam(
-    "bed",
-    (value) => value?.toString() ?? ""
-  );
+  const [checkIn, setCheckIn] = useQueryParam("checkIn", StringParam);
+  const [checkOut, setCheckOut] = useQueryParam("checkOut", StringParam);
+  const [bed, setBed] = useQueryParam("bed", StringParam);
 
   return (
     <>
       <Card className={cn("w-full shadow-xl", className)}>
         <CardContent className="flex md:flex-col md:items-stretch items-center gap-2 pb-0 w-full">
           <DatePickerWithRange
-            currCheckIn={checkIn}
-            currCheckOut={checkOut}
+            currCheckIn={checkIn ?? ""}
+            currCheckOut={checkOut ?? ""}
             handleCheckIn={setCheckIn}
             handleCheckOut={setCheckOut}
             className="h-full rounded-[40px] w-[55%] md:w-1/3"
@@ -107,7 +98,7 @@ export default function BedReservationCard({
               <PopoverContent></PopoverContent>
             </Popover>
           </div>
-          <SelectBed roomData={roomData} />
+          <SelectBed />
         </CardContent>
       </Card>
     </>

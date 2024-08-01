@@ -3,7 +3,7 @@ import { eq, sql } from "drizzle-orm";
 
 import { db } from "@/db";
 import { bedTable, buildingTable, roomTable, roomTypeTable } from "@/db/schema";
-import { BedInfo } from "@/interface";
+import { BedInfo, Room } from "@/interface";
 
 export const getAllRooms = async () => {
   console.log("fetching data getAllRooms...");
@@ -46,7 +46,7 @@ export const getAllRooms = async () => {
   return roomsData;
 };
 
-export const getRoomById = async (roomId: number) => {
+export const getRoomById = async (roomId: number)  => {
   console.log("fetching data getRoomById...");
 
   const roomData = await db

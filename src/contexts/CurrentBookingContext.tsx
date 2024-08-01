@@ -2,6 +2,8 @@
 
 import React, { createContext, useState, ReactNode, useEffect } from "react";
 import { addDays, format } from "date-fns";
+import NextAdapterApp from "next-query-params/app";
+import { QueryParamProvider } from "use-query-params";
 
 import type { CurrentBooking, CurrentBookingContextType } from "@/interface";
 
@@ -40,7 +42,9 @@ const CurrentBookingProvider: React.FC<{ children: ReactNode }> = ({
     <CurrentBookingContext.Provider
       value={{ currentBooking, setCurrentBooking }}
     >
-      {children}
+      <QueryParamProvider adapter={NextAdapterApp}>
+        {children}
+      </QueryParamProvider>
     </CurrentBookingContext.Provider>
   );
 };

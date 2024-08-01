@@ -29,7 +29,7 @@ export function SelectBed() {
             <DrawerTitle>Select your bed</DrawerTitle>
           </DrawerHeader>
           <RoomMaps
-            type={currentBooking?.roomData?.roomTypeName ?? ""}
+            type={currentBooking?.roomData?.roomTypeName ?? undefined}
             roomData={currentBooking?.roomData!}
           />
           <DrawerFooter>

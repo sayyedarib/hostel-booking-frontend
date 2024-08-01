@@ -4,7 +4,7 @@ import { useContext, useState } from "react";
 import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { useQueryParam } from "nextjs-query-param";
+import { useQueryParam } from "use-query-params";
 import { z } from "zod";
 
 import { cn } from "@/lib/utils";
@@ -45,7 +45,7 @@ export default function DatePickerWithRange({
             variant={"ghost"}
             className={cn(
               "w-full h-full rounded-[40px] text-lg text-start",
-              !date && "text-muted-foreground",
+              !date && "text-muted-foreground"
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4 hidden md:block" />

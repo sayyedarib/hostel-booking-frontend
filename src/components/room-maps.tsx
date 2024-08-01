@@ -7,7 +7,7 @@ export default function RoomMaps({
   type,
   roomData,
 }: {
-  type: string;
+  type?: string;
   roomData: RoomDataType;
 }) {
   const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
@@ -23,7 +23,15 @@ export default function RoomMaps({
     ],
   };
 
-  const beds = roomLayout[type] ?? [];
+  let beds: string[][] | null = null;
+  if (
+    type === "1-bed" ||
+    type === "2-bed" ||
+    type === "3-bed" ||
+    type === "4-bed"
+  ) {
+    beds = roomLayout[type];
+  }
 
   const handleBedClick = (bed: string) => {
     setSelectedBeds((prev) =>
@@ -63,7 +71,7 @@ export default function RoomMaps({
       >
         {listOfRoomCapacity.map((_, index) => (
           <div className="flex w-fit justify-center space-x-0 mb-8" key={index}>
-            {beds.map((column, columnIndex) => (
+            {beds?.map((column, columnIndex) => (
               <React.Fragment key={columnIndex}>
                 <div
                   className={`flex flex-col ${getBedBackgroundImage()} bg-contain ${
@@ -73,10 +81,11 @@ export default function RoomMaps({
                   {column.map((bed) => (
                     <Button
                       key={bed}
-                      className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
+                      className={`w-32 h-16 rounded-lg bg-contain bg-transparent`}
+                      // ${getBedStyle(getBedStatus(bed))}
                       // TODO: here bed is an string that is bed type e.g. 2-b 3-bed but that's not correct how can we update the database just based on bedtype(that is 2-bed, 3-bed) instead we need complete bed info like id, occupied, etc. from database
                       onClick={() => handleBedClick(bed)}
-                      disabled={getBedStatus(bed) === "occupied"}
+                      // disabled={getBedStatus(bed) === "occupied"}
                     ></Button>
                   ))}
                 </div>

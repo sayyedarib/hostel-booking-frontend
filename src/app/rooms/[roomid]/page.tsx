@@ -18,7 +18,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 
-import type { Room as RoomDataType } from "@/interface";
+import type { Room, Room as RoomDataType } from "@/interface";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -43,7 +43,7 @@ import { Label } from "@/components/ui/label";
 import BedReservationCard from "@/components/bed-reservation-card";
 import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 import { getRoomById } from "@/db/queries";
-
+import { Suspense } from "react";
 import { calculateBedPrice, calculateRoomPrice } from "@/lib/utils";
 
 export default function Room({ params }: { params: { roomid: string } }) {
@@ -90,7 +90,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
   }, [isLinkCopied]);
 
   return (
-    <>
+    <Suspense>
       <div className="w-2/3 flex justify-center mx-auto">
         <div className="mt-32 border-neutral-600 py-2 space-y-4">
           <div className="w-full min-h-[400px] px-2">
@@ -276,6 +276,6 @@ export default function Room({ params }: { params: { roomid: string } }) {
           </div>
         </div>
       </div>
-    </>
+    </Suspense>
   );
 }

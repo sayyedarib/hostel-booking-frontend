@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
-
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
 import { CurrentBookingProvider } from "@/contexts/CurrentBookingContext";
+import { Suspense } from "react";
 
 const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
 
@@ -23,17 +23,20 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={cn(inter.className, "relative")}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <CurrentBookingProvider>
-            <Header className="fixed top-0 left-0 right-0 z-50" />
-            {children}
-          </CurrentBookingProvider>
-        </ThemeProvider>
+        <Suspense>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <CurrentBookingProvider>
+              <Header className="fixed top-0 left-0 right-0 z-50" />
+
+              {children}
+            </CurrentBookingProvider>
+          </ThemeProvider>
+        </Suspense>
       </body>
     </html>
   );
