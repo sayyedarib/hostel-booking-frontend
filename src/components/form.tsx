@@ -1,37 +1,57 @@
 "use client";
 
 import React, { useState } from "react";
+import { toWords } from "number-to-words";
+import { jsPDF } from "jspdf";
+import { CircleHelp, IndianRupee, LoaderCircle } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { createClient } from "@/lib/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { jsPDF } from "jspdf";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function PayingGuestAgreement() {
+  const supabase = createClient();
+  const currentDate = new Date();
+  const formattedCurrentDate = currentDate.toISOString().split("T")[0];
+  const weekday = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
-    owner: "",
-    payingGuest1: "",
-    payingGuest2: "",
-    flatNo: "",
-    floor: "",
-    buildingName: "",
+    owner: "Khan Group of Hostels(Boys & Girls)",
+    payingGuest: "",
+    buildingName: "Campus View Appartment",
+    guestAddress: "",
     address: "",
     city: "",
-    agreementDate: "",
+    agreementDate: formattedCurrentDate,
     agreementMonth: "",
     agreementYear: "",
     duration: "",
-    startDate: "",
-    amount: "",
-    amountInWords: "",
-    securityDeposit: "",
-    securityDepositInWords: "",
-    additionalDeposit: "",
-    additionalDepositInWords: "",
-    additionalDepositDate: "",
-    electricityDeduction: "200",
+    startDate: formattedCurrentDate,
+    amount: "4500",
+    totalAmount: "",
+    securityDeposit: "2000",
   });
+
+  const [guestImage, setGuestImage] = useState<File | null>(null);
 
   type Clauses = {
     [key: string]: boolean;
@@ -60,6 +80,12 @@ export default function PayingGuestAgreement() {
     }));
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setGuestImage(e.target.files[0]);
+    }
+  };
+
   const handleClauseChange = (name: string) => {
     setClauses((prevState) => ({
       ...prevState,
@@ -69,7 +95,7 @@ export default function PayingGuestAgreement() {
 
   const allClausesChecked = Object.values(clauses).every(Boolean);
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     if (!allClausesChecked) {
       alert("Please agree to all clauses before downloading the agreement.");
       return;
@@ -101,22 +127,35 @@ export default function PayingGuestAgreement() {
       }
     };
 
-    addText(
-      `BETWEEN ${formData.owner} AND ${formData.payingGuest1}${formData.payingGuest2 ? `, ${formData.payingGuest2}` : ""}`,
-      0,
-      true,
-    );
-    addText(`Re: One room in Flat No. ${formData.flatNo}`, 0, true);
+    // Add guest image if available
+    if (guestImage) {
+      try {
+        const imgData = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (event) => resolve(event.target?.result as string);
+          reader.onerror = (error) => reject(error);
+          reader.readAsDataURL(guestImage);
+        });
+
+        doc.addImage(imgData, "JPEG", 150, y, 40, 40);
+        y += 45;
+      } catch (error) {
+        console.error("Error adding image to PDF:", error);
+      }
+    }
+
+    addText(`BETWEEN ${formData.owner} AND ${formData.payingGuest}`, 0, true);
+    // addText(`Re: One room in Flat No. ${formData.flatNo}`, 0, true);
     y += 10;
 
     addText(
-      `AGREEMENT made at ${formData.city} this ${new Date(formData.agreementDate).getDate()} day of ${new Date(formData.agreementDate).toLocaleString("default", { month: "long" })} ${new Date(formData.agreementDate).getFullYear()} BETWEEN ${formData.owner} hereinafter referred to as "the Owner" of the One Part AND ${formData.payingGuest1}${formData.payingGuest2 ? ` and ${formData.payingGuest2}` : ""} hereinafter referred to as "the Paying Guest" of the Second Part;`,
+      `AGREEMENT made at ${formData.city} this ${weekday[currentDate.getDay()]} day of ${formattedCurrentDate} BETWEEN ${formData.owner} hereinafter referred to as "the Owner" of the One Part AND ${formData.payingGuest} hereinafter referred to as "the Paying Guest" of the Second Part;`,
       0,
       true,
     );
 
     addText(
-      `WHEREAS the Owner is seized and possessed of and is occupying Flat No.${formData.flatNo} on the ${formData.floor} floor of the building named and known as ${formData.buildingName} situated at ${formData.address};`,
+      `WHEREAS the Owner is seized and possessed of and is occupying building named and known as ${formData.buildingName} situated at Shah Jahan Public School, Shamshad Market, Aligarh;`,
     );
 
     addText(
@@ -126,13 +165,11 @@ export default function PayingGuestAgreement() {
     addText("NOW THIS AGREEMENT WITNESSETH:");
 
     addText(
-      "1. The Owner hereby agrees to permit the Paying Guest to use one bedroom in the aforesaid premises being Flat No." +
-        formData.flatNo +
-        " in " +
+      "1. The Owner hereby agrees to permit the Paying Guest to use one bedroom in" +
         formData.buildingName +
         " situated at " +
-        formData.address +
-        " together with the use of the attached bathroom, on paying guest basis.",
+        "Shah Jahan Public School, Shamshad Market, Aligarh" +
+        " together with the use of the attached or shared bathroom, on paying guest basis.",
       10,
     );
 
@@ -142,12 +179,12 @@ export default function PayingGuestAgreement() {
     );
 
     addText(
-      `3. The Paying Guest shall pay an amount of Rs.${formData.amount} (Rupees ${formData.amountInWords} only) for every quarter (three months). The charges shall include the use of bathroom and other incidentals and society charges. The Paying Guest have agreed to pay the entire electricity bill, less an amount of Rs.${formData.electricityDeduction}/- (Rupees ${formData.electricityDeduction === "200" ? "two hundred" : formData.electricityDeduction}) per month.`,
+      `3. The Paying Guest shall pay an amount of Rs.${formData.totalAmount} (Rupees ${toWords(Number(formData.totalAmount))} only) for every quarter (three months). The charges shall include the use of bathroom and other incidentals and society charges.`,
       10,
     );
 
     addText(
-      `4. The Paying Guest have paid at the time of execution hereof a security deposit of Rs.${formData.securityDeposit} (Rupees ${formData.securityDepositInWords} only) which shall remain with the Owner free of interest, until the termination of this agreement, and shall be returned to the Paying Guest, subject to any deduction for payments due hereunder. The Paying Guest shall pay a further sum of Rs.${formData.additionalDeposit} (Rupees ${formData.additionalDepositInWords} only) as Security Deposit on or before ${formData.additionalDepositDate}.`,
+      `4. The Paying Guest have paid at the time of execution hereof a security deposit of Rs.2,000 (Rupees Two Thousands only) which shall remain with the Owner free of interest, until the termination of this agreement, and shall be returned to the Paying Guest, subject to any deduction for payments due hereunder.`,
       10,
     );
 
@@ -176,10 +213,7 @@ export default function PayingGuestAgreement() {
     addText("in the presence of");
     y += 10;
     addText("SIGNED AND DELIVERED by the within-");
-    addText(`named ${formData.payingGuest1}`);
-    if (formData.payingGuest2) {
-      addText(`and ${formData.payingGuest2}`);
-    }
+    addText(`named ${formData.payingGuest}`);
     addText("in the presence of");
 
     y += 20;
@@ -188,7 +222,7 @@ export default function PayingGuestAgreement() {
     doc.setFontSize(12);
 
     addText(
-      `Received this day the sum of Rs.${formData.securityDeposit} (Rupees ${formData.securityDepositInWords} only) by cheque bearing No. __________ and Rs.${formData.additionalDeposit} (Rupees ${formData.additionalDepositInWords} only) by cheque bearing No. __________ dated ${formData.additionalDepositDate} both drawn on __________ Bank __________ Branch from ${formData.payingGuest1}${formData.payingGuest2 ? ` and ${formData.payingGuest2}` : ""}, the Paying Guests towards security deposit.`,
+      `Received this day ${formattedCurrentDate} the sum of Rs.${formData.securityDeposit} (Rupees ${toWords(Number(formData.securityDeposit))} only), by the Paying Guests towards security deposit.`,
     );
 
     addText("WE SAY RECEIVED");
@@ -196,6 +230,60 @@ export default function PayingGuestAgreement() {
     addText(`${formData.owner}`);
 
     doc.save("paying-guest-agreement.pdf");
+    return new Promise<Blob>((resolve) => {
+      const pdfBlob: Blob = doc.output("blob");
+      resolve(pdfBlob);
+    });
+  };
+
+  const uploadPDF = async (pdfBlob: Blob | undefined) => {
+    if (!pdfBlob) {
+      console.log(
+        "No PDF blob found. Please generate the PDF before uploading.",
+      );
+      return;
+    }
+    const { data, error } = await supabase.storage
+      .from("agreement_docs")
+      .upload(`${formData.payingGuest}-${Date.now()}.pdf`, pdfBlob);
+
+    if (error) {
+      console.error("Error uploading PDF:", error);
+    } else {
+      console.log("PDF uploaded successfully:", data);
+    }
+  };
+
+  const uploadGuestImage = async () => {
+    if (!guestImage) {
+      console.log("No guest image selected.");
+      return;
+    }
+
+    const { data, error } = await supabase.storage
+      .from("guest_image")
+      .upload(`${formData.payingGuest}-${Date.now()}.jpg`, guestImage);
+
+    if (error) {
+      console.error("Error uploading guest image:", error);
+    } else {
+      console.log("Guest image uploaded successfully:", data);
+    }
+  };
+
+  const handleUpload = async () => {
+    try {
+      setIsLoading(true);
+      console.log("generating PDF...");
+      const pdfBlob = await generatePDF();
+      console.log("uploading PDF...");
+      await uploadPDF(pdfBlob);
+      console.log("uploading guest image...");
+      await uploadGuestImage();
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error in upload process:", error);
+    }
   };
 
   return (
@@ -204,79 +292,35 @@ export default function PayingGuestAgreement() {
       <form className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <Label htmlFor="owner">Owner Name</Label>
+            <Label htmlFor="guestImage">Guest Image</Label>
             <Input
-              id="owner"
-              name="owner"
-              value={formData.owner}
+              id="guestImage"
+              name="guestImage"
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+          </div>
+          <div>
+            <Label htmlFor="payingGuest">Paying Guest</Label>
+            <Input
+              id="payingGuest"
+              name="payingGuest"
+              value={formData.payingGuest}
               onChange={handleInputChange}
             />
           </div>
           <div>
-            <Label htmlFor="payingGuest1">Paying Guest 1</Label>
-            <Input
-              id="payingGuest1"
-              name="payingGuest1"
-              value={formData.payingGuest1}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="payingGuest2">Paying Guest 2</Label>
-            <Input
-              id="payingGuest2"
-              name="payingGuest2"
-              value={formData.payingGuest2}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="flatNo">Flat No.</Label>
-            <Input
-              id="flatNo"
-              name="flatNo"
-              value={formData.flatNo}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="floor">Floor</Label>
-            <Input
-              id="floor"
-              name="floor"
-              value={formData.floor}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="buildingName">Building Name</Label>
-            <Input
-              id="buildingName"
-              name="buildingName"
-              value={formData.buildingName}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="address">Address</Label>
+            <Label htmlFor="guestAddress">Guest Address</Label>
             <Textarea
-              id="address"
-              name="address"
-              value={formData.address}
+              id="guestAddress"
+              name="guestAddress"
+              value={formData.guestAddress}
               onChange={handleInputChange}
             />
           </div>
           <div>
-            <Label htmlFor="city">City</Label>
-            <Input
-              id="city"
-              name="city"
-              value={formData.city}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="agreementDate">Agreement Date</Label>
+            <Label htmlFor="agreementDate">Agreement Date/Joining Date</Label>
             <Input
               id="agreementDate"
               name="agreementDate"
@@ -295,32 +339,51 @@ export default function PayingGuestAgreement() {
               onChange={handleInputChange}
             />
           </div>
-          <div>
-            <Label htmlFor="startDate">Start Date</Label>
-            <Input
-              id="startDate"
-              name="startDate"
-              type="date"
-              value={formData.startDate}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="amount">Amount (per quarter)</Label>
+          <div className="space-y-1">
+            <Label htmlFor="amount" className="flex gap-3">
+              Amount (per Month)
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <CircleHelp size={14} />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <Card className="border-none">
+                      <CardHeader>
+                        <CardTitle>Amount Description</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex flex-col gap-2">
+                          <span className="flex justify-between">
+                            <span className="flex items-center">
+                              <IndianRupee size={14} /> 5000/bed
+                            </span>
+                            <span>2-seater rooms</span>
+                          </span>
+                          <span className="flex justify-between">
+                            <span className="flex items-center">
+                              <IndianRupee size={14} /> 4500/bed
+                            </span>
+                            <span>3-seater rooms</span>
+                          </span>
+                          <span className="flex justify-between">
+                            <span className="flex items-center">
+                              <IndianRupee size={14} /> 4000/bed
+                            </span>
+                            <span>4-seater rooms</span>
+                          </span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </Label>
             <Input
               id="amount"
               name="amount"
               type="number"
               value={formData.amount}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="amountInWords">Amount in Words</Label>
-            <Input
-              id="amountInWords"
-              name="amountInWords"
-              value={formData.amountInWords}
               onChange={handleInputChange}
             />
           </div>
@@ -332,62 +395,21 @@ export default function PayingGuestAgreement() {
               type="number"
               value={formData.securityDeposit}
               onChange={handleInputChange}
+              disabled
             />
           </div>
           <div>
-            <Label htmlFor="securityDepositInWords">
-              Security Deposit in Words
-            </Label>
+            <Label htmlFor="totalAmount">Total Amount to be paid</Label>
             <Input
-              id="securityDepositInWords"
-              name="securityDepositInWords"
-              value={formData.securityDepositInWords}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="additionalDeposit">Additional Deposit</Label>
-            <Input
-              id="additionalDeposit"
-              name="additionalDeposit"
+              id="totalAmount"
+              name="totalAmount"
               type="number"
-              value={formData.additionalDeposit}
+              value={(
+                Number(formData.amount) * Number(formData.duration) +
+                Number(formData.securityDeposit)
+              ).toString()}
               onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="additionalDepositInWords">
-              Additional Deposit in Words
-            </Label>
-            <Input
-              id="additionalDepositInWords"
-              name="additionalDepositInWords"
-              value={formData.additionalDepositInWords}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="additionalDepositDate">
-              Additional Deposit Date
-            </Label>
-            <Input
-              id="additionalDepositDate"
-              name="additionalDepositDate"
-              type="date"
-              value={formData.additionalDepositDate}
-              onChange={handleInputChange}
-            />
-          </div>
-          <div>
-            <Label htmlFor="electricityDeduction">
-              Electricity Deduction (Rs.)
-            </Label>
-            <Input
-              id="electricityDeduction"
-              name="electricityDeduction"
-              type="number"
-              value={formData.electricityDeduction}
-              onChange={handleInputChange}
+              disabled
             />
           </div>
         </div>
@@ -504,11 +526,15 @@ export default function PayingGuestAgreement() {
 
         <Button
           type="button"
-          onClick={generatePDF}
-          disabled={!allClausesChecked}
+          onClick={async () => await handleUpload()}
+          disabled={!allClausesChecked || isLoading}
           className={`mt-6 ${!allClausesChecked ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          Download Agreement
+          {!isLoading ? (
+            "Download Agreement"
+          ) : (
+            <LoaderCircle className="animate-spin" />
+          )}
         </Button>
       </form>
     </div>
