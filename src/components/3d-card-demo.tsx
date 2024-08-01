@@ -12,19 +12,20 @@ import { RoomCard } from "@/interface";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   const searchParams = useSearchParams();
-  const checkIn = searchParams.get("checkIn");
-  const checkOut = searchParams.get("checkOut");
+  const checkInParam = searchParams.get("checkIn");
+  const checkOutParam = searchParams.get("checkOut");
+
+  const checkIn = checkInParam ? new Date(checkInParam) : new Date();
+  const checkOut = checkOutParam
+    ? new Date(checkOutParam)
+    : new Date(new Date().setDate(new Date().getDate() + 30));
   const duration = differenceInDays(checkOut!, checkIn!);
 
   const searchParamsString = searchParams.toString();
   const roomUrl = `/rooms/${roomData.id}?${searchParamsString}`;
 
   return (
-    <CardContainer
-      as={Link}
-      href={roomUrl}
-      className="inter-var"
-    >
+    <CardContainer as={Link} href={roomUrl} className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  shadow-lg hover:shadow:2xl w-auto sm:w-[30rem] h-auto rounded-xl border">
         <CardItem translateZ="100" className="w-full">
           <Image
@@ -63,7 +64,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
         >
           <IndianRupee size={16} />{" "}
           {Math.max(roomData.totalBedPrice, roomData.bedInfo[0].dailyPrice)} for{" "}
-          {duration ? duration : duration} night{duration > 1 ? "s" : ""}
+          {duration} night{duration > 1 ? "s" : ""}
         </CardItem>
       </CardBody>
     </CardContainer>

@@ -59,7 +59,7 @@ export const bedTable = pgTable("bed", {
     .notNull()
     .references(() => roomTable.id),
   bedType: text("bed_type").notNull(),
-  status: text("status").notNull().default("available"), //available, occupied, under_maintenance
+  occupied: boolean("occupied").notNull().default(false),
   dailyPrice: numeric("daily_price").notNull(),
   monthlyPrice: numeric("monthly_price").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

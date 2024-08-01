@@ -9,11 +9,10 @@ import { getAllRooms } from "@/db/queries";
 
 const CurrentBookingContext = createContext<CurrentBookingContextType>({
   currentBooking: {
-    male: 0,
-    female: 0,
-    room: 0,
+    bed: 1,
     checkIn: new Date(),
     checkOut: addDays(new Date(), 30),
+    roomData: null,
   },
   setCurrentBooking: () => {},
 });
@@ -22,11 +21,10 @@ const CurrentBookingProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [currentBooking, setCurrentBooking] = useState<CurrentBooking>({
-    male: 0,
-    female: 0,
-    room: 0,
+    bed: 1,
     checkIn: new Date(),
     checkOut: addDays(new Date(), 30),
+    roomData: null,
   });
 
   useEffect(() => {

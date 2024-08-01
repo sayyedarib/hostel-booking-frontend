@@ -1,4 +1,4 @@
-// /app/(auth)/login/page.tsx
+// /app/(auth)/signup/page.tsx
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -8,14 +8,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/lib/supabase/actions";
+import { signup } from "@/lib/supabase/actions";
 
 type FormData = {
   email: string;
   password: string;
 };
 
-export default function Login() {
+export default function Signup() {
   const { register, handleSubmit } = useForm<FormData>();
 
   const onSubmit = async (data: FormData) => {
@@ -24,10 +24,10 @@ export default function Login() {
     formData.append("password", data.password);
 
     try {
-      await login(formData);
+      await signup(formData);
     } catch (error) {
-      console.error("Login failed:", error);
-      alert("Error logging in");
+      console.error("Signup failed:", error);
+      alert("Error signing up");
     }
   };
 
@@ -36,9 +36,9 @@ export default function Login() {
       <div className="flex items-center justify-center py-12">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
+            <h1 className="text-3xl font-bold">Sign Up</h1>
             <p className="text-balance text-muted-foreground">
-              Enter your email below to login to your account
+              Enter your email below to create an account
             </p>
           </div>
           <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
@@ -53,15 +53,7 @@ export default function Login() {
               />
             </div>
             <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
-              </div>
+              <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -70,16 +62,13 @@ export default function Login() {
               />
             </div>
             <Button type="submit" className="w-full">
-              Login
-            </Button>
-            <Button variant="outline" className="w-full">
-              Login with Google
+              Sign Up
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="underline">
-              Sign up
+            Already have an account?{" "}
+            <Link href="/login" className="underline">
+              Login
             </Link>
           </div>
         </div>
