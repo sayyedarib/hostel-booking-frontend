@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { bookBed } from "@/db/queries";
-import { BedInfo, Room } from "@/interface";
+import { BedInfo, Room as RoomDataType } from "@/interface";
 
 export default function RoomMaps({
   type,
+  roomData,
 }: {
   type: "1-bed" | "2-bed" | "3-bed" | "4-bed";
+  roomData: RoomDataType;
 }) {
   const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
+  const listOfRoomCapacity = new Array(Number(roomData.roomCapacity!)).fill("");
 
   const roomLayout = {
     "1-bed": [["A1"]],
@@ -32,7 +35,7 @@ export default function RoomMaps({
 
   const getBedStatus = (bed: BedInfo) => {
     if (selectedBeds.includes(bed.id.toString())) return "selected";
-    if (bed.occupied) return "true";
+    if (bed.occupied) return "occupied";
     return "available";
   };
 
@@ -56,24 +59,31 @@ export default function RoomMaps({
 
   return (
     <div className="max-w-md mx-auto p-4 border">
-      <div className="flex justify-center space-x-0 mb-8">
-        {beds.map((column, columnIndex) => (
-          <React.Fragment key={columnIndex}>
-            <div
-              className={`flex flex-col ${getBedBackgroundImage()} bg-contain ${
-                columnIndex % 2 !== 0 && type !== "3-bed" ? "scale-x-[-1]" : ""
-              }`}
-            >
-              {column.map((bed) => (
-                <Button
-                  key={bed}
-                  className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
-                  onClick={() => handleBedClick(bed)}
-                  disabled={getBedStatus(bed) === "true"}
-                ></Button>
-              ))}
-            </div>
-          </React.Fragment>
+      <div
+        className={`grid ${listOfRoomCapacity.length > 1 && "grid-cols-2"} w-fit mx-auto`}
+      >
+        {listOfRoomCapacity.map((_, index) => (
+          <div className="flex w-fit justify-center space-x-0 mb-8" key={index}>
+            {beds.map((column, columnIndex) => (
+              <React.Fragment key={columnIndex}>
+                <div
+                  className={`flex flex-col ${getBedBackgroundImage()} bg-contain ${
+                    index % 2 !== 0 && "scale-x-[-1]"
+                  }`}
+                >
+                  {column.map((bed) => (
+                    <Button
+                      key={bed}
+                      className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
+                      // TODO: here bed is an string that is bed type e.g. 2-b 3-bed but that's not correct how can we update the database just based on bedtype(that is 2-bed, 3-bed) instead we need complete bed info like id, occupied, etc. from database
+                      onClick={() => handleBedClick(bed)}
+                      disabled={getBedStatus(bed) === "occupied"}
+                    ></Button>
+                  ))}
+                </div>
+              </React.Fragment>
+            ))}
+          </div>
         ))}
       </div>
       <div className="flex justify-center space-x-4">
