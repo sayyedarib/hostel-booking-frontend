@@ -34,3 +34,14 @@ export interface BedInfo {
   monthlyPrice: number;
   occupied?: boolean;
 }
+
+export interface Guest {
+  id?: number;
+  name: string;
+  email: string;
+  phone: string;
+  clerkId: string;
+  roomId?: number;
+  bedId?: number;
+  paymentId?: string;
+}

@@ -183,7 +183,7 @@ export default function Room({ params }: { params: { roomid: string } }) {
                     type="submit"
                     onClick={() =>
                       copyLink(
-                        `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`
+                        `${process.env.NEXT_PUBLIC_FRONTEND_URL}/${pathname}`,
                       )
                     }
                     size="sm"

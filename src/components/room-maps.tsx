@@ -29,7 +29,7 @@ export default function RoomMaps({
     setSelectedBeds((prev) =>
       prev.includes(bed)
         ? prev.filter((selectedBed) => selectedBed !== bed)
-        : [...prev, bed]
+        : [...prev, bed],
     );
   };
 

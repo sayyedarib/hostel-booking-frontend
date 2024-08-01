@@ -2,8 +2,14 @@
 import { eq, sql } from "drizzle-orm";
 
 import { db } from "@/db";
-import { bedTable, buildingTable, roomTable, roomTypeTable } from "@/db/schema";
-import { BedInfo } from "@/interface";
+import {
+  bedTable,
+  buildingTable,
+  guestTable,
+  roomTable,
+  roomTypeTable,
+} from "@/db/schema";
+import { BedInfo, Guest } from "@/interface";
 
 export const getAllRooms = async () => {
   console.log("fetching data getAllRooms...");
@@ -99,4 +105,33 @@ export const bookBed = async (bedId: number) => {
 
   console.log("bedData", bedData);
   return bedData;
+};
+
+export const createGuestWithClerk = async (guestData: Guest) => {
+  console.log("creating guest...");
+
+  const guest = await db.insert(guestTable).values({
+    name: guestData.name,
+    userName:
+      guestData.name.toLowerCase().replace(/\s/g, "").substring(0, 4) +
+      Math.floor(Math.random() * 1000),
+    email: guestData.email,
+    phone: guestData.phone,
+    clerkId: guestData.clerkId,
+  });
+
+  console.log("guest", guest);
+  return guest;
+};
+
+export const checkIfGuestExistsByClerkId = async (clerkId: string) => {
+  console.log("checking if guest exists...");
+
+  const guest = await db
+    .select()
+    .from(guestTable)
+    .where(eq(guestTable.clerkId, clerkId));
+
+  console.log("guest", guest);
+  return guest;
 };

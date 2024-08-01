@@ -72,12 +72,14 @@ export const guestTable = pgTable(
   "guest",
   {
     id: serial("id").primaryKey(),
+    clerkId: text("clerk_id").notNull(),
     name: text("name").notNull(),
     userName: text("user_name").notNull(),
     email: text("email").notNull(),
     phone: text("phone").notNull().default(""),
     dob: date("dob"),
-    gender: text("gender").notNull(),
+    gender: text("gender"),
+    googlePic: text("google_pic"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()
