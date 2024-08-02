@@ -248,7 +248,7 @@ const GuestRoomRegistrationForm: React.FC = () => {
             <li>
               Thank you for choosing KGH GUEST ROOMS. We want to let you know
               that our online booking open 24 hours for all your questions and
-              inquiries. www.hostelinaligarh.com Please don't hesitate to
+              inquiries. www.hostelinaligarh.com Please don&apos;t hesitate to
               contact us if you have any questions. We are happy to help!
             </li>
             <li>
@@ -261,7 +261,7 @@ const GuestRoomRegistrationForm: React.FC = () => {
               precede an early check out.
             </li>
             <li>
-              By signing this form, you agree on following the hostel's and
+              By signing this form, you agree on following the hostel&apos;s and
               Guest Rooms rules and the purpose described above, plus consenting
               to the usage of your personal Information for administrative and
               marketing purposes.
