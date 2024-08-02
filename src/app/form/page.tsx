@@ -1,10 +1,11 @@
-import PayingGuestAgreement from "@/components/form";
+"use client";
+import GuestRoomRegistrationForm from "@/components/registration-form";
 
 export default function Form() {
   return (
-    <div className="max-w-screen min-h-screen flex items-center justify-center mt-12">
+    <div className="max-w-screen min-h-screen flex flex-col items-center justify-center my-12">
       {" "}
-      <PayingGuestAgreement />
+      <GuestRoomRegistrationForm />
     </div>
   );
 }

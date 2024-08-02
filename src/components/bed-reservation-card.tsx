@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import { cn, calculateBedPrice } from "@/lib/utils";
 import { MinusCircle, PlusCircle } from "lucide-react";
 import { useQueryParam } from "nextjs-query-param";
@@ -56,7 +56,9 @@ export default function BedReservationCard({
       defaultCheckOut.setDate(defaultCheckOut.getDate() + 30);
       setCheckOut(defaultCheckOut.toISOString().split("T")[0]);
     }
+  }, []); // Empty dependency array
 
+  useEffect(() => {
     // Calculate available beds
     const notOccupiedBeds =
       roomData?.bedInfo?.filter((bed) => !bed.occupied) || [];
@@ -64,7 +66,7 @@ export default function BedReservationCard({
 
     // Initialize selected beds
     setSelectedBeds(notOccupiedBeds.slice(0, Number(bedCount)));
-  }, [checkIn, checkOut, setCheckIn, setCheckOut, roomData, bedCount]);
+  }, [roomData, bedCount]);
 
   const handleBedCountChange = (increment: boolean) => {
     const newCount = increment

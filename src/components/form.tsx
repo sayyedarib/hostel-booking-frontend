@@ -13,11 +13,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 
 export default function PayingGuestAgreement() {
   const supabase = createClient();
@@ -342,42 +341,40 @@ export default function PayingGuestAgreement() {
           <div className="space-y-1">
             <Label htmlFor="amount" className="flex gap-3">
               Amount (per Month)
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <CircleHelp size={14} />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <Card className="border-none">
-                      <CardHeader>
-                        <CardTitle>Amount Description</CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex flex-col gap-2">
-                          <span className="flex justify-between">
-                            <span className="flex items-center">
-                              <IndianRupee size={14} /> 5000/bed
-                            </span>
-                            <span>2-seater rooms</span>
+              <HoverCard>
+                <HoverCardTrigger>
+                  <CircleHelp size={14} />
+                </HoverCardTrigger>
+                <HoverCardContent>
+                  <Card className="border-none">
+                    <CardHeader>
+                      <CardTitle>Amount Description</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col gap-2">
+                        <span className="flex justify-between">
+                          <span className="flex items-center">
+                            <IndianRupee size={14} /> 5000/bed
                           </span>
-                          <span className="flex justify-between">
-                            <span className="flex items-center">
-                              <IndianRupee size={14} /> 4500/bed
-                            </span>
-                            <span>3-seater rooms</span>
+                          <span>2-seater rooms</span>
+                        </span>
+                        <span className="flex justify-between">
+                          <span className="flex items-center">
+                            <IndianRupee size={14} /> 4500/bed
                           </span>
-                          <span className="flex justify-between">
-                            <span className="flex items-center">
-                              <IndianRupee size={14} /> 4000/bed
-                            </span>
-                            <span>4-seater rooms</span>
+                          <span>3-seater rooms</span>
+                        </span>
+                        <span className="flex justify-between">
+                          <span className="flex items-center">
+                            <IndianRupee size={14} /> 4000/bed
                           </span>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                          <span>4-seater rooms</span>
+                        </span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </HoverCardContent>
+              </HoverCard>
             </Label>
             <Input
               id="amount"
@@ -416,52 +413,52 @@ export default function PayingGuestAgreement() {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold">Agreement Clauses</h2>
           <div className="space-y-3">
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause5"
                 checked={clauses.clause5}
                 onCheckedChange={() => handleClauseChange("clause5")}
               />
-              <Label htmlFor="clause5">
+              <Label className="leading-5" htmlFor="clause5">
                 The Owner may allot to the Paying Guest any of the bedrooms in
                 the said flat for the use of the Paying Guest and the Owner may
                 change the allocation at any time during the pendency of the
                 Agreement.
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause6"
                 checked={clauses.clause6}
                 onCheckedChange={() => handleClauseChange("clause6")}
               />
-              <Label htmlFor="clause6">
+              <Label className="leading-5" htmlFor="clause6">
                 The Paying Guest hereby specifically confirm and agree that they
                 have no right whatsoever to the said premises nor shall claim to
                 be tenant/sub-tenant or licensees nor shall claim any other
                 right whatsoever in or to the said premises.
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause7"
                 checked={clauses.clause7}
                 onCheckedChange={() => handleClauseChange("clause7")}
               />
-              <Label htmlFor="clause7">
+              <Label className="leading-5" htmlFor="clause7">
                 It is clearly agreed and understood that the Paying Guest have
                 not been given any key to the entrance door of the flat nor even
                 to the room that is allocated to them for their temporary use
                 from time to time.
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause8"
                 checked={clauses.clause8}
                 onCheckedChange={() => handleClauseChange("clause8")}
               />
-              <Label htmlFor="clause8">
+              <Label className="leading-5" htmlFor="clause8">
                 They Paying Guest may use the passages in the flat for access to
                 the room and may use the kitchen for cooking their own food only
                 provided that no disturbance whatsoever is caused to the use of
@@ -469,25 +466,25 @@ export default function PayingGuestAgreement() {
                 Owner and his servants and others.
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause9"
                 checked={clauses.clause9}
                 onCheckedChange={() => handleClauseChange("clause9")}
               />
-              <Label htmlFor="clause9">
+              <Label className="leading-5" htmlFor="clause9">
                 The Paying Guest shall not cause any disturbance at any time and
                 may permit guests or any outsider to enter the flat only with
                 the permission of the Owner.
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause10"
                 checked={clauses.clause10}
                 onCheckedChange={() => handleClauseChange("clause10")}
               />
-              <Label htmlFor="clause10">
+              <Label className="leading-5" htmlFor="clause10">
                 In the event that the Paying Guest misuse any of the facilities
                 in the flat or causes any disturbance or delays in making
                 payment of the Paying Guest charges, this Agreement shall stand
@@ -497,24 +494,24 @@ export default function PayingGuestAgreement() {
                 all the belongings of the Paying Guest and dispose of them.
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause11"
                 checked={clauses.clause11}
                 onCheckedChange={() => handleClauseChange("clause11")}
               />
-              <Label htmlFor="clause11">
+              <Label className="leading-5" htmlFor="clause11">
                 This Agreement shall stand terminated immediately upon the
                 expiry of the period mentioned hereinabove.
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
+            <div className="flex space-x-2">
               <Checkbox
                 id="clause12"
                 checked={clauses.clause12}
                 onCheckedChange={() => handleClauseChange("clause12")}
               />
-              <Label htmlFor="clause12">
+              <Label className="leading-5" htmlFor="clause12">
                 The Paying Guest shall be responsible for any damage caused by
                 them or by any other outsider who has entered the flat through
                 them to the said flat and to any of the furniture, fixtures and
