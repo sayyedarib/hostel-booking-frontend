@@ -79,7 +79,7 @@ export const guestTable = pgTable(
     email: text("email").notNull(),
     phone: text("phone").notNull().default(""),
     dob: date("dob"),
-    gender: text("gender"),
+    gender: text("gender").default(""),
     googlePic: text("google_pic"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
@@ -102,14 +102,9 @@ export const bookingTable = pgTable("booking", {
     .notNull()
     .references(() => roomTable.id),
   bedId: integer("bed_id").references(() => bedTable.id),
-  bookingType: text("booking_type").notNull(),
   checkInDate: date("check_in_date").notNull(),
   checkOutDate: date("check_out_date").notNull(),
-  bookingInterval: text("booking_interval").notNull(),
   status: text("status").notNull().default("active"),
-  pricingType: text("pricing_type").notNull(),
-  totalAmount: numeric("total_amount").notNull(),
-  securityDeposit: numeric("security_deposit").notNull(),
   isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -143,8 +138,6 @@ export const paymentTable = pgTable("payment", {
     .notNull()
     .references(() => bookingTable.id),
   amount: numeric("amount").notNull(),
-  paymentDate: date("payment_date").notNull(),
-  paymentType: text("payment_type").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()

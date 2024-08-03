@@ -1,15 +1,32 @@
 "use server";
-import { eq, sql } from "drizzle-orm";
-
+import { eq, sql, inArray } from "drizzle-orm";
+import { auth } from "@clerk/nextjs/server"
 import { db } from "@/db";
 import {
   bedTable,
+  bookingTable,
   buildingTable,
   guestTable,
   roomTable,
   roomTypeTable,
 } from "@/db/schema";
 import { BedInfo, Guest } from "@/interface";
+
+export const getGuestByClerkId = async () => {
+  const userId = auth().userId;
+  if(!userId) {
+    console.error("No user id found");
+    return;
+  }
+
+  const guestData = await db
+    .select()
+    .from(guestTable)
+    .where(eq(guestTable.clerkId, userId));
+
+  console.log("guestData", guestData);
+  return guestData[0];
+}
 
 export const getAllRooms = async () => {
   console.log("fetching data getAllRooms...");
@@ -137,3 +154,106 @@ export const checkIfGuestExistsByClerkId = async (clerkId: string) => {
   console.log("guest", guest);
   return guest;
 };
+
+
+interface BookingParams {
+  roomId: number;
+  bedId: number;
+  checkIn: string;
+  checkOut: string;
+}
+
+export async function createBooking({
+  roomId,
+  bedId,
+  checkIn,
+  checkOut,
+}: BookingParams) {
+  const guest = await getGuestByClerkId();
+  if (!guest) {
+    console.log("No guest found");
+    return;
+  }
+
+  try {
+    const booking = await db
+      .insert(bookingTable)
+      .values({
+        guestId: guest.id as number, // Use guest.id directly
+        roomId: roomId,
+        bedId: bedId,
+        checkInDate: new Date(checkIn),
+        checkOutDate: new Date(checkOut),
+        status: "active",
+        isActive: true,
+      })
+      .returning();
+
+    return { success: true, booking }; // Return the booking object if needed
+  } catch (error) {
+    console.error("Booking error:", error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+export async function updateBedStatus(bedIds: number[], occupied: boolean) {
+  try {
+    await db
+      .update(bedTable)
+      .set({ occupied })
+      .where(inArray(bedTable.id, bedIds));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Bed status update error:", error);
+    return { success: false, error: (error as Error).message };
+  }
+}
+
+
+
+interface RoomDetails {
+  roomNumber: string;
+  bedCodes: string[];
+  roomMonthlyPrice: number;
+  roomDailyPrice: number;
+}
+
+export async function getRoomDetails(roomId: number, bedIdsString: string): Promise<RoomDetails | null> {
+  try {
+    const bedIds = bedIdsString.split("+").map(Number);
+
+    const roomData = await db
+      .select({
+        roomNumber: roomTable.roomNumber,
+        roomDailyPrice: sql<number>`CAST(${roomTable.dailyPrice} AS NUMERIC)`,
+        roomMonthlyPrice: sql<number>`CAST(${roomTable.monthlyPrice} AS NUMERIC)`,
+      })
+      .from(roomTable)
+      .where(eq(roomTable.id, roomId))
+      .limit(1);
+
+    if (roomData.length === 0) {
+      return null;
+    }
+
+    console.log("roomData", roomData);
+    console.log("bed ", bedIds);
+    const bedCodesForSelectedBeds = await db
+      .select({ bedCode: bedTable.bedCode })
+      .from(bedTable)
+      .where(inArray(bedTable.id, bedIds));
+
+
+
+    return {
+      roomNumber: roomData[0].roomNumber,
+      roomMonthlyPrice: roomData[0].roomMonthlyPrice,
+      roomDailyPrice: roomData[0].roomDailyPrice,
+      bedCodes: bedCodesForSelectedBeds.map(bed => bed.bedCode),
+    };
+  } catch (error) {
+    console.error("Error fetching room details:", error);
+    return null;
+  }
+}

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter, redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { cn, calculateBedPrice } from "@/lib/utils";
 import { MinusCircle, PlusCircle } from "lucide-react";
 import { useQueryParam } from "nextjs-query-param";
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import DatePickerWithRange from "@/components/ui/date-picker";
 import { Separator } from "./ui/separator";
+import { SelectBed } from "./select-bed";
 
 interface BedReservationCardProps {
   className?: string;
@@ -32,16 +33,17 @@ export default function BedReservationCard({
 
   const [checkIn, setCheckIn] = useQueryParam(
     "checkIn",
-    (value) => value?.toString() ?? "",
+    (value) => value?.toString() ?? ""
   );
   const [checkOut, setCheckOut] = useQueryParam(
     "checkOut",
-    (value) => value?.toString() ?? "",
+    (value) => value?.toString() ?? ""
   );
   const [bedCount, setBedCount] = useQueryParam(
     "bedCount",
-    (value) => value?.toString() ?? "1",
+    (value) => value?.toString() ?? "1"
   );
+
   const [selectedBeds, setSelectedBeds] = useState<BedInfo[]>([]);
 
   const [availableBeds, setAvailableBeds] = useState<BedInfo[]>([]);
@@ -70,19 +72,20 @@ export default function BedReservationCard({
 
   const handleBedCountChange = (increment: boolean) => {
     const newCount = increment
-      ? Math.min(Number(bedCount) + 1, availableBeds.length)
+      ? Math.min(Number(bedCount) + 1, availableBeds.length, roomData.roomCapacity)
       : Math.max(Number(bedCount) - 1, 1);
     setBedCount(newCount.toString());
     setSelectedBeds(availableBeds.slice(0, newCount));
   };
 
   const getTotalPrice = () => {
-    return selectedBeds.reduce((total, bed) => {
-      return (
-        total +
-        calculateBedPrice(roomData, new Date(checkIn), new Date(checkOut), 1)
-      );
-    }, 0);
+    // return selectedBeds.reduce((total) => {
+    //   return (
+    //     total +
+    //     calculateBedPrice(roomData, new Date(checkIn), new Date(checkOut), selectedBeds.length)
+    //   );
+    // }, 0);
+    return calculateBedPrice(roomData, new Date(checkIn), new Date(checkOut), selectedBeds.length);
   };
 
   const handleBookNow = () => {
@@ -90,10 +93,11 @@ export default function BedReservationCard({
     params.append("checkIn", checkIn);
     params.append("checkOut", checkOut);
     params.append("bedCount", bedCount);
-    selectedBeds.forEach((bed, index) => {
-      params.append(`bedId${index + 1}`, bed.id.toString());
-    });
-    router.push(`/checkout?${params.toString()}`);
+    params.append("roomId", roomData.id.toString());
+    const bedIds = selectedBeds.map((bed) => bed.id).join("+");
+    params.append("bedIds", bedIds);
+    params.append("totalAmount", (getTotalPrice() + 2000 * selectedBeds.length).toString());
+    router.push(`/form?${params.toString()}`);
   };
 
   return (
@@ -171,6 +175,7 @@ export default function BedReservationCard({
             </div>
           </CardContent>
           <CardFooter className="flex flex-col w-full">
+            <SelectBed/>
             <Button onClick={handleBookNow} className="w-full">
               Book Now
             </Button>

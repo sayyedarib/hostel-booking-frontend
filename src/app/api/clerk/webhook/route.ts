@@ -1,5 +1,3 @@
-// import cookies
-import { cookies } from "next/headers";
 import { Webhook } from "svix";
 
 import { headers } from "next/headers";
