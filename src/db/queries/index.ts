@@ -1,6 +1,6 @@
 "use server";
 import { eq, sql, inArray } from "drizzle-orm";
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
 import {
   bedTable,
@@ -14,7 +14,7 @@ import { BedInfo, Guest } from "@/interface";
 
 export const getGuestByClerkId = async () => {
   const userId = auth().userId;
-  if(!userId) {
+  if (!userId) {
     console.error("No user id found");
     return;
   }
@@ -26,7 +26,7 @@ export const getGuestByClerkId = async () => {
 
   console.log("guestData", guestData);
   return guestData[0];
-}
+};
 
 export const getAllRooms = async () => {
   console.log("fetching data getAllRooms...");
@@ -155,7 +155,6 @@ export const checkIfGuestExistsByClerkId = async (clerkId: string) => {
   return guest;
 };
 
-
 interface BookingParams {
   roomId: number;
   bedId: number;
@@ -210,8 +209,6 @@ export async function updateBedStatus(bedIds: number[], occupied: boolean) {
   }
 }
 
-
-
 interface RoomDetails {
   roomNumber: string;
   bedCodes: string[];
@@ -219,7 +216,10 @@ interface RoomDetails {
   roomDailyPrice: number;
 }
 
-export async function getRoomDetails(roomId: number, bedIdsString: string): Promise<RoomDetails | null> {
+export async function getRoomDetails(
+  roomId: number,
+  bedIdsString: string,
+): Promise<RoomDetails | null> {
   try {
     const bedIds = bedIdsString.split("+").map(Number);
 
@@ -244,13 +244,11 @@ export async function getRoomDetails(roomId: number, bedIdsString: string): Prom
       .from(bedTable)
       .where(inArray(bedTable.id, bedIds));
 
-
-
     return {
       roomNumber: roomData[0].roomNumber,
       roomMonthlyPrice: roomData[0].roomMonthlyPrice,
       roomDailyPrice: roomData[0].roomDailyPrice,
-      bedCodes: bedCodesForSelectedBeds.map(bed => bed.bedCode),
+      bedCodes: bedCodesForSelectedBeds.map((bed) => bed.bedCode),
     };
   } catch (error) {
     console.error("Error fetching room details:", error);

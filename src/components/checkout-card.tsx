@@ -16,28 +16,28 @@ interface RoomDetails {
 export default function CheckoutCard() {
   const [checkIn] = useQueryParam(
     "checkIn",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [checkOut] = useQueryParam(
     "checkOut",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [bedCount] = useQueryParam(
     "bedCount",
-    (value: string | null) => value ?? "1"
+    (value: string | null) => value ?? "1",
   );
   const [roomId] = useQueryParam(
     "roomId",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
 
   const [bedIds] = useQueryParam(
     "bedIds",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [totalAmount] = useQueryParam(
     "totalAmount",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
 
   const totalCharge = Number(totalAmount);
@@ -94,8 +94,6 @@ export default function CheckoutCard() {
           checkIn,
           checkOut,
         });
-
-
       });
       // const bookingResult = await createBooking({
       //   userId,

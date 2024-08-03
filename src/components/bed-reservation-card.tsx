@@ -33,15 +33,15 @@ export default function BedReservationCard({
 
   const [checkIn, setCheckIn] = useQueryParam(
     "checkIn",
-    (value) => value?.toString() ?? ""
+    (value) => value?.toString() ?? "",
   );
   const [checkOut, setCheckOut] = useQueryParam(
     "checkOut",
-    (value) => value?.toString() ?? ""
+    (value) => value?.toString() ?? "",
   );
   const [bedCount, setBedCount] = useQueryParam(
     "bedCount",
-    (value) => value?.toString() ?? "1"
+    (value) => value?.toString() ?? "1",
   );
 
   const [selectedBeds, setSelectedBeds] = useState<BedInfo[]>([]);
@@ -72,7 +72,11 @@ export default function BedReservationCard({
 
   const handleBedCountChange = (increment: boolean) => {
     const newCount = increment
-      ? Math.min(Number(bedCount) + 1, availableBeds.length, roomData.roomCapacity)
+      ? Math.min(
+          Number(bedCount) + 1,
+          availableBeds.length,
+          roomData.roomCapacity,
+        )
       : Math.max(Number(bedCount) - 1, 1);
     setBedCount(newCount.toString());
     setSelectedBeds(availableBeds.slice(0, newCount));
@@ -85,7 +89,12 @@ export default function BedReservationCard({
     //     calculateBedPrice(roomData, new Date(checkIn), new Date(checkOut), selectedBeds.length)
     //   );
     // }, 0);
-    return calculateBedPrice(roomData, new Date(checkIn), new Date(checkOut), selectedBeds.length);
+    return calculateBedPrice(
+      roomData,
+      new Date(checkIn),
+      new Date(checkOut),
+      selectedBeds.length,
+    );
   };
 
   const handleBookNow = () => {
@@ -96,7 +105,10 @@ export default function BedReservationCard({
     params.append("roomId", roomData.id.toString());
     const bedIds = selectedBeds.map((bed) => bed.id).join("+");
     params.append("bedIds", bedIds);
-    params.append("totalAmount", (getTotalPrice() + 2000 * selectedBeds.length).toString());
+    params.append(
+      "totalAmount",
+      (getTotalPrice() + 2000 * selectedBeds.length).toString(),
+    );
     router.push(`/form?${params.toString()}`);
   };
 
@@ -175,7 +187,7 @@ export default function BedReservationCard({
             </div>
           </CardContent>
           <CardFooter className="flex flex-col w-full">
-            <SelectBed/>
+            <SelectBed />
             <Button onClick={handleBookNow} className="w-full">
               Book Now
             </Button>
