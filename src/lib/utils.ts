@@ -1,7 +1,7 @@
 import { differenceInDays } from "date-fns";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { useEffect } from "react";
+import crypto from "crypto";
 
 import type { Room } from "@/interface";
 
@@ -59,3 +59,7 @@ export function calculateBedPrice(
 
   return totalPrice;
 }
+
+export const generateToken = (length = 16) => {
+  return crypto.randomBytes(length).toString('hex').substring(0, length);
+};
