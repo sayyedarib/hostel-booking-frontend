@@ -9,6 +9,7 @@ import {
   guestTable,
   roomTable,
   roomTypeTable,
+  paymentTable,
 } from "@/db/schema";
 import { BedInfo, Guest } from "@/interface";
 
@@ -155,11 +156,119 @@ export const checkIfGuestExistsByClerkId = async (clerkId: string) => {
   return guest;
 };
 
+// TODO: for now single guest is allowed to book multiple rooms, but later refactor such that each bed is assigned to a single guestid but multiple booking can be done by a single guest
+export const updateGuestName = async (name: string) => {
+  console.log("updating guest name...");
+
+  const guestId = auth().userId;
+  if (!guestId) {
+    console.error("No user id found");
+    return;
+  }
+
+  const guest = await db
+    .update(guestTable)
+    .set({
+      name,
+    })
+    .where(eq(guestTable.clerkId, guestId));
+
+  console.log("guest", guest);
+  return guest;
+}
+
+export const updateGooglePic = async (googlePic: string) => {
+  console.log("updating google pic...");
+
+  const guestId = auth().userId;
+  if (!guestId) {
+    console.error("No user id found");
+    return;
+  }
+
+  const guest = await db
+    .update(guestTable)
+    .set({
+      googlePic,
+    })
+    .where(eq(guestTable.clerkId, guestId));
+
+  console.log("guest", guest);
+  return guest;
+}
+
+export const updateGuestPhone = async (phone: string) => {
+  console.log("updating guest phone...");
+  const guestId = auth().userId;
+  if (!guestId) {
+    console.error("No user id found");
+    return;
+  }
+
+  const guest = await db
+    .update(guestTable)
+    .set({
+      phone,
+    })
+    .where(eq(guestTable.clerkId, guestId));
+
+  console.log("guest", guest);
+  return guest;
+}
+
+export const updateGuestAddress = async (address: string) => {
+  console.log("updating guest address...");
+  const guestId = auth().userId;
+  if (!guestId) {
+    console.error("No user id found");
+    return;
+  }
+  const guest = await db
+    .update(guestTable)
+    .set({
+      address,
+    })
+    .where(eq(guestTable.clerkId, guestId));
+
+  console.log("guest", guest);
+  return guest;
+}
+
+export const updateGuestGuardianName = async (guardianName: string) => {
+  console.log("updating guest guardian's name...");
+
+  const guestId = auth().userId;
+  if (!guestId) {
+    console.error("No user id found");
+    return;
+  }
+
+  const guest = await db.update(guestTable).set({
+    guardianName,
+  }).where(
+    eq(guestTable.clerkId, guestId)
+  )
+
+  return guest;
+}
+
+
+
 interface BookingParams {
   roomId: number;
-  bedId: number;
-  checkIn: string;
-  checkOut: string;
+  bedId?: number; // Optional if bedId can be null
+  checkIn: string; // ISO date string
+  checkOut: string; // ISO date string
+}
+
+interface Booking {
+  id: number;
+  roomId: number;
+  guestId: number;
+  bedId: number | null;
+  checkInDate: string;
+  checkOutDate: string;
+  status: string;
 }
 
 export async function createBooking({
@@ -167,30 +276,53 @@ export async function createBooking({
   bedId,
   checkIn,
   checkOut,
-}: BookingParams) {
+}: BookingParams): Promise<Booking | null> {
   const guest = await getGuestByClerkId();
   if (!guest) {
     console.log("No guest found");
-    return;
+    return null;
   }
 
+  console.log("creating booking....")
+
   try {
-    const booking = await db
+    const result = await db
       .insert(bookingTable)
       .values({
-        guestId: guest.id as number, // Use guest.id directly
+        guestId: guest.id as number,
         roomId: roomId,
-        bedId: bedId,
-        checkInDate: new Date(checkIn),
-        checkOutDate: new Date(checkOut),
+        bedId: bedId ?? null,
+        checkInDate: new Date(checkIn).toISOString(),
+        checkOutDate: new Date(checkOut).toISOString(),
         status: "active",
-        isActive: true,
       })
       .returning();
 
-    return { success: true, booking }; // Return the booking object if needed
+    if (result.length > 0) {
+      return result[0] as Booking; // Typecast to Booking
+    } else {
+      return null; // No booking created
+    }
   } catch (error) {
     console.error("Booking error:", error);
+    return null;
+  }
+}
+
+
+export async function updateBookingStatus(
+  bookingId: number,
+  status: string,
+) {
+  try {
+    await db
+      .update(bookingTable)
+      .set({ status })
+      .where(eq(bookingTable.id, bookingId));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Booking status update error:", error);
     return { success: false, error: (error as Error).message };
   }
 }
@@ -254,4 +386,38 @@ export async function getRoomDetails(
     console.error("Error fetching room details:", error);
     return null;
   }
+}
+
+
+export async function getBookingDetails(bookingId: number) {
+  console.log("fetching booking details...");
+
+  const bookingDetails = await db
+    .select({
+      guestName: guestTable.name,
+      guestEmail: guestTable.email,
+      guestPhone: guestTable.phone,
+      roomNumber: roomTable.roomNumber,
+      bedCode: bedTable.bedCode,
+      totalAmount: paymentTable.amount,
+      token: paymentTable.token,
+    })
+    .from(bookingTable)
+    .innerJoin(guestTable, eq(bookingTable.guestId, guestTable.id))
+    .innerJoin(roomTable, eq(bookingTable.roomId, roomTable.id))
+    .innerJoin(bedTable, eq(bookingTable.bedId, bedTable.id))
+    .innerJoin(paymentTable, eq(bookingTable.id, paymentTable.bookingId))
+    .where(eq(bookingTable.id, bookingId))
+    .limit(1);
+
+  console.log("bookingDetails", bookingDetails);
+  return bookingDetails;
+}
+
+export async function createPayment({bookingId, amount, token}:{bookingId: number, amount: number, token: string}) {
+  await db.insert(paymentTable).values({
+    bookingId, 
+    amount,
+    token,
+  })
 }
