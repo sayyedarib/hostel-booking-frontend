@@ -3,10 +3,11 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { differenceInDays } from "date-fns";
 import { useQueryParam } from "nextjs-query-param";
+
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
-import { createBooking, updateBedStatus, getRoomDetails } from "@/db/queries";
-import { calculateBedPrice } from "@/lib/utils";
+import { createBooking, updateBedStatus, getRoomDetails, createPayment } from "@/db/queries";
+import { generateToken } from "@/lib/utils";
 
 interface RoomDetails {
   roomNumber: string;
@@ -16,42 +17,44 @@ interface RoomDetails {
 export default function CheckoutCard() {
   const [checkIn] = useQueryParam(
     "checkIn",
-    (value: string | null) => value ?? "",
+    (value: string | null) => value ?? ""
   );
   const [checkOut] = useQueryParam(
     "checkOut",
-    (value: string | null) => value ?? "",
+    (value: string | null) => value ?? ""
   );
   const [bedCount] = useQueryParam(
     "bedCount",
-    (value: string | null) => value ?? "1",
+    (value: string | null) => value ?? "1"
   );
   const [roomId] = useQueryParam(
     "roomId",
-    (value: string | null) => value ?? "",
+    (value: string | null) => value ?? ""
   );
-
   const [bedIds] = useQueryParam(
     "bedIds",
-    (value: string | null) => value ?? "",
+    (value: string | null) => value ?? ""
   );
   const [totalAmount] = useQueryParam(
     "totalAmount",
-    (value: string | null) => value ?? "",
+    (value: string | null) => value ?? ""
+  );
+  const [bookingIds, setBookingIds] = useQueryParam(
+    "bookingIds",
+    (value: string | null) => value ?? ""
   );
 
   const totalCharge = Number(totalAmount);
   const [securityDeposit, setSecurityDeposit] = useState<number>(0);
   const [isPaymentConfirmed, setIsPaymentConfirmed] = useState<boolean>(false);
   const [roomDetails, setRoomDetails] = useState<RoomDetails | null>(null);
+  const [token, setToken] = useState<string>(generateToken(10));
 
   useEffect(() => {
-    // Calculate total amount and security deposit
     const days = differenceInDays(new Date(checkOut), new Date(checkIn));
     const calculatedDeposit = 2000 * parseInt(bedCount);
     setSecurityDeposit(calculatedDeposit);
 
-    // Fetch room details
     const fetchRoomDetails = async () => {
       const details = await getRoomDetails(parseInt(roomId), bedIds);
       if (details) {
@@ -64,13 +67,23 @@ export default function CheckoutCard() {
   const handleConfirmPayment = async () => {
     await handleBooking();
 
+    // Generate a random token for payment confirmation with length of at least 10 (alphanumeric)
     try {
       const bedIdsArray = bedIds.split("+").map(Number);
       const updateResult = await updateBedStatus(bedIdsArray, true);
 
       if (updateResult.success) {
-        setIsPaymentConfirmed(true);
-        alert("Payment confirmed! Beds have been marked as occupied.");
+        await fetch(`/api/email/payment-verification?token=${token}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              bookingIds,
+            }),
+          }
+        );
       } else {
         alert("Failed to update bed status: " + updateResult.error);
       }
@@ -81,39 +94,38 @@ export default function CheckoutCard() {
   };
 
   const handleBooking = async () => {
-    if (!isPaymentConfirmed) {
-      alert("Please confirm payment before booking");
-      return;
-    }
-    const bedId = bedIds.split("+").map(Number);
+    console.log("handling booking...")
+    const bedIdArray = bedIds.split("+").map(Number);
+    let temp = "";
+  
     try {
-      bedId.map(async (id) => {
-        await createBooking({
+      for (const id of bedIdArray) {
+        const booking = await createBooking({
           roomId: parseInt(roomId),
           bedId: id,
           checkIn,
           checkOut,
         });
-      });
-      // const bookingResult = await createBooking({
-      //   userId,
-      //   roomId: parseInt(roomId),
-      //   bedId: bedId[0],
-      //   checkIn,
-      //   checkOut,
-      // });
+  
+        if (booking) {
+          temp += booking.id + "+";
+        }
+      }
 
-      // if (bookingResult?.success) {
-      //   alert("Booking successful!");
-      //   // Redirect to a confirmation page or update UI
-      // } else {
-      //   alert("Booking failed: " + bookingResult?.error);
-      // }
+      await createPayment({
+        bookingId: temp.split("+").map(Number)[0], //for now only one booking id is supported
+        amount: totalCharge,
+        token,
+      });
+
+      temp = temp.endsWith("+") ? temp.slice(0, -1) : temp;
+      console.log("temp: ", temp)
+      setBookingIds(temp);
     } catch (error) {
-      console.error("Booking error:", error);
-      alert("An error occurred during booking");
+      console.error("Handle booking error:", error);
     }
-  };
+  };  
+
 
   return (
     <div className="border p-4 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 flex flex-col md:flex-row gap-4">
@@ -143,9 +155,8 @@ export default function CheckoutCard() {
         <Button
           onClick={handleConfirmPayment}
           className="mt-4 w-full"
-          disabled={isPaymentConfirmed}
         >
-          {isPaymentConfirmed ? "Payment Confirmed" : "Confirm Payment"}
+          Confirm Payment
         </Button>
       </div>
     </div>
