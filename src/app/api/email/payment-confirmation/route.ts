@@ -1,24 +1,34 @@
-import { NextResponse, NextRequest } from 'next/server';
+import { NextResponse, NextRequest } from "next/server";
 import { transporter } from "@/lib/server-utils";
 import { getBookingDetails } from "@/db/queries";
 
 export async function POST(request: NextRequest) {
-    console.log("Email Request received");
+  console.log("Email Request received");
 
-    const { bookingId } = await request.json(); // Assume bookingId is sent in the request body
-    const token = "abcd";
-    try {
-        // Fetch booking details from the database
-        const bookingDetails = await getBookingDetails(bookingId);
+  const { bookingId } = await request.json(); // Assume bookingId is sent in the request body
+  const token = "abcd";
+  try {
+    // Fetch booking details from the database
+    const bookingDetails = await getBookingDetails(bookingId);
 
-        if (!bookingDetails.length) {
-            return NextResponse.json({ message: "No booking found" }, { status: 404 });
-        }
+    if (!bookingDetails.length) {
+      return NextResponse.json(
+        { message: "No booking found" },
+        { status: 404 },
+      );
+    }
 
-        const { guestName, guestEmail, guestPhone, roomNumber, bedCode, totalAmount } = bookingDetails[0];
+    const {
+      guestName,
+      guestEmail,
+      guestPhone,
+      roomNumber,
+      bedCode,
+      totalAmount,
+    } = bookingDetails[0];
 
-        // Construct the email content
-        const mailContent = `
+    // Construct the email content
+    const mailContent = `
             <h1>Hurrah! Your payment has been verified</h1>
             <p>Dear ${guestName},</p>
             <p>Thank you for your booking!</p>
@@ -33,18 +43,20 @@ export async function POST(request: NextRequest) {
             <p>support@aligarhhostel.com</p>
         `;
 
-        // Send the email
-        await transporter.sendMail({
-            from: "support@aligarhhostel.com",
-            to: guestEmail,
-            subject: `Payment Confirmed`,
-            html: mailContent,
-        });
+    // Send the email
+    await transporter.sendMail({
+      from: "support@aligarhhostel.com",
+      to: guestEmail,
+      subject: `Payment Confirmed`,
+      html: mailContent,
+    });
 
-        return NextResponse.json({ message: "Success: email was sent" });
-
-    } catch (error) {
-        console.error(error);
-        return NextResponse.json({ message: "COULD NOT SEND MESSAGE" }, { status: 500 });
-    }
+    return NextResponse.json({ message: "Success: email was sent" });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { message: "COULD NOT SEND MESSAGE" },
+      { status: 500 },
+    );
+  }
 }

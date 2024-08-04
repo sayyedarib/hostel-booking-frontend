@@ -175,7 +175,7 @@ export const updateGuestName = async (name: string) => {
 
   console.log("guest", guest);
   return guest;
-}
+};
 
 export const updateGooglePic = async (googlePic: string) => {
   console.log("updating google pic...");
@@ -195,7 +195,7 @@ export const updateGooglePic = async (googlePic: string) => {
 
   console.log("guest", guest);
   return guest;
-}
+};
 
 export const updateGuestPhone = async (phone: string) => {
   console.log("updating guest phone...");
@@ -214,7 +214,7 @@ export const updateGuestPhone = async (phone: string) => {
 
   console.log("guest", guest);
   return guest;
-}
+};
 
 export const updateGuestAddress = async (address: string) => {
   console.log("updating guest address...");
@@ -232,7 +232,7 @@ export const updateGuestAddress = async (address: string) => {
 
   console.log("guest", guest);
   return guest;
-}
+};
 
 export const updateGuestGuardianName = async (guardianName: string) => {
   console.log("updating guest guardian's name...");
@@ -243,16 +243,15 @@ export const updateGuestGuardianName = async (guardianName: string) => {
     return;
   }
 
-  const guest = await db.update(guestTable).set({
-    guardianName,
-  }).where(
-    eq(guestTable.clerkId, guestId)
-  )
+  const guest = await db
+    .update(guestTable)
+    .set({
+      guardianName,
+    })
+    .where(eq(guestTable.clerkId, guestId));
 
   return guest;
-}
-
-
+};
 
 interface BookingParams {
   roomId: number;
@@ -283,7 +282,7 @@ export async function createBooking({
     return null;
   }
 
-  console.log("creating booking....")
+  console.log("creating booking....");
 
   try {
     const result = await db
@@ -309,11 +308,7 @@ export async function createBooking({
   }
 }
 
-
-export async function updateBookingStatus(
-  bookingId: number,
-  status: string,
-) {
+export async function updateBookingStatus(bookingId: number, status: string) {
   try {
     await db
       .update(bookingTable)
@@ -388,7 +383,6 @@ export async function getRoomDetails(
   }
 }
 
-
 export async function getBookingDetails(bookingId: number) {
   console.log("fetching booking details...");
 
@@ -414,10 +408,18 @@ export async function getBookingDetails(bookingId: number) {
   return bookingDetails;
 }
 
-export async function createPayment({bookingId, amount, token}:{bookingId: number, amount: number, token: string}) {
+export async function createPayment({
+  bookingId,
+  amount,
+  token,
+}: {
+  bookingId: number;
+  amount: number;
+  token: string;
+}) {
   await db.insert(paymentTable).values({
-    bookingId, 
+    bookingId,
     amount,
     token,
-  })
+  });
 }

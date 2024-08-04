@@ -7,11 +7,16 @@ import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client"
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
-import { updateGuestName, updateGooglePic, updateGuestPhone, updateGuestAddress, updateGuestGuardianName } from "@/db/queries";
-
+import {
+  updateGuestName,
+  updateGooglePic,
+  updateGuestPhone,
+  updateGuestAddress,
+  updateGuestGuardianName,
+} from "@/db/queries";
 
 const GuestRoomRegistrationForm: React.FC<{
   name: string;
@@ -21,7 +26,6 @@ const GuestRoomRegistrationForm: React.FC<{
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
-
 
   const [guestInfo, setGuestInfo] = useState({
     name: "",
@@ -50,7 +54,7 @@ const GuestRoomRegistrationForm: React.FC<{
 
   const handleGuestInputChange = (
     index: number,
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { name, value } = e.target;
     setGuestInfo((prev) => {
@@ -64,20 +68,22 @@ const GuestRoomRegistrationForm: React.FC<{
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const reader = new FileReader();
-      
+
       reader.onload = async (event) => {
         setGuestImage(event.target?.result as string);
-  
+
         const fileName = `${guestInfo.name}_${new Date().toISOString()}.png`;
-        const { data, error } = await supabase.storage.from('guest_image').upload(fileName, file);
-  
+        const { data, error } = await supabase.storage
+          .from("guest_image")
+          .upload(fileName, file);
+
         if (error) {
-          console.error('Error uploading image:', error);
+          console.error("Error uploading image:", error);
         } else {
-          console.log('Image uploaded successfully:', data);
+          console.log("Image uploaded successfully:", data);
         }
       };
-  
+
       reader.readAsDataURL(file);
     }
   };
@@ -87,50 +93,49 @@ const GuestRoomRegistrationForm: React.FC<{
   };
 
   const generatePDF = async () => {
-
-    try{
-
+    try {
       if (formRef.current) {
         const canvas = await html2canvas(formRef.current);
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("p", "mm", [canvas.width, canvas.height]);
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      // pdf.save("guest_room_registration_form.pdf");
-      
-      return pdf.output('blob'); // Return the PDF as a Blob
-    }
-    }catch(error) {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("p", "mm", [canvas.width, canvas.height]);
+        const imgProps = pdf.getImageProperties(imgData);
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+        pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+        // pdf.save("guest_room_registration_form.pdf");
+
+        return pdf.output("blob"); // Return the PDF as a Blob
+      }
+    } catch (error) {
       console.error("Error generating PDF", error);
     }
   };
-  
+
   const handleSubmit = async () => {
     const pdfBlob = await generatePDF();
     const fileName = `${guestInfo.name}_${new Date().toISOString()}.pdf`;
-    try{
-
+    try {
       if (pdfBlob) {
-        console.log("uploading pdf...")
-        const { data, error } = await supabase.storage.from('agreement_docs').upload(fileName, pdfBlob);
-        console.log("uploaded pdf response", data, error)
+        console.log("uploading pdf...");
+        const { data, error } = await supabase.storage
+          .from("agreement_docs")
+          .upload(fileName, pdfBlob);
+        console.log("uploaded pdf response", data, error);
+      }
+
+      await Promise.all([
+        updateGuestName(guestInfo.name),
+        updateGuestPhone(guestInfo.guestPhone),
+        updateGuestAddress(guestInfo.permanentAddress),
+        updateGuestGuardianName(guestInfo.fatherName),
+        updateGooglePic(guestImage),
+      ]);
+    } catch (error) {
+      console.error("Error updating guest info", error);
     }
-  
-    await Promise.all([
-      updateGuestName(guestInfo.name),
-      updateGuestPhone(guestInfo.guestPhone),
-      updateGuestAddress(guestInfo.permanentAddress),
-      updateGuestGuardianName(guestInfo.fatherName),
-      updateGooglePic(guestImage)
-    ]);
-  } catch(error) {
-    console.error("Error updating guest info", error);
-  }
-    
+
     router.push(`/checkout?${searchParams.toString()}`);
-  }
+  };
 
   return (
     <>

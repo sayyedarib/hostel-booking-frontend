@@ -6,12 +6,11 @@ export async function POST(request: NextRequest) {
   console.log("Email Request received");
 
   const { bookingIds } = await request.json(); // Assume bookingId is sent in the request body
-  
-  if(typeof bookingIds == "string") {
+
+  if (typeof bookingIds == "string") {
   }
-  
+
   let bookingId = Number(bookingIds.split(",")[0]);
-    
 
   try {
     // Fetch booking details from the database
@@ -20,7 +19,7 @@ export async function POST(request: NextRequest) {
     if (!bookingDetails.length) {
       return NextResponse.json(
         { message: "No booking found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -57,7 +56,7 @@ export async function POST(request: NextRequest) {
     console.error(error);
     return NextResponse.json(
       { message: "COULD NOT SEND MESSAGE" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

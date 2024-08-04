@@ -6,7 +6,12 @@ import { useQueryParam } from "nextjs-query-param";
 
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
-import { createBooking, updateBedStatus, getRoomDetails, createPayment } from "@/db/queries";
+import {
+  createBooking,
+  updateBedStatus,
+  getRoomDetails,
+  createPayment,
+} from "@/db/queries";
 import { generateToken } from "@/lib/utils";
 
 interface RoomDetails {
@@ -17,31 +22,31 @@ interface RoomDetails {
 export default function CheckoutCard() {
   const [checkIn] = useQueryParam(
     "checkIn",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [checkOut] = useQueryParam(
     "checkOut",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [bedCount] = useQueryParam(
     "bedCount",
-    (value: string | null) => value ?? "1"
+    (value: string | null) => value ?? "1",
   );
   const [roomId] = useQueryParam(
     "roomId",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [bedIds] = useQueryParam(
     "bedIds",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [totalAmount] = useQueryParam(
     "totalAmount",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
   const [bookingIds, setBookingIds] = useQueryParam(
     "bookingIds",
-    (value: string | null) => value ?? ""
+    (value: string | null) => value ?? "",
   );
 
   const totalCharge = Number(totalAmount);
@@ -73,17 +78,15 @@ export default function CheckoutCard() {
       const updateResult = await updateBedStatus(bedIdsArray, true);
 
       if (updateResult.success) {
-        await fetch(`/api/email/payment-verification?token=${token}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              bookingIds,
-            }),
-          }
-        );
+        await fetch(`/api/email/payment-verification?token=${token}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            bookingIds,
+          }),
+        });
       } else {
         alert("Failed to update bed status: " + updateResult.error);
       }
@@ -94,10 +97,10 @@ export default function CheckoutCard() {
   };
 
   const handleBooking = async () => {
-    console.log("handling booking...")
+    console.log("handling booking...");
     const bedIdArray = bedIds.split("+").map(Number);
     let temp = "";
-  
+
     try {
       for (const id of bedIdArray) {
         const booking = await createBooking({
@@ -106,7 +109,7 @@ export default function CheckoutCard() {
           checkIn,
           checkOut,
         });
-  
+
         if (booking) {
           temp += booking.id + "+";
         }
@@ -119,13 +122,12 @@ export default function CheckoutCard() {
       });
 
       temp = temp.endsWith("+") ? temp.slice(0, -1) : temp;
-      console.log("temp: ", temp)
+      console.log("temp: ", temp);
       setBookingIds(temp);
     } catch (error) {
       console.error("Handle booking error:", error);
     }
-  };  
-
+  };
 
   return (
     <div className="border p-4 rounded-lg shadow-xl w-full md:w-2/3 lg:w-1/2 flex flex-col md:flex-row gap-4">
@@ -152,10 +154,7 @@ export default function CheckoutCard() {
           <Separator />
           <p>Total Amount: ₹{totalCharge}</p>
         </div>
-        <Button
-          onClick={handleConfirmPayment}
-          className="mt-4 w-full"
-        >
+        <Button onClick={handleConfirmPayment} className="mt-4 w-full">
           Confirm Payment
         </Button>
       </div>

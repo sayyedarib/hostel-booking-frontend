@@ -24,9 +24,10 @@ export async function GET(request: NextRequest) {
           verified: true,
         })
         .where(eq(paymentTable.token, token));
-      
+
       // Return HTML response
-      return new NextResponse(`
+      return new NextResponse(
+        `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -62,11 +63,15 @@ export async function GET(request: NextRequest) {
             </div>
         </body>
         </html>
-      `, { headers: { 'Content-Type': 'text/html' } });
-      
+      `,
+        { headers: { "Content-Type": "text/html" } },
+      );
     } catch (dbError) {
       console.error("Error updating payment table", dbError);
-      return NextResponse.json({ error: "Error updating payment table" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Error updating payment table" },
+        { status: 400 },
+      );
     }
   } catch (error) {
     console.error("Got some error :(", error);

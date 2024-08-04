@@ -61,5 +61,5 @@ export function calculateBedPrice(
 }
 
 export const generateToken = (length = 16) => {
-  return crypto.randomBytes(length).toString('hex').substring(0, length);
+  return crypto.randomBytes(length).toString("hex").substring(0, length);
 };
