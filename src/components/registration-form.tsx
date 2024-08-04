@@ -1,27 +1,28 @@
+"use client";
+
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useRef } from "react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client"
+import { Button } from "@/components/ui/button";
 
-interface GuestInfo {
+import { updateGuestName, updateGooglePic, updateGuestPhone, updateGuestAddress, updateGuestGuardianName } from "@/db/queries";
+
+
+const GuestRoomRegistrationForm: React.FC<{
   name: string;
-  guestPhone: string;
-  fatherName: string;
-  fatherPhone: string;
-  purpose: string;
-  permanentAddress: string;
-  policeStation: string;
-  city: string;
-  state: string;
-  guests: { name: string; adhaar: string; age: string; sex: string }[];
-  checkInDate: string;
-  checkOutDate: string;
-  flatNumber: string;
-  floor: string;
-}
+  phone: string;
+  imageUrl: string;
+}> = () => {
+  const supabase = createClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-const GuestRoomRegistrationForm: React.FC = () => {
+
   const [guestInfo, setGuestInfo] = useState({
     name: "",
     guestPhone: "",
@@ -38,7 +39,7 @@ const GuestRoomRegistrationForm: React.FC = () => {
     flatNumber: "",
     floor: "",
   });
-  const [guestImage, setGuestImage] = useState<string | null>(null);
+  const [guestImage, setGuestImage] = useState<string>("");
   const formRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -49,7 +50,7 @@ const GuestRoomRegistrationForm: React.FC = () => {
 
   const handleGuestInputChange = (
     index: number,
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setGuestInfo((prev) => {
@@ -59,13 +60,25 @@ const GuestRoomRegistrationForm: React.FC = () => {
     });
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
       const reader = new FileReader();
-      reader.onload = (event) => {
+      
+      reader.onload = async (event) => {
         setGuestImage(event.target?.result as string);
+  
+        const fileName = `${guestInfo.name}_${new Date().toISOString()}.png`;
+        const { data, error } = await supabase.storage.from('guest_image').upload(fileName, file);
+  
+        if (error) {
+          console.error('Error uploading image:', error);
+        } else {
+          console.log('Image uploaded successfully:', data);
+        }
       };
-      reader.readAsDataURL(e.target.files[0]);
+  
+      reader.readAsDataURL(file);
     }
   };
 
@@ -74,26 +87,59 @@ const GuestRoomRegistrationForm: React.FC = () => {
   };
 
   const generatePDF = async () => {
-    if (formRef.current) {
-      const canvas = await html2canvas(formRef.current);
+
+    try{
+
+      if (formRef.current) {
+        const canvas = await html2canvas(formRef.current);
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF("p", "mm", [canvas.width, canvas.height]);
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("guest_room_registration_form.pdf");
+      // pdf.save("guest_room_registration_form.pdf");
+      
+      return pdf.output('blob'); // Return the PDF as a Blob
+    }
+    }catch(error) {
+      console.error("Error generating PDF", error);
     }
   };
+  
+  const handleSubmit = async () => {
+    const pdfBlob = await generatePDF();
+    const fileName = `${guestInfo.name}_${new Date().toISOString()}.pdf`;
+    try{
+
+      if (pdfBlob) {
+        console.log("uploading pdf...")
+        const { data, error } = await supabase.storage.from('agreement_docs').upload(fileName, pdfBlob);
+        console.log("uploaded pdf response", data, error)
+    }
+  
+    await Promise.all([
+      updateGuestName(guestInfo.name),
+      updateGuestPhone(guestInfo.guestPhone),
+      updateGuestAddress(guestInfo.permanentAddress),
+      updateGuestGuardianName(guestInfo.fatherName),
+      updateGooglePic(guestImage)
+    ]);
+  } catch(error) {
+    console.error("Error updating guest info", error);
+  }
+    
+    router.push(`/checkout?${searchParams.toString()}`);
+  }
 
   return (
     <>
       <div
         ref={formRef}
-        className="w-[210mm] h-auto mx-auto my-10 bg-white p-8 relative"
+        className="max-w-full lg:w-[210mm] h-full mx-auto my-10 bg-white p-8 relative"
         style={{ fontFamily: "Arial, sans-serif" }}
       >
-        <h1 className="text-center text-red-600 font-bold text-xl mb-14">
+        <h1 className="text-center text-red-500 font-bold text-xl mb-14">
           Guest Room Registration Form
         </h1>
 
@@ -108,7 +154,7 @@ const GuestRoomRegistrationForm: React.FC = () => {
 
         {/* Photo upload area */}
         <div
-          className="absolute top-8 right-8 w-32 h-40 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
+          className="absolute top-14 right-8 w-32 h-40 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
           onClick={handleImageClick}
         >
           {guestImage ? (
@@ -239,7 +285,7 @@ const GuestRoomRegistrationForm: React.FC = () => {
 
         {/* Declaration */}
         <div className="mt-8">
-          <h2 className="font-bold text-red-600">Declaration</h2>
+          <h2 className="font-bold text-red-500">Declaration</h2>
           <ul className="space-y-2 text-sm">
             <li>
               I understand and accept the general conditions for booking of
@@ -277,7 +323,7 @@ const GuestRoomRegistrationForm: React.FC = () => {
         </div>
 
         {/* Check-in/out details */}
-        <div className="mt-8 flex justify-between space-x-4">
+        <div className="mt-8 flex justify-between space-x-2 md:space-x-4 text-xs md:text-md">
           <InputField
             label="Check-in Date"
             name="checkInDate"
@@ -324,12 +370,12 @@ const GuestRoomRegistrationForm: React.FC = () => {
           </p>
         </div>
       </div>
-      <button
-        onClick={generatePDF}
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded"
+      <Button
+        onClick={handleSubmit}
+        className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
       >
-        Generate PDF
-      </button>
+        Proceed to Payment
+      </Button>
     </>
   );
 };

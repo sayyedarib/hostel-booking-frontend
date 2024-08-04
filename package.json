@@ -38,6 +38,7 @@
     "next": "14.2.5",
     "next-themes": "^0.3.0",
     "nextjs-query-param": "^1.0.3",
+    "nodemailer": "^6.9.14",
     "number-to-words": "^1.2.4",
     "pnpm": "^9.6.0",
     "postgres": "^3.4.4",
