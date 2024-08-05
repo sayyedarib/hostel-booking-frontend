@@ -14,10 +14,12 @@ export default function RoomMaps({
   const [beds, setBeds] = useState<BedInfo[]>([]);
 
   useEffect(() => {
-    if (roomData?.beds) {
-      const initialBeds: BedInfo[] = roomData.beds.map((bed) => ({
+    if (roomData && 'beds' in roomData) {
+      const initialBeds: BedInfo[] = (roomData.beds as any[]).map((bed: any) => ({
         id: bed.id.toString(),
         occupied: bed.occupied,
+        dailyPrice: bed.dailyPrice,
+        monthlyPrice: bed.monthlyPrice,
       }));
       setBeds(initialBeds);
     }
@@ -46,7 +48,7 @@ export default function RoomMaps({
   const getBedStatus = (
     bedId: string
   ): "selected" | "occupied" | "available" => {
-    const bed = beds.find((b) => b.id === bedId);
+    const bed = beds.find((b) => b.id.toString() === bedId);
     if (selectedBeds.includes(bedId)) return "selected";
     if (bed?.occupied) return "occupied";
     return "available";
