@@ -14,13 +14,15 @@ export default function RoomMaps({
   const [beds, setBeds] = useState<BedInfo[]>([]);
 
   useEffect(() => {
-    if (roomData && 'beds' in roomData) {
-      const initialBeds: BedInfo[] = (roomData.beds as any[]).map((bed: any) => ({
-        id: bed.id.toString(),
-        occupied: bed.occupied,
-        dailyPrice: bed.dailyPrice,
-        monthlyPrice: bed.monthlyPrice,
-      }));
+    if (roomData && "beds" in roomData) {
+      const initialBeds: BedInfo[] = (roomData.beds as any[]).map(
+        (bed: any) => ({
+          id: bed.id.toString(),
+          occupied: bed.occupied,
+          dailyPrice: bed.dailyPrice,
+          monthlyPrice: bed.monthlyPrice,
+        })
+      );
       setBeds(initialBeds);
     }
   }, [roomData]);
@@ -74,7 +76,9 @@ export default function RoomMaps({
       case "2-bed":
         return "bg-[url('/img/bed-cover.png')]";
       case "3-bed":
-        return columnIndex === 0 ? "bg-[url('/img/bed-cover-1.png')]" : "bg-[url('/img/bed-cover.png')]";
+        return columnIndex === 0
+          ? "bg-[url('/img/bed-cover-1.png')]"
+          : "bg-[url('/img/bed-cover.png')]";
       case "4-bed":
         return "bg-[url('/img/bed-cover.png')]";
       default:
@@ -100,7 +104,9 @@ export default function RoomMaps({
             key={columnIndex}
             className="flex w-fit justify-center space-x-0 mb-8"
           >
-            <div className={`flex flex-col ${getColumnBackgroundImage(columnIndex)} bg-contain bg-bottom bg-no-repeat`}>
+            <div
+              className={`flex flex-col justify-end ${getColumnBackgroundImage(columnIndex)} bg-contain bg-bottom bg-no-repeat`}
+            >
               {column.map((bedId) => {
                 const status = getBedStatus(bedId);
                 return (
