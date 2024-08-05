@@ -487,7 +487,7 @@ const GuestRoomRegistrationForm: React.FC<{
         className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
         disabled={isLoading}
       >
-        {!isLoading ? <LoaderCircle className="animate-spin"/>:"Proceed to Payment"}
+        {isLoading ? <LoaderCircle className="animate-spin"/>:"Submit"}
       </Button>
     </>
   );
