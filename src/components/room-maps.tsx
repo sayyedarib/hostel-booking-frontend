@@ -1,19 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { bookBed } from "@/db/queries";
 import { BedInfo, Room as RoomDataType } from "@/interface";
+import Spinner from "./spinner";
 
 export default function RoomMaps({
   type,
   roomData,
 }: {
   type: "1-bed" | "2-bed" | "3-bed" | "4-bed";
-  roomData: RoomDataType;
+  roomData: RoomDataType | null;
 }) {
   const [selectedBeds, setSelectedBeds] = useState<string[]>([]);
-  const listOfRoomCapacity = new Array(Number(roomData.roomCapacity!)).fill("");
+  const [beds, setBeds] = useState<BedInfo[]>([]);
 
-  const roomLayout = {
+  useEffect(() => {
+    if (roomData?.beds) {
+      const initialBeds: BedInfo[] = roomData.beds.map((bed) => ({
+        id: bed.id.toString(),
+        occupied: bed.occupied,
+      }));
+      setBeds(initialBeds);
+    }
+  }, [roomData]);
+
+  const roomLayout: { [key: string]: string[][] } = {
     "1-bed": [["A1"]],
     "2-bed": [["A1", "A2"]],
     "3-bed": [["A1"], ["B1", "B2"]],
@@ -23,23 +33,28 @@ export default function RoomMaps({
     ],
   };
 
-  const beds = roomLayout[type] ?? [];
+  const bedLayout = roomLayout[type] || [];
 
-  const handleBedClick = (bed: string) => {
+  const handleBedClick = (bedId: string) => {
     setSelectedBeds((prev) =>
-      prev.includes(bed)
-        ? prev.filter((selectedBed) => selectedBed !== bed)
-        : [...prev, bed],
+      prev.includes(bedId)
+        ? prev.filter((selectedBed) => selectedBed !== bedId)
+        : [...prev, bedId]
     );
   };
 
-  const getBedStatus = (bed: BedInfo) => {
-    if (selectedBeds.includes(bed.id.toString())) return "selected";
-    if (bed.occupied) return "occupied";
+  const getBedStatus = (
+    bedId: string
+  ): "selected" | "occupied" | "available" => {
+    const bed = beds.find((b) => b.id === bedId);
+    if (selectedBeds.includes(bedId)) return "selected";
+    if (bed?.occupied) return "occupied";
     return "available";
   };
 
-  const getBedStyle = (status: string) => {
+  const getBedStyle = (
+    status: "selected" | "occupied" | "available"
+  ): string => {
     switch (status) {
       case "selected":
         return "bg-green-500/40 hover:bg-green-500/40 text-white";
@@ -50,53 +65,51 @@ export default function RoomMaps({
     }
   };
 
-  const getBedBackgroundImage = () => {
-    if (type === "3-bed") {
-      return "bg-[url('/img/bedbg3.webp')]";
-    }
-    return "bg-[url('/img/bedbg.webp')]";
-  };
+  if (!roomData) {
+    return (
+      <div className="flex justify-center">
+        <Spinner />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-md mx-auto p-4 border">
       <div
-        className={`grid ${listOfRoomCapacity.length > 1 && "grid-cols-2"} w-fit mx-auto`}
+        className={`grid ${bedLayout.length > 1 ? "grid-cols-2" : ""} w-fit mx-auto gap-5`}
       >
-        {listOfRoomCapacity.map((_, index) => (
-          <div className="flex w-fit justify-center space-x-0 mb-8" key={index}>
-            {beds.map((column, columnIndex) => (
-              <React.Fragment key={columnIndex}>
-                <div
-                  className={`flex flex-col ${getBedBackgroundImage()} bg-contain ${
-                    index % 2 !== 0 && "scale-x-[-1]"
-                  }`}
-                >
-                  {column.map((bed) => (
-                    <Button
-                      key={bed}
-                      // className={`w-32 h-16 rounded-lg bg-contain bg-transparent ${getBedStyle(getBedStatus(bed))}`}
-                      // TODO: here bed is an string that is bed type e.g. 2-b 3-bed but that's not correct how can we update the database just based on bedtype(that is 2-bed, 3-bed) instead we need complete bed info like id, occupied, etc. from database
-                      onClick={() => handleBedClick(bed)}
-                      // disabled={getBedStatus(bed) === "occupied"}
-                    ></Button>
-                  ))}
-                </div>
-              </React.Fragment>
-            ))}
+        {bedLayout.map((column, columnIndex) => (
+          <div
+            key={columnIndex}
+            className="flex w-fit justify-center space-x-0 mb-8"
+          >
+            <div className="flex flex-col bg-[url('/img/bed-cover.png')] bg-contain bg-bottom bg-no-repeat">
+              {column.map((bedId) => {
+                const status = getBedStatus(bedId);
+                return (
+                  <Button
+                    key={bedId}
+                    className={`w-32 h-16 rounded-lg bg-transparent ${getBedStyle(status)}`}
+                    onClick={() => handleBedClick(bedId)}
+                    disabled={status === "occupied"}
+                  />
+                );
+              })}
+            </div>
           </div>
         ))}
       </div>
       <div className="flex justify-center space-x-4">
         <div className="flex items-center">
-          <div className="w-4 h-4 bg-foreground border mr-2"></div>
+          <div className="w-4 h-4 bg-foreground border mr-2" />
           <span>Available</span>
         </div>
         <div className="flex items-center">
-          <div className="w-4 h-4 bg-green-500 mr-2"></div>
+          <div className="w-4 h-4 bg-green-500 mr-2" />
           <span>Selected</span>
         </div>
         <div className="flex items-center">
-          <div className="w-4 h-4 bg-red-500 mr-2"></div>
+          <div className="w-4 h-4 bg-red-500 mr-2" />
           <span>Occupied</span>
         </div>
       </div>
