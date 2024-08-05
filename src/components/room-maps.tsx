@@ -67,6 +67,21 @@ export default function RoomMaps({
     }
   };
 
+  const getColumnBackgroundImage = (columnIndex: number) => {
+    switch (type) {
+      case "1-bed":
+        return "bg-[url('/img/bed-cover-1.png')]";
+      case "2-bed":
+        return "bg-[url('/img/bed-cover.png')]";
+      case "3-bed":
+        return columnIndex === 0 ? "bg-[url('/img/bed-cover-1.png')]" : "bg-[url('/img/bed-cover.png')]";
+      case "4-bed":
+        return "bg-[url('/img/bed-cover.png')]";
+      default:
+        return "bg-[url('/img/bed-cover.png')]";
+    }
+  };
+
   if (!roomData) {
     return (
       <div className="flex justify-center">
@@ -85,7 +100,7 @@ export default function RoomMaps({
             key={columnIndex}
             className="flex w-fit justify-center space-x-0 mb-8"
           >
-            <div className="flex flex-col bg-[url('/img/bed-cover.png')] bg-contain bg-bottom bg-no-repeat">
+            <div className={`flex flex-col ${getColumnBackgroundImage(columnIndex)} bg-contain bg-bottom bg-no-repeat`}>
               {column.map((bedId) => {
                 const status = getBedStatus(bedId);
                 return (
