@@ -17,6 +17,7 @@ import {
   updateGuestAddress,
   updateGuestGuardianName,
 } from "@/db/queries";
+import { LoaderCircle } from "lucide-react";
 
 const GuestRoomRegistrationForm: React.FC<{
   name: string;
@@ -44,8 +45,14 @@ const GuestRoomRegistrationForm: React.FC<{
     floor: "",
   });
   const [guestImage, setGuestImage] = useState<string>("");
+  const [parentImage, setParentImage] = useState<string>("");
+  const [guestAadhaarImage, setGuestAadhaarImage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [aadhaarUploaded, setAadhaarUploaded] = useState<boolean>(false);
   const formRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const parentFileInputRef = useRef<HTMLInputElement>(null);
+  const aadhaarFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,7 +61,7 @@ const GuestRoomRegistrationForm: React.FC<{
 
   const handleGuestInputChange = (
     index: number,
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setGuestInfo((prev) => {
@@ -88,9 +95,70 @@ const GuestRoomRegistrationForm: React.FC<{
     }
   };
 
+  const handleParentImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async (event) => {
+        setParentImage(event.target?.result as string);
+
+        const fileName = `${guestInfo.fatherName}_${new Date().toISOString()}.png`;
+        const { data, error } = await supabase.storage
+          .from("parent_image")
+          .upload(fileName, file);
+
+        if (error) {
+          console.error("Error uploading image:", error);
+        } else {
+          console.log("Image uploaded successfully:", data);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
+  const handleAadhaarImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async (event) => {
+        setGuestAadhaarImage(event.target?.result as string);
+
+        const fileName = `${guestInfo.name}_${new Date().toISOString()}.png`;
+        const { data, error } = await supabase.storage
+          .from("guest_aadhaar")
+          .upload(fileName, file);
+
+        if (error) {
+          console.error("Error uploading image:", error);
+        } else {
+          console.log("Image uploaded successfully:", data);
+          setAadhaarUploaded(true);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  };
+
+
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
+
+  const handleParentImageClick = () => {
+    parentFileInputRef.current?.click();
+  };
+
+  const handleAadhaarImageClick = () => {
+    aadhaarFileInputRef.current?.click();
+  }
+
 
   const generatePDF = async () => {
     try {
@@ -112,6 +180,7 @@ const GuestRoomRegistrationForm: React.FC<{
   };
 
   const handleSubmit = async () => {
+    setIsLoading(true);
     const pdfBlob = await generatePDF();
     const fileName = `${guestInfo.name}_${new Date().toISOString()}.pdf`;
     try {
@@ -133,8 +202,8 @@ const GuestRoomRegistrationForm: React.FC<{
     } catch (error) {
       console.error("Error updating guest info", error);
     }
-
-    router.push(`/checkout?${searchParams.toString()}`);
+    setIsLoading(false);
+    router.push("/thanks");
   };
 
   return (
@@ -148,40 +217,65 @@ const GuestRoomRegistrationForm: React.FC<{
           Guest Room Registration Form
         </h1>
 
-        {/* Logo */}
-        <Image
-          width={100}
-          height={100}
-          src="/logo.png"
-          alt="Khan Group of Hostels"
-          className="absolute top-20 left-8"
-        />
-
-        {/* Photo upload area */}
-        <div
-          className="absolute top-14 right-8 w-32 h-40 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
-          onClick={handleImageClick}
-        >
-          {guestImage ? (
-            <img
-              src={guestImage}
-              alt="Guest"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <span>Photo</span>
-          )}
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleImageChange}
-            accept="image/*"
-            className="hidden"
+        <div className="flex justify-between w-full">
+          {/* Logo */}
+          <Image
+            width={100}
+            height={80}
+            src="/logo.png"
+            alt="Khan Group of Hostels"
+            className="h-24"
           />
-        </div>
 
+          <div className="flex gap-2">
+            {/* Photo upload area */}
+            <div
+              className="w-24 h-32 md:w-32 md:h-40 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
+              onClick={handleImageClick}
+            >
+              {guestImage ? (
+                <img
+                  src={guestImage}
+                  alt="Guest"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xs">Guest Photo</span>
+              )}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+                accept="image/*"
+                className="hidden"
+              />
+            </div>
+            <div
+              className="w-24 h-32 md:w-32 md:h-40 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
+              onClick={handleParentImageClick}
+            >
+              {parentImage ? (
+                <img
+                  src={parentImage}
+                  alt="Guest"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xs">Parent Photo</span>
+              )}
+              <input
+                type="file"
+                ref={parentFileInputRef}
+                onChange={handleParentImageChange}
+                accept="image/*"
+                className="hidden"
+              />
+
+            </div>
+          </div>
+        </div>
         {/* Form fields */}
-        <div className="mt-44 space-y-6">
+        <div className="mt-10 space-y-6">
           <div className="flex w-full gap-2">
             <InputField
               className="w-2/3"
@@ -263,13 +357,24 @@ const GuestRoomRegistrationForm: React.FC<{
                 onChange={(e) => handleGuestInputChange(index, e)}
                 className="w-1/4"
               />
-              <InputField
+              {/* <InputField
                 label="Adhaar #"
                 name="adhaar"
                 value={guest.adhaar}
                 onChange={(e) => handleGuestInputChange(index, e)}
                 className="w-1/4"
-              />
+              /> */}
+              <div onClick={handleAadhaarImageClick} className="relative -top-1 ">
+                <span className="text-xs md:text-md font-bold">Aadhaar</span>
+                <input
+                  type="file"
+                  ref={aadhaarFileInputRef}
+                  onChange={handleAadhaarImageChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <div className="border-b border-dotted border-black mt-2 text-xs md:text-md">{aadhaarUploaded ? "success" : "pending"}</div>
+              </div>
               <InputField
                 label="Age"
                 name="age"
@@ -290,8 +395,10 @@ const GuestRoomRegistrationForm: React.FC<{
 
         {/* Declaration */}
         <div className="mt-8">
-          <h2 className="font-bold text-red-500">Declaration</h2>
-          <ul className="space-y-2 text-sm">
+          <h2 className="font-bold text-xs md:text-md text-red-500">
+            Declaration
+          </h2>
+          <ul className="space-y-2 text-xs md:text-sm">
             <li>
               I understand and accept the general conditions for booking of
               hostel accommodation & Guest Room.
@@ -378,8 +485,9 @@ const GuestRoomRegistrationForm: React.FC<{
       <Button
         onClick={handleSubmit}
         className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+        disabled={isLoading}
       >
-        Proceed to Payment
+        {!isLoading ? <LoaderCircle className="animate-spin"/>:"Proceed to Payment"}
       </Button>
     </>
   );
@@ -393,7 +501,7 @@ const InputField: React.FC<{
   className?: string;
 }> = ({ label, name, value, onChange, className }) => (
   <div className={cn(className, "flex flex-col")}>
-    <label className="font-bold mb-1">{label}</label>
+    <label className="font-bold mb-1 text-xs md:text-md">{label}</label>
     <div className="relative pb-1">
       <input
         type="text"
