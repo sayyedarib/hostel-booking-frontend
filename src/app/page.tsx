@@ -4,11 +4,11 @@ import { useInView } from "react-intersection-observer";
 
 import Header from "@/components/header";
 import SearchBar from "@/components/search-bar"; // Updated import
-import HeroSection from "@/components/hero-section";
-import OurServices from "@/components/our-services";
-import Gallery from "@/components/gallery";
-import Testimonials from "@/components/testimonials";
-import Footer from "@/components/footer";
+import HeroSection from "@/components/landing-page/hero-section";
+import OurServices from "@/components/landing-page/our-services";
+import Gallery from "@/components/landing-page/gallery";
+import Testimonials from "@/components/landing-page/testimonials";
+import Footer from "@/components/landing-page/footer";
 
 export default function Home() {
   const [ref, inView] = useInView({

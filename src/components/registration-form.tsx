@@ -5,11 +5,27 @@ import { useRouter, useSearchParams } from "next/navigation";
 import React, { useState, useRef } from "react";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
+import { LoaderCircle } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
-import { Button } from "@/components/ui/button";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   updateGuestName,
   updateGooglePic,
@@ -17,7 +33,7 @@ import {
   updateGuestAddress,
   updateGuestGuardianName,
 } from "@/db/queries";
-import { LoaderCircle } from "lucide-react";
+import { roomTypeTable } from "@/db/schema";
 
 const GuestRoomRegistrationForm: React.FC<{
   name: string;
@@ -28,9 +44,11 @@ const GuestRoomRegistrationForm: React.FC<{
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [roomType, setRoomType] = useState<string>("Rs.4000/bed");
   const [guestInfo, setGuestInfo] = useState({
     name: "",
     guestPhone: "",
+    guestEmail: "",
     fatherName: "",
     fatherPhone: "",
     purpose: "",
@@ -38,10 +56,10 @@ const GuestRoomRegistrationForm: React.FC<{
     policeStation: "",
     city: "",
     state: "",
-    guests: [{ name: "", adhaar: "", age: "", sex: "" }],
+    guests: [{ name: "", adhaar: "", dob: "", sex: "" }],
     checkInDate: "",
     checkOutDate: "",
-    flatNumber: "",
+    block: "",
     floor: "",
   });
   const [guestImage, setGuestImage] = useState<string>("");
@@ -49,10 +67,28 @@ const GuestRoomRegistrationForm: React.FC<{
   const [guestAadhaarImage, setGuestAadhaarImage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [aadhaarUploaded, setAadhaarUploaded] = useState<boolean>(false);
+  const [roomTypeDescription, setRoomTypeDescription] =
+    useState<string>("4-Seater");
+
   const formRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const parentFileInputRef = useRef<HTMLInputElement>(null);
   const aadhaarFileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleRoomTypeChange = (value: string) => {
+    setRoomType(value);
+    switch (value) {
+      case "Rs. 4000/bed":
+        setRoomTypeDescription("4-Seater");
+        break;
+      case "Rs. 4500/bed":
+        setRoomTypeDescription("3-Seater");
+        break;
+      case "Rs. 5000/bed":
+        setRoomTypeDescription("2-seater");
+        break;
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -61,7 +97,7 @@ const GuestRoomRegistrationForm: React.FC<{
 
   const handleGuestInputChange = (
     index: number,
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const { name, value } = e.target;
     setGuestInfo((prev) => {
@@ -95,7 +131,9 @@ const GuestRoomRegistrationForm: React.FC<{
     }
   };
 
-  const handleParentImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleParentImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const reader = new FileReader();
@@ -117,10 +155,10 @@ const GuestRoomRegistrationForm: React.FC<{
 
       reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleAadhaarImageChange = async (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -146,7 +184,6 @@ const GuestRoomRegistrationForm: React.FC<{
     }
   };
 
-
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
@@ -157,8 +194,7 @@ const GuestRoomRegistrationForm: React.FC<{
 
   const handleAadhaarImageClick = () => {
     aadhaarFileInputRef.current?.click();
-  }
-
+  };
 
   const generatePDF = async () => {
     try {
@@ -170,7 +206,7 @@ const GuestRoomRegistrationForm: React.FC<{
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-        // pdf.save("guest_room_registration_form.pdf");
+        pdf.save("guest_room_registration_form.pdf");
 
         return pdf.output("blob"); // Return the PDF as a Blob
       }
@@ -192,18 +228,43 @@ const GuestRoomRegistrationForm: React.FC<{
         console.log("uploaded pdf response", data, error);
       }
 
-      await Promise.all([
-        updateGuestName(guestInfo.name),
-        updateGuestPhone(guestInfo.guestPhone),
-        updateGuestAddress(guestInfo.permanentAddress),
-        updateGuestGuardianName(guestInfo.fatherName),
-        updateGooglePic(guestImage),
-      ]);
+      await fetch("/api/email/payment-verification", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          guestName: guestInfo.name,
+          guestPhone: guestInfo.guestPhone,
+          guestEmail: guestInfo.guestEmail,
+          checkIn: guestInfo.checkInDate,
+          checkOut: guestInfo.checkOutDate,
+          roomNumber: guestInfo.block,
+          totalAmount: extractAndAdd(roomType),
+        }),
+      });
+
+      // await Promise.all([
+      //   updateGuestName(guestInfo.name),
+      //   updateGuestPhone(guestInfo.guestPhone),
+      //   updateGuestAddress(guestInfo.permanentAddress),
+      //   updateGuestGuardianName(guestInfo.fatherName),
+      //   updateGooglePic(guestImage),
+      // ]);
     } catch (error) {
       console.error("Error updating guest info", error);
     }
     setIsLoading(false);
     router.push("/thanks");
+  };
+
+  const extractAndAdd = (priceString: string) => {
+    const match = priceString.match(/Rs\.\s*(\d+)/);
+    if (match) {
+      const price = parseInt(match[1], 10);
+      return price + 1000;
+    }
+    throw new Error("Invalid price string");
   };
 
   return (
@@ -240,7 +301,7 @@ const GuestRoomRegistrationForm: React.FC<{
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-xs">Guest Photo</span>
+                <span className="text-xs">Applicant Photo</span>
               )}
               <input
                 type="file"
@@ -270,7 +331,6 @@ const GuestRoomRegistrationForm: React.FC<{
                 accept="image/*"
                 className="hidden"
               />
-
             </div>
           </div>
         </div>
@@ -308,6 +368,12 @@ const GuestRoomRegistrationForm: React.FC<{
               onChange={handleInputChange}
             />
           </div>
+          <InputField
+            label="Guest Email"
+            name="guestEmail"
+            value={guestInfo.guestEmail || ""}
+            onChange={handleInputChange}
+          />
           <InputField
             label="Purpose of Stay in Hostel/Guest Room"
             name="purpose"
@@ -364,7 +430,10 @@ const GuestRoomRegistrationForm: React.FC<{
                 onChange={(e) => handleGuestInputChange(index, e)}
                 className="w-1/4"
               /> */}
-              <div onClick={handleAadhaarImageClick} className="relative -top-1 ">
+              <div
+                onClick={handleAadhaarImageClick}
+                className="relative -top-1 "
+              >
                 <span className="text-xs md:text-md font-bold">Aadhaar</span>
                 <input
                   type="file"
@@ -373,12 +442,14 @@ const GuestRoomRegistrationForm: React.FC<{
                   accept="image/*"
                   className="hidden"
                 />
-                <div className="border-b border-dotted border-black mt-2 text-xs md:text-md">{aadhaarUploaded ? "success" : "pending"}</div>
+                <div className="border-b border-dotted border-black mt-2 text-xs md:text-md">
+                  {aadhaarUploaded ? "success" : "pending"}
+                </div>
               </div>
               <InputField
-                label="Age"
-                name="age"
-                value={guest.age}
+                label="Date of Birth"
+                name="dob"
+                value={guest.dob}
                 onChange={(e) => handleGuestInputChange(index, e)}
                 className="w-1/6"
               />
@@ -398,7 +469,7 @@ const GuestRoomRegistrationForm: React.FC<{
           <h2 className="font-bold text-xs md:text-md text-red-500">
             Declaration
           </h2>
-          <ul className="space-y-2 text-xs md:text-sm">
+          <ul className="space-y-1 text-xs md:text-sm">
             <li>
               I understand and accept the general conditions for booking of
               hostel accommodation & Guest Room.
@@ -435,7 +506,7 @@ const GuestRoomRegistrationForm: React.FC<{
         </div>
 
         {/* Check-in/out details */}
-        <div className="mt-8 flex justify-between space-x-2 md:space-x-4 text-xs md:text-md">
+        <div className="mt-8 flex justify-between space-x-2 md:space-x-4">
           <InputField
             label="Check-in Date"
             name="checkInDate"
@@ -451,9 +522,9 @@ const GuestRoomRegistrationForm: React.FC<{
             className="w-1/4"
           />
           <InputField
-            label="Flat #"
-            name="flatNumber"
-            value={guestInfo.flatNumber || ""}
+            label="Block"
+            name="block"
+            value={guestInfo.block || ""}
             onChange={handleInputChange}
             className="w-1/4"
           />
@@ -464,6 +535,54 @@ const GuestRoomRegistrationForm: React.FC<{
             onChange={handleInputChange}
             className="w-1/4"
           />
+        </div>
+
+        {/* payment */}
+        <div className="flex space-x-2 lg:space-x-4 mt-4">
+          <InputField
+            label="Secuity Deposit(Refundable)"
+            name="securityDeposit"
+            value="Rs. 1000"
+            onChange={handleInputChange}
+            className="w-1/3"
+          />
+          <InputField
+            label="Room Type"
+            name="roomType"
+            value={roomType}
+            onChange={handleInputChange}
+            className="w-1/3"
+          />
+          <InputField
+            label="Total"
+            name="total"
+            value={extractAndAdd(roomType).toString()}
+            onChange={handleInputChange}
+            className="w-1/3"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">{roomTypeDescription}</Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuLabel>Select Room Type</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuRadioGroup
+                value={roomType}
+                onValueChange={handleRoomTypeChange}
+              >
+                <DropdownMenuRadioItem value="Rs.4000/bed">
+                  4-Seater
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Rs. 4500/bed">
+                  3-Seater
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="Rs. 5000/bed">
+                  2-seater
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Signature */}
@@ -487,7 +606,7 @@ const GuestRoomRegistrationForm: React.FC<{
         className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
         disabled={isLoading}
       >
-        {isLoading ? <LoaderCircle className="animate-spin"/>:"Submit"}
+        {isLoading ? <LoaderCircle className="animate-spin" /> : "Submit"}
       </Button>
     </>
   );
