@@ -9,6 +9,7 @@ import {
   guestTable,
   roomTable,
   roomTypeTable,
+  tempConfirmationTable,
   paymentTable,
 } from "@/db/schema";
 import { BedInfo, Guest } from "@/interface";
@@ -423,3 +424,43 @@ export async function createPayment({
     token,
   });
 }
+
+export const createConfirmation = async (data: {
+  guestName: string;
+  guestEmail: string;
+  guestPhone: string;
+  room: string;
+  checkIn: string;
+  checkOut: string;
+  totalAmount: number;
+}): Promise<number> => {
+  console.log("creating confirmation...");
+
+  const [result] = await db
+    .insert(tempConfirmationTable)
+    .values({
+      guestName: data.guestName,
+      guestEmail: data.guestEmail,
+      guestPhone: data.guestPhone,
+      room: data.room,
+      checkIn: data.checkIn,
+      checkOut: data.checkOut,
+      totalAmount: data.totalAmount,
+    })
+    .returning({ id: tempConfirmationTable.id });
+
+  console.log("confirmation created with id:", result.id);
+  return result.id;
+};
+
+export const getConfirmation = async (id: number) => {
+  console.log("fetching confirmation...");
+
+  const confirmation = await db
+    .select()
+    .from(tempConfirmationTable)
+    .where(eq(tempConfirmationTable.id, id));
+
+  console.log("confirmation", confirmation);
+  return confirmation;
+};

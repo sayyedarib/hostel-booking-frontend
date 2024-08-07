@@ -6,24 +6,24 @@ import { paymentTable } from "@/db/schema";
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const token = searchParams.get("token");
+    // const { searchParams } = new URL(request.url);
+    // const token = searchParams.get("token");
 
-    console.log("Payment verification request received");
-    console.log("token is: ", token);
+    // console.log("Payment verification request received");
+    // console.log("token is: ", token);
 
-    if (!token) {
-      return NextResponse.json({ error: "Token is required" }, { status: 400 });
-    }
+    // if (!token) {
+    //   return NextResponse.json({ error: "Token is required" }, { status: 400 });
+    // }
 
     console.log("updating payment table...");
     try {
-      await db
-        .update(paymentTable)
-        .set({
-          verified: true,
-        })
-        .where(eq(paymentTable.token, token));
+      // await db
+      //   .update(paymentTable)
+      //   .set({
+      //     verified: true,
+      //   })
+      //   .where(eq(paymentTable.token, token));
 
       // Return HTML response
       return new NextResponse(

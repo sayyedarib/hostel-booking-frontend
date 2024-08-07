@@ -160,3 +160,14 @@ export const agreementTable = pgTable("agreement", {
     .notNull()
     .$onUpdate(() => new Date()),
 });
+
+export const tempConfirmationTable = pgTable("temp_confirmation", {
+  id: serial("id").primaryKey(),
+  guestName: text("guest_name").notNull(),
+  guestEmail: text("guest_email").notNull(),
+  guestPhone: text("guest_phone").notNull(),
+  room: text("room_number").notNull(),
+  checkIn: date("check_in").notNull(),
+  checkOut: date("check_out").notNull(),
+  totalAmount: integer("total_amount").notNull(),
+});
