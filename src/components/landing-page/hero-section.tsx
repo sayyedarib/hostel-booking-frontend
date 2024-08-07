@@ -6,7 +6,7 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { ImagesSlider } from "@/components/ui/images-slider";
-import { HoverBorderGradient } from "./hover-border-gradient";
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 
 export default function HeroSection() {
   const images = [
