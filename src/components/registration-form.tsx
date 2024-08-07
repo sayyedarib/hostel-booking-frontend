@@ -540,14 +540,14 @@ const GuestRoomRegistrationForm: React.FC<{
         {/* Check-in/out details */}
         <div className="mt-8 flex justify-between space-x-2 md:space-x-4">
           <InputField
-            label="Check-in Date"
+            label="Checkin"
             name="checkInDate"
             value={guestInfo.checkInDate || ""}
             onChange={handleInputChange}
             className="w-1/4"
           />
           <InputField
-            label="Check-out Date"
+            label="Checkout"
             name="checkOutDate"
             value={guestInfo.checkOutDate || ""}
             onChange={handleInputChange}
@@ -572,7 +572,7 @@ const GuestRoomRegistrationForm: React.FC<{
         {/* payment */}
         <div className="flex space-x-2 lg:space-x-4 my-4">
           <InputField
-            label="Secuity Deposit(Refundable)"
+            label="Secuity Deposit"
             name="securityDeposit"
             value="Rs. 1000"
             onChange={handleInputChange}
