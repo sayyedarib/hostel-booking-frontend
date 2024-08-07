@@ -65,6 +65,7 @@ const GuestRoomRegistrationForm: React.FC<{
   const [guestImage, setGuestImage] = useState<string>("");
   const [parentImage, setParentImage] = useState<string>("");
   const [guestAadhaarImage, setGuestAadhaarImage] = useState<string>("");
+  const [signatureImage, setSignatureImage] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [aadhaarUploaded, setAadhaarUploaded] = useState<boolean>(false);
   const [roomTypeDescription, setRoomTypeDescription] =
@@ -74,6 +75,7 @@ const GuestRoomRegistrationForm: React.FC<{
   const fileInputRef = useRef<HTMLInputElement>(null);
   const parentFileInputRef = useRef<HTMLInputElement>(null);
   const aadhaarFileInputRef = useRef<HTMLInputElement>(null);
+  const signatureFileInputRef = useRef<HTMLInputElement>(null);
 
   const handleRoomTypeChange = (value: string) => {
     setRoomType(value);
@@ -157,6 +159,32 @@ const GuestRoomRegistrationForm: React.FC<{
     }
   };
 
+  const handleSignatureImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+
+      reader.onload = async (event) => {
+        setSignatureImage(event.target?.result as string);
+
+        const fileName = `${guestInfo.name}_${new Date().toISOString()}.png`;
+        const { data, error } = await supabase.storage
+          .from("signature_image")
+          .upload(fileName, file);
+
+        if (error) {
+          console.error("Error uploading image:", error);
+        } else {
+          console.log("Image uploaded successfully:", data);
+        }
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+
   const handleAadhaarImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -194,6 +222,10 @@ const GuestRoomRegistrationForm: React.FC<{
 
   const handleAadhaarImageClick = () => {
     aadhaarFileInputRef.current?.click();
+  };
+
+  const handleSignatureImageClick = () => {
+    signatureFileInputRef.current?.click();
   };
 
   const generatePDF = async () => {
@@ -538,7 +570,7 @@ const GuestRoomRegistrationForm: React.FC<{
         </div>
 
         {/* payment */}
-        <div className="flex space-x-2 lg:space-x-4 mt-4">
+        <div className="flex space-x-2 lg:space-x-4 my-4">
           <InputField
             label="Secuity Deposit(Refundable)"
             name="securityDeposit"
@@ -586,9 +618,28 @@ const GuestRoomRegistrationForm: React.FC<{
         </div>
 
         {/* Signature */}
-        <div className="mt-8">
-          <p>Guest Signature: ____________________________</p>
-        </div>
+        <span className="font-extrabold">Guest Signature</span>
+        <div
+              className="w-24 h-10 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
+              onClick={handleSignatureImageClick}
+            >
+              {signatureImage ? (
+                <img
+                  src={signatureImage}
+                  alt="Guest"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-xs">Guest Signature Photo</span>
+              )}
+              <input
+                type="file"
+                ref={signatureFileInputRef}
+                onChange={handleSignatureImageChange}
+                accept="image/*"
+                className="hidden"
+              />
+            </div>
 
         {/* Footer */}
         <div className="mt-8 text-center">
