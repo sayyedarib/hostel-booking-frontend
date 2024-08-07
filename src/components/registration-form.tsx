@@ -479,7 +479,7 @@ const GuestRoomRegistrationForm: React.FC<{
                 </div>
               </div>
               <InputField
-                label="Date of Birth"
+                label="DOB"
                 name="dob"
                 value={guest.dob}
                 onChange={(e) => handleGuestInputChange(index, e)}
@@ -620,7 +620,7 @@ const GuestRoomRegistrationForm: React.FC<{
         {/* Signature */}
         <span className="font-extrabold">Guest Signature</span>
         <div
-              className="w-24 h-10 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
+              className="w-32 h-10 border-2 border-black flex items-center justify-center mb-8 cursor-pointer"
               onClick={handleSignatureImageClick}
             >
               {signatureImage ? (
