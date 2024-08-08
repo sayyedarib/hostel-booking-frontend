@@ -38,7 +38,8 @@ export default function SearchBar({
       checkOut: checkOut,
       bed: bed.toString(),
     });
-    router.push(`/rooms?${queryParams.toString()}`);
+    // router.push(`/rooms?${queryParams.toString()}`);
+    router.push("/coming-soon");
   };
 
   return (
