@@ -187,7 +187,7 @@ export default function BedReservationCard({
             </div>
           </CardContent>
           <CardFooter className="flex flex-col w-full">
-            {/* <SelectBed /> */}
+            <SelectBed />
             <Button onClick={handleBookNow} className="w-full">
               Book Now
             </Button>

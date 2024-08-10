@@ -28,10 +28,10 @@ export function SelectBed() {
           <DrawerHeader>
             <DrawerTitle>Select your bed</DrawerTitle>
           </DrawerHeader>
-          {/* <RoomMaps
-            type={currentBooking?.roomData?.roomTypeName}
+          <RoomMaps
+            type={currentBooking?.roomData?.roomTypeName as "1-bed" | "2-bed" | "3-bed" | "4-bed"}
             roomData={currentBooking?.roomData!}
-          /> */}
+          />
           <DrawerFooter>
             <DrawerClose asChild>
               <Button>Proceed to Checkout</Button>
