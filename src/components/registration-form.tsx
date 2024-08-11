@@ -124,7 +124,7 @@ const RegistrationForm = () => {
 
   const handleImageUpload = async (
     e: ChangeEvent<HTMLInputElement>,
-    field: string
+    field: string,
   ) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -179,14 +179,14 @@ const RegistrationForm = () => {
         // Handle error (e.g., show error message to user)
         // You might want to use a toast or alert component to show this error to the user
         alert(
-          `Error uploading ${field}: ${error instanceof Error ? error.message : "Unknown error"}`
+          `Error uploading ${field}: ${error instanceof Error ? error.message : "Unknown error"}`,
         );
       }
     }
   };
 
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -195,7 +195,7 @@ const RegistrationForm = () => {
   const handleGuestChange = (
     index: number,
     field: keyof Guest,
-    value: string
+    value: string,
   ) => {
     setFormData((prev: FormData) => {
       const newGuests = [...prev.guests];
@@ -239,7 +239,7 @@ const RegistrationForm = () => {
       setFormData((prev) => ({ ...prev, signature: signatureDataUrl }));
     }
   };
-  
+
   return (
     <div className="p-8 md:max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-8 text-center">
@@ -416,7 +416,9 @@ const RegistrationForm = () => {
           </DropdownMenuContent>
         </DropdownMenu>
         <div>
-          <Label htmlFor="totalAmount" className="w-52">Total Amount</Label>
+          <Label htmlFor="totalAmount" className="w-52">
+            Total Amount
+          </Label>
           <Input
             name="totalAmount"
             value={formData.totalAmount}

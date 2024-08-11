@@ -94,15 +94,18 @@ export default function DatePickerWithRange({
   );
 }
 
-
 interface DatePickerProps {
   selected: Date | undefined;
   onChange: (date: Date | undefined) => void;
   placeholderText: string;
 }
 
-export function DatePicker({ selected, onChange, placeholderText }: DatePickerProps) {
-  const [date, setDate] = useState<Date>()
+export function DatePicker({
+  selected,
+  onChange,
+  placeholderText,
+}: DatePickerProps) {
+  const [date, setDate] = useState<Date>();
 
   return (
     <Popover>
@@ -111,7 +114,7 @@ export function DatePicker({ selected, onChange, placeholderText }: DatePickerPr
           variant={"outline"}
           className={cn(
             "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground"
+            !date && "text-muted-foreground",
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -119,13 +122,8 @@ export function DatePicker({ selected, onChange, placeholderText }: DatePickerPr
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
-        <Calendar
-          autoFocus
-          mode="single"
-          selected={date}
-          onSelect={setDate}
-        />
+        <Calendar autoFocus mode="single" selected={date} onSelect={setDate} />
       </PopoverContent>
     </Popover>
-  )
+  );
 }

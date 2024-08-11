@@ -1,4 +1,4 @@
-import React  from "react";
+import React from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
@@ -99,7 +99,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
       </p>
       <p>
         <strong>Date of Birth:</strong>{" "}
-        {formData.dob ? formData.dob: "Not provided"}
+        {formData.dob ? formData.dob : "Not provided"}
       </p>
     </div>
 
