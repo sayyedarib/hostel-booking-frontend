@@ -22,7 +22,7 @@ export default function Header({
         )}
       >
         <Link href="/" className="text-red-500 text-3xl">
-          AligarhHostel
+          Under Development....
         </Link>
 
         <SignedOut>
