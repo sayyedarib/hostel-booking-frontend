@@ -2,6 +2,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Inter } from "next/font/google";
 
 let interval: any;
 
@@ -10,6 +11,12 @@ type Card = {
   name: string;
   rank: string;
 };
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const CardStack = ({
   items,
@@ -40,12 +47,12 @@ export const CardStack = ({
   };
 
   return (
-    <div className="relative h-32 w-32">
+    <div className={`relative h-32 w-32 ${inter.className}`}>
       {cards.map((card, index) => {
         return (
           <motion.div
             key={card.src}
-            className="absolute bg-white h-40 w-32 rounded-3xl p-3 border border-neutral-200 flex flex-col justify-between"
+            className={`absolute bg-white h-40 w-32 rounded-3xl p-3 border border-neutral-200 flex flex-col justify-between ${inter.className}`}
             style={{
               transformOrigin: "top center",
             }}
@@ -55,9 +62,9 @@ export const CardStack = ({
               zIndex: cards.length - index, //  decrease z-index for the cards that are behind
             }}
           >
-            <div className="flex flex-col bg-white h-full">
+            <div className={`flex flex-col bg-white h-full ${inter.className}`}>
               <Image src={card.src} height={120} width={120} alt="" />
-              <div className="p-2 overflow-hidden flex-1">
+              <div className={`p-2 overflow-hidden flex-1 ${inter.className}`}>
                 <span className="block">{card.name}</span>
                 {/* <span className="block">Rank {card.rank}</span> */}
               </div>
