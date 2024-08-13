@@ -6,7 +6,6 @@ import { addDays } from "date-fns";
 import type { RoomCard } from "@/interface";
 
 import { RoomCardComponent } from "@/components/room-card";
-import { getAllRooms } from "@/db/queries";
 import { calculateBedPrice, calculateRoomPrice } from "@/lib/utils";
 
 function RoomsContent() {
@@ -26,6 +25,12 @@ function RoomsContent() {
           monthlyPrice: 1000,
           status: "selected",
           bedCode: "L1",
+          occupiedDateRanges: [
+            {
+              startDate: new Date(),
+              endDate: addDays(new Date(), 5),
+            },
+          ],
         },
       ],
     },
@@ -43,6 +48,12 @@ function RoomsContent() {
           monthlyPrice: 2000,
           status: "available",
           bedCode: "L1",
+          occupiedDateRanges: [
+            {
+              startDate: new Date(),
+              endDate: addDays(new Date(), 5),
+            },
+          ],
         },
         {
           id: 3,
@@ -50,6 +61,12 @@ function RoomsContent() {
           monthlyPrice: 2000,
           status: "available",
           bedCode: "U1",
+          occupiedDateRanges: [
+            {
+              startDate: new Date(),
+              endDate: addDays(new Date(), 5),
+            },
+          ],
         },
       ],
     },
@@ -67,6 +84,12 @@ function RoomsContent() {
           monthlyPrice: 3000,
           status: "available",
           bedCode: "L1",
+          occupiedDateRanges: [
+            {
+              startDate: new Date(),
+              endDate: addDays(new Date(), 5),
+            },
+          ],
         },
         {
           id: 5,
@@ -74,6 +97,12 @@ function RoomsContent() {
           monthlyPrice: 3000,
           status: "occupied",
           bedCode: "L2",
+          occupiedDateRanges: [
+            {
+              startDate: new Date(),
+              endDate: addDays(new Date(), 5),
+            },
+          ],
         },
         {
           id: 6,
@@ -81,6 +110,12 @@ function RoomsContent() {
           monthlyPrice: 3000,
           status: "available",
           bedCode: "U1",
+          occupiedDateRanges: [
+            {
+              startDate: new Date(),
+              endDate: addDays(new Date(), 5),
+            },
+          ],
         },
       ],
     },

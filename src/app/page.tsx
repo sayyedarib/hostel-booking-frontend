@@ -11,7 +11,7 @@ import Gallery from "@/components/landing-page/gallery";
 import Testimonials from "@/components/landing-page/testimonials";
 import Footer from "@/components/landing-page/footer";
 import Quotes from "@/components/quotes";
-import FAQ from "@/components/faq";
+import FAQ from "@/components/landing-page/faq";
 import Facilities from "@/components/landing-page/facilities";
 import BedTypes from "@/components/landing-page/bed-types";
 
