@@ -2,8 +2,7 @@ import { differenceInDays } from "date-fns";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import crypto from "crypto";
-
-import type { Room } from "@/interface";
+import type { Room, LogContext, LogLevel } from "@/interface";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -62,4 +61,21 @@ export function calculateBedPrice(
 
 export const generateToken = (length = 16) => {
   return crypto.randomBytes(length).toString("hex").substring(0, length);
+};
+
+export const logger = (
+  level: LogLevel,
+  message: string,
+  context: LogContext | Error = {},
+) => {
+  const time = new Date().toLocaleTimeString();
+  const date = new Date().toLocaleDateString();
+  const dir = process.cwd();
+  const logLevel = level.toUpperCase();
+
+  const contextString = Object.keys(context)?.length
+    ? JSON.stringify(context)
+    : "";
+
+  console.log(`[${date} ${time}] [${logLevel}] ${message} ${contextString}`);
 };
