@@ -48,6 +48,10 @@ export interface Guest {
 }
 
 // refactoring
+export interface OccupiedDateRange {
+  startDate: Date;
+  endDate: Date;
+}
 
 export interface BedInRoomCard {
   id: number;
@@ -55,6 +59,7 @@ export interface BedInRoomCard {
   monthlyPrice: number;
   bedCode: string;
   status: string;
+  occupiedDateRanges: OccupiedDateRange[];
 }
 
 export interface RoomCard {
@@ -66,3 +71,8 @@ export interface RoomCard {
   gender: string;
   availableBeds: number;
 }
+
+import { CreateUser } from "./user";
+import { LogLevel, LogContext } from "./utils";
+
+export type { CreateUser, LogLevel, LogContext };

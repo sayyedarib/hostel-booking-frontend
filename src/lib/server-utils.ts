@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+
 const nodemailer = require("nodemailer");
 
 export const transporter = nodemailer.createTransport({
@@ -13,3 +15,7 @@ export const transporter = nodemailer.createTransport({
     pass: process.env.NEXT_PUBLIC_EMAIL_PWD,
   },
 });
+
+export const getClerkId = () => {
+  return auth().userId;
+};
