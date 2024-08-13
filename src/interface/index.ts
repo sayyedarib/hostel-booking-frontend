@@ -24,10 +24,10 @@ export interface Room {
   bedInfo: BedInfo[];
 }
 
-export interface RoomCard extends Room {
-  totalRoomPrice: number;
-  totalBedPrice: number;
-}
+// export interface RoomCard extends Room {
+//   totalRoomPrice: number;
+//   totalBedPrice: number;
+// }
 export interface BedInfo {
   id: number;
   dailyPrice: number;
@@ -45,4 +45,24 @@ export interface Guest {
   roomId?: number;
   bedId?: number;
   paymentId?: string;
+}
+
+// refactoring
+
+export interface BedInRoomCard {
+  id: number;
+  dailyPrice: number;
+  monthlyPrice: number;
+  bedCode: string;
+  status: string;
+}
+
+export interface RoomCard {
+  id: number;
+  buildingName: string;
+  roomNumber: string;
+  imageUrls: string[];
+  bedInfo: BedInRoomCard[];
+  gender: string;
+  availableBeds: number;
 }

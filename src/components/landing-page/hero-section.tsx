@@ -44,6 +44,7 @@ export default function HeroSection() {
         Your children is our responsibility. <br className="hidden sm:block" />{" "}
         We provide home away from home.
       </p>
+      <Button className="bg-primary rounded-full">Book Now</Button>
 
       {/* <div className="pt-24 text-sm md:text-xl lg:text-2xl text-neutral-500">
         <span>we have acheived so far...</span>{" "}

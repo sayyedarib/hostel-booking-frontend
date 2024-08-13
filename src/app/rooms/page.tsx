@@ -5,13 +5,86 @@ import { addDays } from "date-fns";
 
 import type { RoomCard } from "@/interface";
 
-import { RoomCardComponent } from "@/components/3d-card-demo";
+import { RoomCardComponent } from "@/components/room-card";
 import { getAllRooms } from "@/db/queries";
 import { calculateBedPrice, calculateRoomPrice } from "@/lib/utils";
 
 function RoomsContent() {
   const searchParams = useSearchParams();
-  const [rooms, setRooms] = useState<RoomCard[]>([]);
+  const [rooms, setRooms] = useState<RoomCard[]>([
+    {
+      id: 1,
+      buildingName: "Building 1",
+      roomNumber: "101",
+      imageUrls: ["https://images.unsplash.com/photo-1532635246-7a1f0e3b8d0d"],
+      availableBeds: 2,
+      gender: "male",
+      bedInfo: [
+        {
+          id: 1,
+          dailyPrice: 100,
+          monthlyPrice: 1000,
+          status: "selected",
+          bedCode: "L1",
+        },
+      ],
+    },
+    {
+      id: 2,
+      buildingName: "Building 1",
+      roomNumber: "102",
+      imageUrls: ["https://images.unsplash.com/photo-1532635246-7a1f0e3b8d0d"],
+      availableBeds: 2,
+      gender: "male",
+      bedInfo: [
+        {
+          id: 2,
+          dailyPrice: 200,
+          monthlyPrice: 2000,
+          status: "available",
+          bedCode: "L1",
+        },
+        {
+          id: 3,
+          dailyPrice: 200,
+          monthlyPrice: 2000,
+          status: "available",
+          bedCode: "U1",
+        },
+      ],
+    },
+    {
+      id: 3,
+      buildingName: "Building 1",
+      roomNumber: "103",
+      imageUrls: ["https://images.unsplash.com/photo-1532635246-7a1f0e3b8d0d"],
+      availableBeds: 2,
+      gender: "male",
+      bedInfo: [
+        {
+          id: 4,
+          dailyPrice: 300,
+          monthlyPrice: 3000,
+          status: "available",
+          bedCode: "L1",
+        },
+        {
+          id: 5,
+          dailyPrice: 300,
+          monthlyPrice: 3000,
+          status: "occupied",
+          bedCode: "L2",
+        },
+        {
+          id: 6,
+          dailyPrice: 300,
+          monthlyPrice: 3000,
+          status: "available",
+          bedCode: "U1",
+        },
+      ],
+    },
+  ]);
   console.log(
     "🚀 ~ file: page.tsx ~ line 31 ~ RoomsContent ~ searchParams",
     searchParams.get("checkIn"),
@@ -27,15 +100,15 @@ function RoomsContent() {
         ? new Date(checkOutParam)
         : addDays(new Date(), 30);
       const bed = bedParam ? parseInt(bedParam) : 1;
-      const allRooms = await getAllRooms();
+      // const allRooms = await getAllRooms();
 
-      const roomsWithPrices = allRooms.map((room) => ({
-        ...room,
-        totalRoomPrice: calculateRoomPrice(room, checkIn, checkOut),
-        totalBedPrice: calculateBedPrice(room, checkIn, checkOut, bed),
-      }));
+      // const roomsWithPrices = allRooms.map((room) => ({
+      //   ...room,
+      //   totalRoomPrice: calculateRoomPrice(room, checkIn, checkOut),
+      //   totalBedPrice: calculateBedPrice(room, checkIn, checkOut, bed),
+      // }));
 
-      setRooms(roomsWithPrices);
+      // setRooms(roomsWithPrices);
     };
 
     fetchRooms();

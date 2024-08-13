@@ -13,6 +13,7 @@ import Footer from "@/components/landing-page/footer";
 import Quotes from "@/components/quotes";
 import FAQ from "@/components/faq";
 import Facilities from "@/components/landing-page/facilities";
+import BedTypes from "@/components/landing-page/bed-types";
 
 export default function Home() {
   const [ref, inView] = useInView({
@@ -43,6 +44,15 @@ export default function Home() {
         className="max-w-full bg-[#EDE8F5]/50 min-h-[70vh]"
       >
         <Facilities />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8 }}
+        className="max-w-full min-h-[70vh]"
+      >
+        <BedTypes />
       </motion.div>
 
       <motion.div

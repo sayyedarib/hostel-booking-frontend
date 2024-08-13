@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -45,6 +45,9 @@ export default function Header({
             </li>
             <li>
               <Link href="/contact">Contact</Link>
+            </li>
+            <li>
+              <ShoppingCart />
             </li>
           </ul>
           <div className="bg-black px-3 py-2 rounded-full text-white font-extrabold">
