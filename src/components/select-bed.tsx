@@ -11,11 +11,8 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import RoomMaps from "@/components/room-maps";
-import { CurrentBookingContext } from "@/contexts/CurrentBookingContext";
 
 export function SelectBed() {
-  const { currentBooking } = useContext(CurrentBookingContext);
-
   return (
     <Drawer>
       <DrawerTrigger asChild>
