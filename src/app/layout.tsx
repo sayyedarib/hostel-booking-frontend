@@ -8,8 +8,14 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
 import { CurrentBookingProvider } from "@/contexts/CurrentBookingContext";
+import { Inter } from "next/font/google";
 
-const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
+// const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Hostel in Aligarh",
