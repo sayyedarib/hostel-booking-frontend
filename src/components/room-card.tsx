@@ -3,11 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { useSearchParams } from "next/navigation";
-import { IndianRupee, Star } from "lucide-react";
-import { differenceInDays } from "date-fns";
-import { cn } from "@/lib/utils";
-
+import { Star } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -16,18 +12,8 @@ import {
   CardDescription,
   CardFooter,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+
 import { RoomCard } from "@/interface";
-import AddToCartStep1 from "./add-to-cart-drawer/step1";
 import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
@@ -64,9 +50,10 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
           </div>
         </CardHeader>
         <CardDescription className="text-sm text-gray-600">
-          Room: {roomData.roomNumber}
+          Room: {roomData.roomCode}
         </CardDescription>
-        <AddToCartDrawer roomData={roomData} />
+        {/* TODO: why roomData.id is string here, it should be number always no need to convert */}
+        <AddToCartDrawer roomId={Number(roomData.id)} />
       </CardContent>
     </Card>
   );

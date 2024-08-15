@@ -1,34 +1,48 @@
-import { OccupiedDateRange, RoomCard } from "@/interface";
-import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
+import type { BedInRoomCard, CartItem } from "@/interface";
 
+import { Button } from "@/components/ui/button";
 import {
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
   DrawerClose,
   DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
 } from "@/components/ui/drawer";
+import { cn, getFirstAvailableRange } from "@/lib/utils";
+import { getOccupancyOfBed } from "@/db/queries";
 
-export default function AddToCartStep1({
-  roomData,
+export const AddToCartStep1 = ({
+  cartData,
+  bedData,
+  handleBedSelect,
   handleNext,
+  handleBack,
 }: {
-  roomData: RoomCard;
+  cartData: CartItem[];
+  bedData: BedInRoomCard[];
+  handleBedSelect: (bedId: number) => void;
   handleNext: () => void;
-}) {
-  // if current date lies in the range of occupiedDateRanges, then the bed is occupied
+  handleBack: () => void;
+}) => {
   const getStatus = (bedId: number) => {
-    const bedInfo = roomData.bedInfo.find((bed) => bed.id === bedId);
-    return bedInfo?.occupiedDateRanges?.some((range) => {
-      return (
-        new Date() >= new Date(range.startDate) &&
-        new Date() <= new Date(range.endDate)
-      );
-    })
-      ? "occupied"
-      : "available";
+    const bedInfo = bedData.find((bed) => bed.id === bedId);
+
+    const inCart = cartData.find((item) => item.bedId === bedId);
+
+    if (inCart) {
+      return "cart";
+    }
+
+    const today = new Date();
+    const fifteenDaysFromToday = new Date();
+    fifteenDaysFromToday.setDate(today.getDate() + 15);
+
+    const isOccupied = bedInfo?.occupiedDateRanges?.some((range) => {
+      const rangeStartDate = new Date(range.startDate);
+      const rangeEndDate = new Date(range.endDate);
+      return rangeStartDate <= fifteenDaysFromToday && rangeEndDate >= today;
+    });
+
+    return isOccupied ? "occupied" : "available";
   };
 
   const getStyle = (status: string) => {
@@ -37,10 +51,10 @@ export default function AddToCartStep1({
         return "bg-green-500";
       case "occupied":
         return "bg-red-500";
-      case "reserved":
+      case "cart":
         return "bg-yellow-500";
       default:
-        return "bg-neutral-100";
+        return "bg-neutral-100 hover:bg-green-200";
     }
   };
 
@@ -52,21 +66,23 @@ export default function AddToCartStep1({
           <DrawerClose />
         </DrawerHeader>
         <div className="grid grid-cols-2 grid-rows-2 gap-2">
-          {roomData.bedInfo.map((bed, index) => (
+          {bedData.map((bed, index) => (
             <div
+              key={index}
               className={cn(
-                "h-24 rounded-lg flex justify-center items-center font-semibold",
+                "h-24 rounded-lg flex justify-center items-center font-semibold cursor-pointer",
                 getStyle(getStatus(bed.id)),
               )}
+              onClick={() => handleBedSelect(bed.id)}
             >
               {bed.bedCode}
             </div>
           ))}
         </div>
         <DrawerFooter>
-          <Button>Next</Button>
+          <Button onClick={handleNext}>Next</Button>
         </DrawerFooter>
       </div>
     </>
   );
-}
+};
