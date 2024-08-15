@@ -14,8 +14,8 @@ export default function Quotes({ text }: { text: string }) {
       </svg>
       <blockquote>
         <p className="text-2xl sm:text-4xl md:text-6xl italic font-medium">
-          "All birds find shelter during a rain. But Eagle avoids the rain by
-          flying above the clouds."
+          &quot;All birds find shelter during a rain. But Eagle avoids the rain by
+          flying above the clouds.&quot;
         </p>
       </blockquote>
       <figcaption className="flex items-center justify-center mt-6 space-x-3 rtl:space-x-reverse">

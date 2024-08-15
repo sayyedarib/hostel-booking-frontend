@@ -76,10 +76,10 @@ const PrintableForm: React.ForwardRefRenderFunction<
         <strong>Phone:</strong> {formData.phone}
       </p>
       <p>
-        <strong>Father's Name:</strong> {formData.fatherName}
+        <strong>Father&apos;s Name:</strong> {formData.fatherName}
       </p>
       <p>
-        <strong>Father's Phone:</strong> {formData.fatherPhone}
+        <strong>Father&apos;s Phone:</strong> {formData.fatherPhone}
       </p>
       <p className="col-span-2">
         <strong>Purpose of Stay in PG/Guest Room:</strong>{" "}
@@ -131,7 +131,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
       <li>
         Thank you for choosing KGH GUEST ROOMS. We want to let you know that our
         online booking open 24 hours for all your questions and inquiries.
-        www.aligarhhostel.com Please don't hesitate to contact us if you have
+        www.aligarhhostel.com Please don&apos;t hesitate to contact us if you have
         any questions. We are happy to help!
       </li>
       <li>
@@ -144,7 +144,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
         an early check out.
       </li>
       <li>
-        By signing this form, you agree on following the hostel's and Guest
+        By signing this form, you agree on following the hostel&apos;s and Guest
         Rooms rules and the purpose described above, plus consenting to the
         usage of your personal Information for administrative and marketing
         purposes.

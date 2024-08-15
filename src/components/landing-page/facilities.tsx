@@ -39,11 +39,8 @@ export default function Facilities() {
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 p-2 md:p-4 w-full md:w-3/4 mx-auto">
       {facilities.map((facility, index) => {
         return (
-          <div className="flex flex-col items-center mt-10 gap-3">
-            <div
-              key={index}
-              className="w-40 h-40 mx-auto flex md:w-60 md:h-60 items-center justify-center gap-2 rounded-full p-1 bg-[#7091E6]"
-            >
+          <div key={index} className="flex flex-col items-center mt-10 gap-3">
+            <div className="w-40 h-40 mx-auto flex md:w-60 md:h-60 items-center justify-center gap-2 rounded-full p-1 bg-[#7091E6]">
               <Image src={facility.icon} width={150} height={150} alt="" />
             </div>
             <span className="font-extrabold"> {facility.title}</span>
