@@ -4,4 +4,5 @@ export interface CreateUser {
   phone: string;
   email: string;
   dob?: Date;
+  imageUrl?: string;
 }

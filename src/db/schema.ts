@@ -52,12 +52,10 @@ export const RoomTable = pgTable("room", {
   propertyId: integer("property_id")
     .notNull()
     .references(() => PropertyTable.id),
-  name: text("name").notNull(),
+  roomCode: text("code").notNull(),
   floor: integer("floor").notNull().default(0),
-  gender: text("gender"),
-  imageUrls: text("image_urls")
-    .notNull()
-    .default(sql`'{}'::text[]`),
+  gender: text("gender").notNull().default("male"),
+  imageUrls: text("image_urls").array(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -69,7 +67,7 @@ export const BedTable = pgTable("bed", {
   roomId: integer("room_id")
     .notNull()
     .references(() => RoomTable.id),
-  name: text("name").notNull(),
+  bedCode: text("code").notNull(),
   type: text("type").notNull(),
   monthlyRent: integer("monthly_rent").notNull(),
   dailyRent: integer("daily_rent").notNull(),
@@ -86,6 +84,7 @@ export const UserTable = pgTable("user", {
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   dob: date("dob"),
+  imageUrl: text("image_url"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -101,6 +100,7 @@ export const GuestTable = pgTable("guest", {
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   dob: date("dob").notNull(),
+  aadhaarImage: text("aadhaar_image").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -118,21 +118,27 @@ export const CartTable = pgTable("cart", {
   bedId: integer("bed_id")
     .notNull()
     .references(() => BedTable.id),
-  checkInDate: date("check_in_date").notNull(),
-  checkOutDate: date("check_out_date").notNull(),
+  checkInDate: date("check_in").notNull(),
+  checkOutDate: date("check_out").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
 });
 
+const statusEnum = pgEnum("status", ["booked", "checked_in", "checked_out"]);
+
 export const BedOccupancyTable = pgTable("bed_occupancy", {
   id: serial("id").primaryKey(),
   bedId: integer("bed_id")
     .notNull()
     .references(() => BedTable.id),
-  checkInDate: date("check_in_date").notNull(),
-  checkOutDate: date("check_out_date").notNull(),
+  guestId: integer("guest_id")
+    .notNull()
+    .references(() => GuestTable.id),
+  checkInDate: date("check_in").notNull(),
+  checkOutDate: date("check_out").notNull(),
+  status: text("status"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
