@@ -34,9 +34,11 @@ export default function HeroSection() {
     },
   ];
   return (
-    <div className="space-y-4 flex flex-col items-center">
-      <CardStack items={acheievers} />
-      <div className="text-2xl sm:text-4xl md:text-6xl text-[#3D5280]">
+    <div className="space-y-4 flex flex-col items-center relative">
+      <div className="absolute top-0">
+        <CardStack items={acheievers} />
+      </div>
+      <div className="pt-40 text-2xl sm:text-4xl md:text-6xl text-[#3D5280]">
         Experience Premium Hostel Living, <br className="hidden sm:block" />{" "}
         Designed for Your Children&apos;s Success.
       </div>
