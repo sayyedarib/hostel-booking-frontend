@@ -17,6 +17,11 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
   const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
   const [checkIn, setCheckIn] = useQueryState("checkIn");
   const [checkOut, setCheckOut] = useQueryState("checkOut");
+  const [cartItemsCount, setCartItemsCount] = useQueryState(
+    "cartItemsCount",
+    parseAsInteger.withDefault(0),
+  );
+  const [amount, setAmount] = useQueryState("amount", parseAsInteger);
 
   const [bedData, setBedData] = useState<BedInRoomCard[] | null>(null);
   const [cartData, setCartData] = useState<CartItemShort[]>([]);
@@ -25,7 +30,6 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
   const [loading, setLoading] = useState(false);
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedBed, setSelectedBed] = useState<number | null>(bedId);
 
   useEffect(() => {
     const fetchBedData = async () => {
@@ -62,24 +66,31 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
 
   const handleBedSelect = (bedId: number) => {
     setBedId(bedId);
-    setSelectedBed(bedId);
     handleNext();
   };
 
   const handleAddToCart = async () => {
     setLoading(true);
-    if (!checkIn || !checkOut || !guestId || !bedId) {
+    if (!checkIn || !checkOut || !guestId || !bedId || !amount) {
       logger("error", "Missing required fields", {
         checkIn,
         checkOut,
         guestId,
         bedId,
+        amount,
       });
+      setLoading(false);
       // TODO: Add toast
       return;
     }
 
-    const { status, data } = await addToCart(guestId, bedId, checkIn, checkOut);
+    const { status, data } = await addToCart(
+      guestId,
+      bedId,
+      checkIn,
+      checkOut,
+      amount,
+    );
 
     if (status === "error" || !data) {
       logger("error", "Error in adding to cart", {
@@ -88,6 +99,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
         checkIn,
         checkOut,
       });
+      setLoading(false);
       // TODO: Add toast
       return;
     }
@@ -102,6 +114,8 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
       },
     ]);
 
+    setCartItemsCount((prev) => prev + 1);
+    // TODO: Add toast
     logger("info", "Added to cart", { guestId, bedId, checkIn, checkOut });
 
     setCurrentStep(1);
@@ -119,7 +133,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
           Add Bed to Cart
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="min-h-[60vh]">
         {currentStep === 1 && (
           <AddToCartStep1
             cartData={cartData}
@@ -129,9 +143,9 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
             handleBack={handleBack}
           />
         )}
-        {currentStep === 2 && bedData && selectedBed && (
+        {currentStep === 2 && bedData && bedId && (
           <AddToCartStep2
-            bedData={bedData[selectedBed]}
+            bedData={bedData.find((bed) => Number(bed.id) === bedId)!}
             handleNext={handleNext}
             handleBack={handleBack}
           />
@@ -140,6 +154,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
           <AddToCartStep3
             handleAddToCart={handleAddToCart}
             handleBack={handleBack}
+            loading={loading}
           />
         )}
       </DrawerContent>

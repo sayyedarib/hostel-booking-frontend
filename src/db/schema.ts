@@ -121,6 +121,7 @@ export const CartTable = pgTable("cart", {
     .references(() => BedTable.id),
   checkIn: date("check_in").notNull(),
   checkOut: date("check_out").notNull(),
+  amount: integer("amount").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()

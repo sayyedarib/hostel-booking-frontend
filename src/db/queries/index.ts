@@ -116,8 +116,8 @@ export const getBedData = async (roomId: number) => {
       .select({
         id: BedTable.id,
         bedCode: BedTable.bedCode,
-        dailyPrice: BedTable.dailyRent,
-        monthlyPrice: BedTable.monthlyRent,
+        dailyRent: BedTable.dailyRent,
+        monthlyRent: BedTable.monthlyRent,
         occupiedDateRanges: sql<OccupiedDateRange[]>`
           array_agg(json_build_object(
             'startDate', ${BedOccupancyTable.checkIn},
@@ -239,6 +239,7 @@ export const addToCart = async (
   bedId: number,
   checkIn: string,
   checkOut: string,
+  amount: number,
 ) => {
   try {
     const userId = await getUserId();
@@ -254,6 +255,7 @@ export const addToCart = async (
       bedId,
       checkIn,
       checkOut,
+      amount,
     });
     const cartItem = await db
       .insert(CartTable)
@@ -263,6 +265,7 @@ export const addToCart = async (
         bedId,
         checkIn,
         checkOut,
+        amount,
       })
       .returning();
     logger("info", "Added to cart successfully");
@@ -317,11 +320,10 @@ export const getCartItems = async () => {
         roomImage: RoomTable.imageUrls,
         bedCode: BedTable.bedCode,
         bedType: BedTable.type,
-        dailyRent: BedTable.dailyRent,
-        monthlyRent: BedTable.monthlyRent,
         guestName: GuestTable.name,
         checkIn: CartTable.checkIn,
         checkOut: CartTable.checkOut,
+        amount: CartTable.amount,
       })
       .from(CartTable)
       .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id))

@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import { IndianRupee, Trash2 } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
 import { getCartItems, removeFromCart } from "@/db/queries";
 import { logger } from "@/lib/utils";
 import { CartItem } from "@/interface";
-import Image from "next/image";
-import { Trash } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -35,9 +38,7 @@ export default function CartPage() {
   };
 
   const calculateTotal = () => {
-    return cartItems
-      .reduce((total, item) => total + item.dailyRent, 0)
-      .toFixed(2);
+    return cartItems.reduce((total, item) => total + item.amount, 0);
   };
 
   return (
@@ -83,26 +84,32 @@ export default function CartPage() {
                 </div>
               </div>
               <div className="text-right sm:text-left flex items-center">
-                <p className="text-lg font-semibold mr-4">
-                  ${item.dailyRent.toFixed(2)}
+                <p className="text-lg font-semibold mr-4 flex items-center">
+                  <IndianRupee />
+                  {item.amount}
                 </p>
-                <button
+                <Trash2
                   onClick={() => handleRemove(item.id)}
-                  className="text-red-500 hover:text-red-700 transition duration-200"
-                >
-                  <Trash size={24} />
-                </button>
+                  size={24}
+                  className="cursor-pointer text-red-500"
+                />
               </div>
             </li>
           ))}
         </ul>
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center">
-          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-0">
-            Total: ${calculateTotal()}
+        <div className="mt-6 flex flex-col items-start">
+          <span className="flex items-center">
+            Total Rent for 1 month: <IndianRupee size={14} /> {calculateTotal()}
+          </span>
+          <span className="flex items-center">
+            Security Deposit: <IndianRupee size={14} /> 1000
+          </span>
+          <Separator className="my-4" />
+          <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-2 flex items-center">
+            Total: <IndianRupee />
+            {calculateTotal()}
           </h2>
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-200">
-            Checkout
-          </button>
+          <Button>Checkout</Button>
         </div>
       </div>
     </div>

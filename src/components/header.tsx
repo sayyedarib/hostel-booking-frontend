@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useQueryState, parseAsInteger } from "nuqs";
 import Link from "next/link";
 import { Menu, X, ShoppingCart } from "lucide-react";
 
@@ -13,7 +14,10 @@ export default function Header({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartItemsCount, setCartItemsCount] = useState<number | null>(null);
+  const [cartItemsCount, setCartItemsCount] = useQueryState(
+    "cartItemsCount",
+    parseAsInteger.withDefault(0),
+  );
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

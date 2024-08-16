@@ -45,7 +45,7 @@ export const AddToCartStep1 = ({
       case "occupied":
         return "bg-red-500 text-white";
       case "cart":
-        return "bg-yellow-500 text-white";
+        return "bg-yellow-500 text-white cursor-not-allowed";
       default:
         return "bg-neutral-100 hover:bg-green-200";
     }
@@ -53,7 +53,7 @@ export const AddToCartStep1 = ({
 
   return (
     <>
-      <div className="mx-auto w-full md:w-1/2 lg:w-1/3 p-6 bg-white shadow-lg rounded-lg">
+      <div className="mx-auto w-full md:w-1/2 lg:w-1/3 p-6 h-full bg-white shadow-lg rounded-lg">
         <DrawerHeader>
           <DrawerTitle className="text-2xl font-semibold">
             Select Your Bed
@@ -80,16 +80,22 @@ export const AddToCartStep1 = ({
             </div>
           </div>
           <div className="grid grid-cols-2 grid-rows-2 gap-4">
-            {bedData.map((bed, index) => (
+            {bedData?.map((bed, index) => (
               <div
                 key={index}
                 className={cn(
-                  "h-24 rounded-lg flex justify-center items-center font-semibold cursor-pointer transition-colors duration-200",
+                  "h-24 rounded-lg flex flex-col justify-center items-start p-3 cursor-pointer transition-colors duration-200",
                   getStyle(getStatus(bed.id)),
                 )}
                 onClick={() => handleBedSelect(bed.id)}
               >
-                {bed.bedCode}
+                <span>
+                  <b>Bed Code: </b>
+                  {bed.bedCode}
+                </span>
+                <span>
+                  <b>Rent: </b> {bed.dailyRent}/day - {bed.monthlyRent}/month
+                </span>
               </div>
             ))}
           </div>

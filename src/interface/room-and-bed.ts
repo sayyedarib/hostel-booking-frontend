@@ -6,8 +6,8 @@ export interface OccupiedDateRange {
 export interface BedInRoomCard {
   id: number;
   bedCode: string;
-  dailyPrice: number;
-  monthlyPrice: number;
+  dailyRent: number;
+  monthlyRent: number;
   status: string;
   occupiedDateRanges: OccupiedDateRange[];
 }
@@ -34,9 +34,8 @@ export interface CartItem {
   roomImage: string[] | null;
   bedCode: string;
   bedType: string;
-  dailyRent: number;
-  monthlyRent: number;
   guestName: string;
   checkIn: Date | string;
   checkOut: Date | string;
+  amount: number;
 }

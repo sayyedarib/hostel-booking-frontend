@@ -10,14 +10,14 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function formatDate(input: string | number): string {
-  const date = new Date(input);
+export const formatDate = (date: Date): string => {
   return date.toLocaleDateString("en-US", {
-    month: "long",
-    day: "numeric",
+    weekday: "short",
     year: "numeric",
+    month: "short",
+    day: "numeric",
   });
-}
+};
 
 export function absoluteUrl(path: string) {
   return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
@@ -86,8 +86,11 @@ export const checkOverlap = (
   selectedRange: DateRange,
   occupiedDateRanges: OccupiedDateRange[],
 ) => {
-  console.log("checking overlap...");
-  if (!selectedRange) return false;
+  logger("info", "checking overlap...");
+  if (!selectedRange) {
+    logger("error", "selectedRange is not provided");
+    return false;
+  }
 
   return occupiedDateRanges?.some((range) => {
     const bookedStart = new Date(range.startDate);
@@ -132,4 +135,27 @@ export const getFirstAvailableRange = (
     firstAvailableDate.setDate(firstAvailableDate.getDate() + availableDays),
   );
   return { from: firstAvailableDate, to: toDate };
+};
+
+export const calculateRent = (
+  dailyRent: number,
+  monthlyRent: number,
+  checkIn: Date,
+  checkOut: Date,
+): number => {
+  const days = differenceInDays(checkOut, checkIn);
+
+  if (days < 20) {
+    return days * dailyRent;
+  }
+
+  const fullMonths = Math.floor(days / 31);
+  let remainingDays = days % 31;
+
+  // If remaining days are between 25 to 31, consider it as an additional full month
+  if (remainingDays >= 25) {
+    return (fullMonths + 1) * monthlyRent;
+  }
+
+  return fullMonths * monthlyRent + remainingDays * dailyRent;
 };

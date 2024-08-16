@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { MoveLeft } from "lucide-react";
+import { LoaderCircle, MoveLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -17,9 +18,11 @@ import { Label } from "@/components/ui/label";
 export const AddToCartStep3 = ({
   handleBack,
   handleAddToCart,
+  loading = false,
 }: {
   handleBack: () => void;
   handleAddToCart: () => void;
+  loading: boolean;
 }) => {
   const supabase = createClient();
 
@@ -31,6 +34,15 @@ export const AddToCartStep3 = ({
   const [aadhaarUrl, setAadhaarUrl] = useQueryState("aadhaarUrl");
   const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
 
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [creatingGuest, setCreatingGuest] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (guestId !== null) {
+      handleAddToCart();
+    }
+  }, [guestId]);
+
   const handleGuestImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -40,8 +52,10 @@ export const AddToCartStep3 = ({
       return;
     }
 
+    setUploading(true);
     const fileName = `${name}_${Date.now()}`;
-
+    // TODO: add toast
+    logger("info", "Uploading guest image", { fileName });
     const { data, error } = await supabase.storage
       .from("guest_image")
       .upload(fileName, file);
@@ -50,6 +64,7 @@ export const AddToCartStep3 = ({
       .from("guest_image")
       .getPublicUrl(fileName);
 
+    setUploading(false);
     if (error) {
       logger("error", "Error in uploading guest image", { error });
       return;
@@ -68,7 +83,10 @@ export const AddToCartStep3 = ({
     }
 
     const fileName = `${name}_${Date.now()}`;
+    // TODO: add toast
     logger("info", "Uploading aadhaar image", { fileName });
+
+    setUploading(true);
     const { data, error } = await supabase.storage
       .from("guest_aadhaar")
       .upload(fileName, file);
@@ -77,7 +95,9 @@ export const AddToCartStep3 = ({
       .from("guest_aadhaar")
       .getPublicUrl(fileName);
 
+    setUploading(false);
     if (error) {
+      // TODO: add toast
       logger("error", "Error in uploading aadhaar image", { error });
       return;
     } else {
@@ -100,7 +120,10 @@ export const AddToCartStep3 = ({
       // TODO: add toast
       return;
     }
-    // Handle form submission
+
+    // TODO: add toast
+    logger("info", "Creating guest", { name, phone, email });
+    setCreatingGuest(true);
     const { status, data: id } = await createGuest({
       name,
       phone,
@@ -109,14 +132,18 @@ export const AddToCartStep3 = ({
       photoUrl,
       aadhaarUrl,
     });
+    setCreatingGuest(false);
 
     if (status === "error" || !id) {
+      // TODO: add toast
       logger("error", "Error in creating guest", { name, phone, email });
       return;
     }
 
+    // TODO: add toast
     logger("info", "Guest created successfully", { id });
     setGuestId(Number(id));
+
     handleAddToCart();
   };
 
@@ -208,6 +235,7 @@ export const AddToCartStep3 = ({
               type="file"
               className="h-12 rounded-lg p-4 w-full border border-gray-300"
               onChange={handleGuestImageUpload}
+              disabled={uploading}
               required
             />
           </div>
@@ -223,6 +251,7 @@ export const AddToCartStep3 = ({
               type="file"
               className="h-12 rounded-lg p-4 w-full border border-gray-300"
               onChange={handleAadhaarUpload}
+              disabled={uploading}
               required
             />
           </div>
@@ -232,8 +261,21 @@ export const AddToCartStep3 = ({
             type="submit"
             onClick={handleSubmit}
             className="w-full h-12 bg-blue-600 text-white rounded-lg"
+            disabled={
+              loading ||
+              !name ||
+              !email ||
+              !phone ||
+              !dob ||
+              !aadhaarUrl ||
+              !photoUrl
+            }
           >
-            Add to Cart
+            {loading || creatingGuest ? (
+              <LoaderCircle className="animate-spin" />
+            ) : (
+              "Add to Cart"
+            )}
           </Button>
         </DrawerFooter>
       </div>
