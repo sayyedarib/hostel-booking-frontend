@@ -100,7 +100,8 @@ export const GuestTable = pgTable("guest", {
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   dob: date("dob").notNull(),
-  aadhaarImage: text("aadhaar_image").notNull(),
+  photoUrl: text("photo_url").notNull(),
+  aadhaarUrl: text("aadhaar_url").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -118,8 +119,8 @@ export const CartTable = pgTable("cart", {
   bedId: integer("bed_id")
     .notNull()
     .references(() => BedTable.id),
-  checkInDate: date("check_in").notNull(),
-  checkOutDate: date("check_out").notNull(),
+  checkIn: date("check_in").notNull(),
+  checkOut: date("check_out").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -136,8 +137,8 @@ export const BedOccupancyTable = pgTable("bed_occupancy", {
   guestId: integer("guest_id")
     .notNull()
     .references(() => GuestTable.id),
-  checkInDate: date("check_in").notNull(),
-  checkOutDate: date("check_out").notNull(),
+  checkIn: date("check_in").notNull(),
+  checkOut: date("check_out").notNull(),
   status: text("status"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")

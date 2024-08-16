@@ -1,8 +1,9 @@
 export interface CreateGuest {
-  userId: number;
+  userId?: number;
   name: string;
   phone: string;
   email: string;
   dob: string;
-  aadhaarImage: string;
+  photoUrl: string;
+  aadhaarUrl: string;
 }

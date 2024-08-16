@@ -5,12 +5,14 @@ import {
   RoomCard,
   BedInRoomCard,
   OccupiedDateRange,
+  CartItemShort,
   CartItem,
 } from "./room-and-bed";
 
 export type {
   BedInRoomCard,
   CartItem,
+  CartItemShort,
   CreateUser,
   CreateGuest,
   LogLevel,

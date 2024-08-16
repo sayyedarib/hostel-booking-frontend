@@ -20,8 +20,23 @@ export interface RoomCard {
   gender: string;
 }
 
-export interface CartItem {
+export interface CartItemShort {
+  guestId: number;
   bedId: number;
   checkIn: Date;
   checkOut: Date;
+}
+
+export interface CartItem {
+  id: number;
+  buildingName: string;
+  roomCode: string;
+  roomImage: string[] | null;
+  bedCode: string;
+  bedType: string;
+  dailyRent: number;
+  monthlyRent: number;
+  guestName: string;
+  checkIn: Date | string;
+  checkOut: Date | string;
 }
