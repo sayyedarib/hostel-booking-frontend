@@ -1,14 +1,7 @@
-import type { BedInRoomCard, CartItem } from "@/interface";
+import type { BedInRoomCard, CartItemShort } from "@/interface";
 
-import { Button } from "@/components/ui/button";
-import {
-  DrawerClose,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-} from "@/components/ui/drawer";
-import { cn, getFirstAvailableRange } from "@/lib/utils";
-import { getOccupancyOfBed } from "@/db/queries";
+import { DrawerClose, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { cn } from "@/lib/utils";
 
 export const AddToCartStep1 = ({
   cartData,
@@ -17,7 +10,7 @@ export const AddToCartStep1 = ({
   handleNext,
   handleBack,
 }: {
-  cartData: CartItem[];
+  cartData: CartItemShort[];
   bedData: BedInRoomCard[];
   handleBedSelect: (bedId: number) => void;
   handleNext: () => void;
@@ -48,11 +41,11 @@ export const AddToCartStep1 = ({
   const getStyle = (status: string) => {
     switch (status) {
       case "selected":
-        return "bg-green-500";
+        return "bg-green-500 text-white";
       case "occupied":
-        return "bg-red-500";
+        return "bg-red-500 text-white";
       case "cart":
-        return "bg-yellow-500";
+        return "bg-yellow-500 text-white";
       default:
         return "bg-neutral-100 hover:bg-green-200";
     }
@@ -60,28 +53,47 @@ export const AddToCartStep1 = ({
 
   return (
     <>
-      <div className="mx-auto w-full md:w-1/2 lg:w-1/3">
+      <div className="mx-auto w-full md:w-1/2 lg:w-1/3 p-6 bg-white shadow-lg rounded-lg">
         <DrawerHeader>
-          <DrawerTitle>Select Your Bed</DrawerTitle>
+          <DrawerTitle className="text-2xl font-semibold">
+            Select Your Bed
+          </DrawerTitle>
           <DrawerClose />
         </DrawerHeader>
-        <div className="grid grid-cols-2 grid-rows-2 gap-2">
-          {bedData.map((bed, index) => (
-            <div
-              key={index}
-              className={cn(
-                "h-24 rounded-lg flex justify-center items-center font-semibold cursor-pointer",
-                getStyle(getStatus(bed.id)),
-              )}
-              onClick={() => handleBedSelect(bed.id)}
-            >
-              {bed.bedCode}
+        <div className="mt-4">
+          <div className="flex justify-around mb-4">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-green-500 mr-2"></div>
+              <span>Selected</span>
             </div>
-          ))}
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-red-500 mr-2"></div>
+              <span>Occupied</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-yellow-500 mr-2"></div>
+              <span>In Cart</span>
+            </div>
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-neutral-100 mr-2"></div>
+              <span>Available</span>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 grid-rows-2 gap-4">
+            {bedData.map((bed, index) => (
+              <div
+                key={index}
+                className={cn(
+                  "h-24 rounded-lg flex justify-center items-center font-semibold cursor-pointer transition-colors duration-200",
+                  getStyle(getStatus(bed.id)),
+                )}
+                onClick={() => handleBedSelect(bed.id)}
+              >
+                {bed.bedCode}
+              </div>
+            ))}
+          </div>
         </div>
-        <DrawerFooter>
-          <Button onClick={handleNext}>Next</Button>
-        </DrawerFooter>
       </div>
     </>
   );

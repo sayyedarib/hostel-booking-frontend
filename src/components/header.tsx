@@ -1,27 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu, X, ShoppingCart } from "lucide-react";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { getCartItemsCount } from "@/db/queries";
+
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 
 export default function Header({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartItemsCount, setCartItemsCount] = useState<number | null>(null);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      const { data } = await getCartItemsCount();
+      setCartItemsCount(data);
+    };
+
+    fetchCartItems();
+  }, []);
 
   return (
     <>
@@ -47,17 +52,22 @@ export default function Header({
               <Link href="/contact">Contact</Link>
             </li>
             <li>
-              <ShoppingCart />
+              <SignedIn>
+                <Link href="/cart" className="relative">
+                  <ShoppingCart />
+                  <span className="absolute -right-2 -top-1 bg-primary h-4 w-4 p-1 rounded-full text-sm text-white flex items-center justify-center font-extrabold">
+                    {cartItemsCount}
+                  </span>
+                </Link>
+              </SignedIn>
             </li>
           </ul>
-          <div className="bg-black px-3 py-2 rounded-full text-white font-extrabold">
-            <SignedOut>
-              <SignInButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </div>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
         </div>
         <button onClick={toggleMenu} className="md:hidden">
           {isMenuOpen ? <X /> : <Menu />}
