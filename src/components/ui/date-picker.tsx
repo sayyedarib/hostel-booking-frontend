@@ -103,9 +103,8 @@ export function DatePicker({
   selected,
   onChange,
   placeholderText,
+  ...props
 }: DatePickerProps) {
-  const [date, setDate] = useState<Date>();
-
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -113,15 +112,21 @@ export function DatePicker({
           variant={"outline"}
           className={cn(
             "w-[280px] justify-start text-left font-normal",
-            !date && "text-muted-foreground",
+            !selected && "text-muted-foreground",
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Pick a date</span>}
+          {selected ? format(selected, "PPP") : <span>{placeholderText}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
-        <Calendar autoFocus mode="single" selected={date} onSelect={setDate} />
+        <Calendar
+          mode="single"
+          selected={selected}
+          onSelect={onChange}
+          {...props}
+          autoFocus
+        />
       </PopoverContent>
     </Popover>
   );
