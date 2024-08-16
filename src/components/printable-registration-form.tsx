@@ -131,8 +131,8 @@ const PrintableForm: React.ForwardRefRenderFunction<
       <li>
         Thank you for choosing KGH GUEST ROOMS. We want to let you know that our
         online booking open 24 hours for all your questions and inquiries.
-        www.aligarhhostel.com Please don&apos;t hesitate to contact us if you have
-        any questions. We are happy to help!
+        www.aligarhhostel.com Please don&apos;t hesitate to contact us if you
+        have any questions. We are happy to help!
       </li>
       <li>
         We kindly remind you that the hostel and all rooms are non-smoking
