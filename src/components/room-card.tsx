@@ -17,18 +17,6 @@ import { RoomCard } from "@/interface";
 import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
-  const getStyle = (status: string) => {
-    switch (status) {
-      case "selected":
-        return "bg-green-500";
-      case "occupied":
-        return "bg-red-500";
-      case "reserved":
-        return "bg-yellow-500";
-      default:
-        return "bg-neutral-100";
-    }
-  };
   return (
     <Card className="w-auto sm:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl">
       <Link href="/">
@@ -40,18 +28,21 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
           alt="thumbnail"
         />
       </Link>
-      <CardContent className="">
-        <CardHeader className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold">
-            {roomData.buildingName}
-          </CardTitle>
-          <div className="space-x-2 text-yellow-500">
-            <Star fill="currentColor" size={16} /> 4.2
+      <CardContent className="w-full">
+        <CardHeader className="flex">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg font-semibold">
+              {roomData.buildingName}
+            </CardTitle>
+            <div className="flex items-center space-x-2 text-yellow-500">
+              <Star fill="currentColor" size={16} />
+              <span>4.2</span>
+            </div>
           </div>
+          <CardDescription className="text-sm text-gray-600">
+            Room: {roomData.roomCode}
+          </CardDescription>
         </CardHeader>
-        <CardDescription className="text-sm text-gray-600">
-          Room: {roomData.roomCode}
-        </CardDescription>
         {/* TODO: why roomData.id is string here, it should be number always no need to convert */}
         <AddToCartDrawer roomId={Number(roomData.id)} />
       </CardContent>

@@ -57,9 +57,6 @@ export const CardStack = ({
           >
             <div className="flex flex-col bg-white">
               <Image src={card.src} height={150} width={150} alt="" />
-              <span>{card.name}</span>
-
-              <span>Rank {card.rank}</span>
             </div>
           </motion.div>
         );

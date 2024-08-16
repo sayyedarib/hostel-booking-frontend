@@ -17,7 +17,9 @@ const bedTypes = [
 export default function BedTypes() {
   return (
     <section className="flex flex-col items-center py-12 ">
-      <h2 className="text-4xl font-bold mb-6 text-primary">Bed Types</h2>
+      <h2 className="text-2xl md:text-4xl lg:text-6xl font-extrabold mb-6 text-primary">
+        Bed Variants
+      </h2>
       <p className="text-lg mb-8 text-center max-w-2xl">
         We have a variety of bed types to suit your needs. Choose the one that
         fits you best.
