@@ -8,7 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
 
-const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
+const inter = Playfair_Display({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Hostel in Aligarh",
