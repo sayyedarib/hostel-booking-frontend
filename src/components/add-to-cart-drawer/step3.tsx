@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { LoaderCircle, MoveLeft } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
@@ -44,7 +45,7 @@ export const AddToCartStep3 = ({
   }, [guestId]);
 
   const handleGuestImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
 
@@ -54,7 +55,7 @@ export const AddToCartStep3 = ({
 
     setUploading(true);
     const fileName = `${name}_${Date.now()}`;
-    // TODO: add toast
+    toast.info("Uploading guest image");
     logger("info", "Uploading guest image", { fileName });
     const { data, error } = await supabase.storage
       .from("guest_image")
@@ -74,7 +75,7 @@ export const AddToCartStep3 = ({
   };
 
   const handleAadhaarUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0];
 
@@ -83,7 +84,7 @@ export const AddToCartStep3 = ({
     }
 
     const fileName = `${name}_${Date.now()}`;
-    // TODO: add toast
+    toast.info("Uploading aadhaar image");
     logger("info", "Uploading aadhaar image", { fileName });
 
     setUploading(true);
@@ -97,7 +98,7 @@ export const AddToCartStep3 = ({
 
     setUploading(false);
     if (error) {
-      // TODO: add toast
+      toast.error("Error in uploading aadhaar image");
       logger("error", "Error in uploading aadhaar image", { error });
       return;
     } else {
@@ -114,14 +115,14 @@ export const AddToCartStep3 = ({
         phone,
         dob,
         aadhaarUrl,
-        photoUrl,
+        photoUrl
       );
       logger("error", "All fields are required");
-      // TODO: add toast
+      toast.error("All fields are required");
       return;
     }
 
-    // TODO: add toast
+    toast.info("Creating guest");
     logger("info", "Creating guest", { name, phone, email });
     setCreatingGuest(true);
     const { status, data: id } = await createGuest({
@@ -135,12 +136,12 @@ export const AddToCartStep3 = ({
     setCreatingGuest(false);
 
     if (status === "error" || !id) {
-      // TODO: add toast
+      toast.error("Error in creating guest");
       logger("error", "Error in creating guest", { name, phone, email });
       return;
     }
 
-    // TODO: add toast
+    toast.info("Guest created successfully");
     logger("info", "Guest created successfully", { id });
     setGuestId(Number(id));
 

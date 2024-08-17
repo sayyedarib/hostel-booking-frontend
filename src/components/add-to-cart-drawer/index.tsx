@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { getBedData, addToCart, getBedsInCart } from "@/db/queries";
 import { logger } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function AddToCartDrawer({ roomId }: { roomId: number }) {
   // user states
@@ -19,7 +20,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
   const [checkOut, setCheckOut] = useQueryState("checkOut");
   const [cartItemsCount, setCartItemsCount] = useQueryState(
     "cartItemsCount",
-    parseAsInteger.withDefault(0),
+    parseAsInteger.withDefault(0)
   );
   const [amount, setAmount] = useQueryState("amount", parseAsInteger);
 
@@ -80,7 +81,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
         amount,
       });
       setLoading(false);
-      // TODO: Add toast
+      toast.error("Missing required fields");
       return;
     }
 
@@ -89,7 +90,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
       bedId,
       checkIn,
       checkOut,
-      amount,
+      amount
     );
 
     if (status === "error" || !data) {
@@ -100,7 +101,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
         checkOut,
       });
       setLoading(false);
-      // TODO: Add toast
+      toast.error("Error in adding to cart");
       return;
     }
 
@@ -115,7 +116,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
     ]);
 
     setCartItemsCount((prev) => prev + 1);
-    // TODO: Add toast
+    toast.info("Added to cart");
     logger("info", "Added to cart", { guestId, bedId, checkIn, checkOut });
 
     setCurrentStep(1);
