@@ -7,6 +7,7 @@ import {
 } from "nuqs";
 import { addDays, differenceInDays } from "date-fns";
 import { MoveLeft } from "lucide-react";
+import { toast } from "sonner";
 
 import type { DateRange } from "react-day-picker";
 import {
@@ -47,22 +48,22 @@ export const AddToCartStep2 = ({
   handleBack: () => void;
 }) => {
   const firstAvailableRange = getFirstAvailableRange(
-    bedData?.occupiedDateRanges,
+    bedData?.occupiedDateRanges
   );
   console.log("bedData: ", bedData);
   const [checkIn, setCheckIn] = useQueryState(
     "checkIn",
-    parseAsIsoDateTime.withDefault(firstAvailableRange?.from || new Date()),
+    parseAsIsoDateTime.withDefault(firstAvailableRange?.from || new Date())
   );
   const [checkOut, setCheckOut] = useQueryState(
     "checkOut",
     parseAsIsoDateTime.withDefault(
-      firstAvailableRange?.to || addDays(new Date(), 30),
-    ),
+      firstAvailableRange?.to || addDays(new Date(), 30)
+    )
   );
   const [numberOfMonths, setNumberOfMonths] = useQueryState(
     "numberOfMonths",
-    parseAsString.withDefault("1"),
+    parseAsString.withDefault("1")
   );
 
   const [amount, setAmount] = useQueryState("amount", parseAsInteger);
@@ -120,7 +121,7 @@ export const AddToCartStep2 = ({
     const overlap = checkOverlap({ from, to }, bedData?.occupiedDateRanges);
 
     if (overlap) {
-      // TODO: Add toast notification that the selected date range is not available
+      toast.info("Date range is not avaliable");
       return;
     }
     setCheckOut(to);
@@ -151,7 +152,7 @@ export const AddToCartStep2 = ({
                   Total days:{" "}
                   {differenceInDays(
                     date?.to || new Date(),
-                    date?.from || new Date(),
+                    date?.from || new Date()
                   )}{" "}
                 </span>
                 <span>
@@ -160,7 +161,7 @@ export const AddToCartStep2 = ({
                     bedData?.dailyRent,
                     bedData?.monthlyRent,
                     checkIn,
-                    checkOut,
+                    checkOut
                   )}
                 </span>
                 <Calendar

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Toaster } from "sonner";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -33,6 +34,7 @@ export default function RootLayout({
           >
             <Header className="fixed top-0 left-0 right-0 z-50" />
             {children}
+            <Toaster />
             <SpeedInsights />
           </ThemeProvider>
         </body>
