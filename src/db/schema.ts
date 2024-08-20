@@ -34,13 +34,25 @@ export const PropertyTable = pgTable("property", {
   address: text("address").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
-  zip: text("zip").notNull(),
+  pin: text("pin").notNull(),
   country: text("country").notNull(),
   mapUrl: text("map_url"),
   imageUrls: text("image_urls")
     .array()
     .notNull()
     .default(sql`'{}'::text[]`),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const AddressBookTable = pgTable("address_book", {
+  id: serial("id").primaryKey(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  pin: text("pin").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -80,11 +92,19 @@ export const BedTable = pgTable("bed", {
 export const UserTable = pgTable("user", {
   id: serial("id").primaryKey(),
   clerkId: text("clerk_id").notNull(),
+  addressId: integer("address_id").references(() => AddressBookTable.id),
   name: text("name").notNull(),
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   dob: date("dob"),
-  imageUrl: text("image_url"),
+  imageUrl: text("image_url").notNull(),
+  idUrl: text("id_url"),
+  guardianName: text("guardian_name"),
+  guardianPhone: text("guardian_phone"),
+  guardianPhoto: text("guardian_photo"),
+  guardianIdUrl: text("guardian_id_url"),
+  signature: text("signature"),
+  onboarded: boolean("onboarded").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -100,6 +120,7 @@ export const GuestTable = pgTable("guest", {
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   dob: date("dob").notNull(),
+  purpose: text("purpose").notNull(),
   photoUrl: text("photo_url").notNull(),
   aadhaarUrl: text("aadhaar_url").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -121,14 +142,18 @@ export const CartTable = pgTable("cart", {
     .references(() => BedTable.id),
   checkIn: date("check_in").notNull(),
   checkOut: date("check_out").notNull(),
-  amount: integer("amount").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
 });
 
-const statusEnum = pgEnum("status", ["booked", "checked_in", "checked_out"]);
+const statusEnum = pgEnum("status", [
+  "booked",
+  "checked_in",
+  "checked_out",
+  "cancelled",
+]);
 
 export const BedOccupancyTable = pgTable("bed_occupancy", {
   id: serial("id").primaryKey(),
@@ -140,9 +165,43 @@ export const BedOccupancyTable = pgTable("bed_occupancy", {
     .references(() => GuestTable.id),
   checkIn: date("check_in").notNull(),
   checkOut: date("check_out").notNull(),
-  status: text("status"),
+  status: statusEnum("status").notNull().default("booked"),
+  userRentId: integer("user_rent_id").references(() => UserRentTable.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
+});
+
+export const UserRentTable = pgTable("user_rent", {
+  id: serial("id").primaryKey(),
+  totalAmount: integer("total_amount").notNull(),
+  paidAmount: integer("paid_amount").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+const securityDepositEnum = pgEnum("status", ["pending", "paid", "lost"]);
+
+export const securityDepositTable = pgTable("security_deposit", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  status: securityDepositEnum("status").notNull().default("pending"),
+  warningLevel: integer("warning_level").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const TranscationTable = pgTable("transaction", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
+  userRentId: integer("user_rent")
+    .notNull()
+    .references(() => UserRentTable.id),
+  amount: integer("amount").notNull(),
+  token: text("token"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });

@@ -37,5 +37,12 @@ export interface CartItem {
   guestName: string;
   checkIn: Date | string;
   checkOut: Date | string;
-  amount: number;
+  totalRent: number;
+  payableRent: number;
+}
+
+export interface GroupedCartItem {
+  monthlyRent: number;
+  count: number;
+  totalRent: number;
 }

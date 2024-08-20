@@ -5,5 +5,6 @@ export interface CreateGuest {
   email: string;
   dob: string;
   photoUrl: string;
+  purpose: string;
   aadhaarUrl: string;
 }

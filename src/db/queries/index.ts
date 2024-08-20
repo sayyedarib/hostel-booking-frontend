@@ -7,15 +7,22 @@ import { logger } from "@/lib/utils";
 import { getClerkId } from "@/lib/server-utils";
 import { db } from "@/db";
 import {
+  AddressBookTable,
   BedTable,
   BedOccupancyTable,
   CartTable,
   GuestTable,
   PropertyTable,
   RoomTable,
+  securityDepositTable,
   UserTable,
 } from "@/db/schema";
-import { CreateUser, CreateGuest, BedInRoomCard } from "@/interface";
+import {
+  AgreementForm,
+  CreateUser,
+  CreateGuest,
+  CreateAddress,
+} from "@/interface";
 
 export const createUser = async ({
   clerkId,
@@ -79,6 +86,179 @@ export const getUserId = async () => {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
     logger("error", "Error fetching user", { error: errorMessage });
+    return { status: "error", data: null };
+  }
+};
+
+export const getUserData = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching user data", { userId: userId.data });
+    const user = await db
+      .select({
+        name: UserTable.name,
+        phone: UserTable.phone,
+        email: UserTable.email,
+        guardianName: UserTable.guardianName,
+        guardianPhone: UserTable.guardianPhone,
+        guardianPhoto: UserTable.guardianPhoto,
+        guardianIdImage: UserTable.guardianIdUrl,
+        applicantPhoto: UserTable.imageUrl,
+        dob: UserTable.dob,
+        userIdImage: UserTable.idUrl,
+        address: AddressBookTable.address,
+        city: AddressBookTable.city,
+        state: AddressBookTable.state,
+        pin: AddressBookTable.pin,
+      })
+      .from(UserTable)
+      .innerJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
+      .where(eq(UserTable.id, userId.data));
+
+    logger("info", "Fetched user data", { user: user[0] });
+    return { status: "success", data: user[0] };
+  } catch (error) {
+    logger("error", "Error fetching user data", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getUserOnboadingStatus = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching user onboarding status", { userId: userId.data });
+    const user = await db
+      .select({
+        onboarded: UserTable.onboarded,
+      })
+      .from(UserTable)
+      .where(eq(UserTable.id, userId.data));
+
+    logger("info", "Fetched user onboarding status", { user: user[0] });
+    return { status: "success", data: user[0] };
+  } catch (error) {
+    logger("error", "Error fetching user onboarding status", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const createAddress = async ({
+  address,
+  city,
+  state,
+  pin,
+}: CreateAddress) => {
+  try {
+    logger("info", "Creating address", { address, city, state, pin });
+    const addressId = await db
+      .insert(AddressBookTable)
+      .values({
+        address,
+        city,
+        state,
+        pin,
+      })
+      .returning({
+        id: AddressBookTable.id,
+      });
+    logger("info", "Address created successfully");
+    return { status: "success", data: addressId[0].id };
+  } catch (error) {
+    logger("error", "Error in creating address", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateUserSubProfile = async ({
+  imageUrl,
+  dob,
+  idUrl,
+  guardianName,
+  guardianPhone,
+  guardianPhoto,
+  guardianIdUrl,
+  addressId,
+  onboarded,
+}: {
+  imageUrl: string;
+  dob: string;
+  idUrl: string;
+  guardianName: string;
+  guardianPhone: string;
+  guardianPhoto: string;
+  guardianIdUrl: string;
+  addressId: number;
+  onboarded: boolean;
+}) => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Updating user", { userId: userId.data });
+    await db
+      .update(UserTable)
+      .set({
+        imageUrl,
+        dob,
+        idUrl,
+        guardianName,
+        guardianPhone,
+        guardianPhoto,
+        guardianIdUrl,
+        addressId,
+        onboarded,
+      })
+      .where(eq(UserTable.id, userId.data))
+      .execute();
+    logger("info", "User updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error in updating user", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateUserSignature = async ({
+  signature,
+}: {
+  signature: string;
+}) => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Updating user signature", { userId: userId.data });
+    await db
+      .update(UserTable)
+      .set({
+        signature,
+      })
+      .where(eq(UserTable.id, userId.data))
+      .execute();
+    logger("info", "User signature updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error in updating user signature", { error });
     return { status: "error", data: null };
   }
 };
@@ -173,6 +353,45 @@ export const getBedsInCart = async (roomId: number) => {
   }
 };
 
+// In your queries file (e.g., db/queries.ts)
+
+export const getCartItemsGrouped = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching grouped cart items", { userId: userId.data });
+    const cartItems = await db
+      .select({
+        monthlyRent: BedTable.monthlyRent,
+        count: sql<number>`count(*)`,
+        totalRent: sql<number>`sum(${CartTable.checkOut} - ${CartTable.checkIn}) * ${BedTable.monthlyRent} / 30`,
+      })
+      .from(CartTable)
+      .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id))
+      .where(eq(CartTable.userId, userId.data))
+      .groupBy(BedTable.monthlyRent);
+
+    logger("info", "Fetched grouped cart items");
+    return {
+      status: "success",
+      data: cartItems,
+      message: "Fetched grouped cart items",
+    };
+  } catch (error) {
+    logger("error", "Error fetching grouped cart items", { error });
+    return {
+      status: "error",
+      data: null,
+      message: "Error fetching grouped cart items",
+    };
+  }
+};
+
 export const getOccupancyOfBed = async (bedId: number) => {
   try {
     logger("info", "Fetching occupancy of bed", { bedId });
@@ -202,6 +421,7 @@ export const createGuest = async ({
   phone,
   email,
   dob,
+  purpose,
   photoUrl,
   aadhaarUrl,
 }: CreateGuest) => {
@@ -221,6 +441,7 @@ export const createGuest = async ({
         name,
         phone,
         email,
+        purpose,
         dob,
         photoUrl,
         aadhaarUrl,
@@ -239,7 +460,6 @@ export const addToCart = async (
   bedId: number,
   checkIn: string,
   checkOut: string,
-  amount: number,
 ) => {
   try {
     const userId = await getUserId();
@@ -255,8 +475,8 @@ export const addToCart = async (
       bedId,
       checkIn,
       checkOut,
-      amount,
     });
+
     const cartItem = await db
       .insert(CartTable)
       .values({
@@ -265,7 +485,6 @@ export const addToCart = async (
         bedId,
         checkIn,
         checkOut,
-        amount,
       })
       .returning();
     logger("info", "Added to cart successfully");
@@ -319,11 +538,11 @@ export const getCartItems = async () => {
         roomCode: RoomTable.roomCode,
         roomImage: RoomTable.imageUrls,
         bedCode: BedTable.bedCode,
+        monthlyRent: BedTable.monthlyRent,
         bedType: BedTable.type,
         guestName: GuestTable.name,
         checkIn: CartTable.checkIn,
         checkOut: CartTable.checkOut,
-        amount: CartTable.amount,
       })
       .from(CartTable)
       .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id))
@@ -367,5 +586,164 @@ export const removeFromCart = async (cartId: number) => {
   } catch (error) {
     logger("error", "Error in removing from cart", { error });
     return { status: "error", message: "Error removing from cart" };
+  }
+};
+
+export const getSecurityDepositStatus = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching security deposit status", { userId: userId.data });
+    const securityDeposit = await db
+      .select({
+        status: securityDepositTable.status,
+      })
+      .from(securityDepositTable)
+      .where(eq(securityDepositTable.userId, userId.data));
+    logger("info", "Fetched security deposit status");
+    return { status: "success", data: securityDeposit[0].status };
+  } catch (error) {
+    logger("error", "Error fetching security deposit status", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getAgreementFormData = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching agreement form data", { userId: userId.data });
+
+    // Fetch user data
+    const userData = await db
+      .select({
+        name: UserTable.name,
+        phone: UserTable.phone,
+        email: UserTable.email,
+        applicantPhoto: UserTable.imageUrl,
+        dob: UserTable.dob,
+        userIdImage: UserTable.idUrl,
+        guardianIdImage: UserTable.guardianIdUrl,
+        guardianName: UserTable.guardianName,
+        guardianPhone: UserTable.guardianPhone,
+        guardianPhoto: UserTable.guardianPhoto,
+        signature: UserTable.signature,
+        address: AddressBookTable.address,
+        pin: AddressBookTable.pin,
+        city: AddressBookTable.city,
+        state: AddressBookTable.state,
+      })
+      .from(UserTable)
+      .leftJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
+      .where(eq(UserTable.id, userId.data))
+      .limit(1);
+
+    // Fetch guest data with room and bed information
+    const guestData = await db
+      .select({
+        name: GuestTable.name,
+        phone: GuestTable.phone,
+        email: GuestTable.email,
+        purpose: GuestTable.purpose,
+        dob: GuestTable.dob,
+        photoUrl: GuestTable.photoUrl,
+        aadhaarUrl: GuestTable.aadhaarUrl,
+        roomCode: RoomTable.roomCode,
+        monthlyRent: BedTable.monthlyRent,
+        bedCode: BedTable.bedCode,
+        checkIn: CartTable.checkIn,
+        checkOut: CartTable.checkOut,
+      })
+      .from(GuestTable)
+      .innerJoin(CartTable, eq(GuestTable.id, CartTable.guestId))
+      .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id))
+      .innerJoin(RoomTable, eq(BedTable.roomId, RoomTable.id))
+      .where(eq(GuestTable.userId, userId.data));
+
+    const agreementFormData: AgreementForm = {
+      ...userData[0],
+      guests: guestData.map((guest) => ({
+        ...guest,
+        checkIn: new Date(guest.checkIn),
+        checkOut: new Date(guest.checkOut),
+      })),
+    };
+
+    logger("info", "Fetched agreement form data");
+    return { status: "success", data: agreementFormData };
+  } catch (error) {
+    logger("error", "Error fetching agreement form data", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const createBooking = async ({
+  bedId,
+  guestId,
+  checkIn,
+  checkOut,
+}: {
+  bedId: number;
+  guestId: number;
+  checkIn: string;
+  checkOut: string;
+}) => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", message: "User not found" };
+    }
+
+    logger("info", "Creating booking", {
+      userId,
+      guestId,
+      bedId,
+      checkIn,
+      checkOut,
+    });
+
+    await db.transaction(async (trx) => {
+      await trx
+        .insert(BedOccupancyTable)
+        .values({
+          bedId,
+          guestId,
+          checkIn,
+          checkOut,
+          status: "booked",
+        })
+        .execute();
+
+      await trx
+        .delete(CartTable)
+        .where(
+          and(
+            eq(CartTable.userId, userId.data),
+            eq(CartTable.guestId, guestId),
+            eq(CartTable.bedId, bedId),
+            eq(CartTable.checkIn, checkIn),
+            eq(CartTable.checkOut, checkOut),
+          ),
+        )
+        .execute();
+    });
+
+    logger("info", "Booking created successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error in creating booking", { error });
+    return { status: "error", message: "Error creating booking" };
   }
 };
