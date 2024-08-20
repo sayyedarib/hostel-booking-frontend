@@ -94,6 +94,12 @@ importers:
       html2canvas:
         specifier: ^1.4.1
         version: 1.4.1
+      html2pdf:
+        specifier: ^0.0.11
+        version: 0.0.11
+      html2pdf.js:
+        specifier: ^0.10.2
+        version: 0.10.2
       jspdf:
         specifier: ^2.5.1
         version: 2.5.1
@@ -125,13 +131,13 @@ importers:
         specifier: ^3.3.3
         version: 3.3.3
       react:
-        specifier: ^18
+        specifier: ^18.3.1
         version: 18.3.1
       react-day-picker:
         specifier: ^9.0.8
         version: 9.0.8(react@18.3.1)
       react-dom:
-        specifier: ^18
+        specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       react-hook-form:
         specifier: ^7.52.1
@@ -3296,6 +3302,18 @@ packages:
         integrity: sha512-fPU6BHNpsyIhr8yyMpTLLxAbkaK8ArIBcmZIRiBLiDhjeqvXolaEmDGmELFuX9I4xDcaKKcJl+TKZLqruBbmWA==,
       }
     engines: { node: ">=8.0.0" }
+
+  html2pdf.js@0.10.2:
+    resolution:
+      {
+        integrity: sha512-WyHVeMb18Bp7vYTmBv1GVsThH//K7SRfHdSdhHPkl4JvyQarNQXnailkYn0QUbRRmnN5rdbbmSIGEsPZtzPy2Q==,
+      }
+
+  html2pdf@0.0.11:
+    resolution:
+      {
+        integrity: sha512-Kx3I5r7lazHZzZv5lDk59jQoTxqaEGlf2BcGNvzWGPQVu0hE8jYCk4hboksuaCvmMJPa0S0A+156ZbE71Wdo2w==,
+      }
 
   ignore@5.3.1:
     resolution:
@@ -7209,6 +7227,14 @@ snapshots:
     dependencies:
       css-line-break: 2.1.0
       text-segmentation: 1.0.3
+
+  html2pdf.js@0.10.2:
+    dependencies:
+      es6-promise: 4.2.8
+      html2canvas: 1.4.1
+      jspdf: 2.5.1
+
+  html2pdf@0.0.11: {}
 
   ignore@5.3.1: {}
 
