@@ -138,24 +138,26 @@ export const getFirstAvailableRange = (
 };
 
 export const calculateRent = (
-  dailyRent: number,
   monthlyRent: number,
   checkIn: Date,
   checkOut: Date,
-): number => {
+): { totalRent: number; payableRent: number; pendingRent: number } => {
   const days = differenceInDays(checkOut, checkIn);
 
-  if (days < 20) {
-    return days * dailyRent;
-  }
+  if (days < 30)
+    return {
+      totalRent: Math.floor(days * (monthlyRent / 30)),
+      payableRent: Math.floor(days * (monthlyRent / 30)),
+      pendingRent: 0,
+    };
 
-  const fullMonths = Math.floor(days / 31);
-  let remainingDays = days % 31;
+  const months = Math.floor(days / 30);
+  const remainingDays = days % 30;
 
-  // If remaining days are between 25 to 31, consider it as an additional full month
-  if (remainingDays >= 25) {
-    return (fullMonths + 1) * monthlyRent;
-  }
-
-  return fullMonths * monthlyRent + remainingDays * dailyRent;
+  return {
+    totalRent: months * monthlyRent + remainingDays * (monthlyRent / 30),
+    payableRent: monthlyRent,
+    pendingRent:
+      months * monthlyRent + remainingDays * (monthlyRent / 30) - monthlyRent,
+  };
 };
