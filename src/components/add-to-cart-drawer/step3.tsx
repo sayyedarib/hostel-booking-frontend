@@ -34,6 +34,7 @@ export const AddToCartStep3 = ({
   const [aadhaarUrl, setAadhaarUrl] = useQueryState("aadhaarUrl");
   const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
 
+  const [purpose, setPurpose] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
   const [creatingGuest, setCreatingGuest] = useState<boolean>(false);
 
@@ -129,6 +130,7 @@ export const AddToCartStep3 = ({
       phone,
       email,
       dob,
+      purpose,
       photoUrl,
       aadhaarUrl,
     });
@@ -221,6 +223,23 @@ export const AddToCartStep3 = ({
               type="date"
               value={dob ?? ""}
               onChange={(e) => setDob(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label
+              htmlFor="purpose"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Purpose
+            </Label>
+            <Input
+              id="purpose"
+              type="text"
+              placeholder="Meeting"
+              className="h-12 rounded-lg p-4 w-full border border-gray-300"
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              required
             />
           </div>
           <div>

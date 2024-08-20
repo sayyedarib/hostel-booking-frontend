@@ -1,28 +1,60 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { IndianRupee, Trash2 } from "lucide-react";
+import { parseAsInteger, useQueryState } from "nuqs";
 
 import { Button } from "@/components/ui/button";
-import { getCartItems, removeFromCart } from "@/db/queries";
-import { logger } from "@/lib/utils";
+import {
+  getCartItems,
+  removeFromCart,
+  getSecurityDepositStatus,
+} from "@/db/queries";
+import { calculateRent, logger } from "@/lib/utils";
 import { CartItem } from "@/interface";
 import { Separator } from "@/components/ui/separator";
+import { differenceInDays } from "date-fns";
 
 export default function CartPage() {
+  const router = useRouter();
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItemsCount, setCartItemsCount] = useQueryState(
+    "cartItemsCount",
+    parseAsInteger.withDefault(0),
+  );
+  const [securityDepositStatus, setSecurityDepositStatus] = useState<
+    "paid" | "pending" | "lost" | null
+  >("pending");
 
   useEffect(() => {
     const fetchCartItems = async () => {
-      const { data } = await getCartItems();
+      const { data: cartData } = await getCartItems();
+      const { data: securityDepositData } = await getSecurityDepositStatus();
 
-      if (!data) {
+      if (!cartData) {
         logger("info", "Failed to fetch cart items");
         return;
       }
-      console.log(data);
-      setCartItems(data);
+
+      const enhancedData = cartData.map((item) => ({
+        ...item,
+        totalRent: calculateRent(
+          item.monthlyRent,
+          new Date(item.checkIn),
+          new Date(item.checkOut),
+        ).totalRent,
+        payableRent: calculateRent(
+          item.monthlyRent,
+          new Date(item.checkIn),
+          new Date(item.checkOut),
+        ).payableRent,
+      }));
+
+      setCartItems(enhancedData);
+      setCartItemsCount(enhancedData.length);
+      setSecurityDepositStatus(securityDepositData);
     };
 
     fetchCartItems();
@@ -31,14 +63,17 @@ export default function CartPage() {
   const handleRemove = async (cartId: number) => {
     const response = await removeFromCart(cartId);
     if (response.status === "success") {
+      setCartItemsCount(cartItemsCount - 1);
       setCartItems(cartItems.filter((item) => item.id !== cartId));
     } else {
+      // TODO: Add toast
       logger("error", "Failed to remove item from cart");
+      return;
     }
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item.amount, 0);
+    return cartItems.reduce((total, item) => total + item?.payableRent, 0);
   };
 
   return (
@@ -59,34 +94,40 @@ export default function CartPage() {
                   alt="room image"
                   className="hidden md:block w-64 h-48 object-cover rounded-lg mr-4"
                 />
-                <div>
-                  <h2 className="text-lg font-semibold">{item.buildingName}</h2>
-                  <p className="text-gray-500">Room Code: {item.roomCode}</p>
-                  <p className="text-gray-500">Bed Code: {item.bedCode}</p>
-                  <p className="text-gray-500">Bed Type: {item.bedType}</p>
-                  <p className="text-gray-500">Guest Name: {item.guestName}</p>
+                <div className="text-xs md:text-md lg:text-lg">
+                  <span className="flex">
+                    <h2 className="font-semibold">{item.buildingName}</h2> |
+                    Room {item.roomCode} | Bed {item.bedCode} | {item.bedType}
+                  </span>
+                  <p className="text-gray-500">{item.guestName}</p>
                   <p className="text-gray-500">
-                    Check-In:{" "}
+                    {differenceInDays(
+                      new Date(item.checkOut),
+                      new Date(item.checkIn),
+                    )}{" "}
+                    Days |{" "}
                     {new Date(item.checkIn).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
-                    })}
-                  </p>
-                  <p className="text-gray-500">
-                    Check-Out:{" "}
+                    })}{" "}
+                    -
                     {new Date(item.checkOut).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
                       year: "numeric",
                     })}
                   </p>
+                  <p className="text-gray-500 flex items-center">
+                    Total Rent: <IndianRupee size={14} />
+                    {item.totalRent}
+                  </p>
                 </div>
               </div>
-              <div className="text-right sm:text-left flex items-center">
-                <p className="text-lg font-semibold mr-4 flex items-center">
-                  <IndianRupee />
-                  {item.amount}
+              <div className="text-right sm:text-left text-xs md:text-md lg:text-lg flex items-center justify-between md:justify-normal w-full md:w-auto">
+                <p className="font-semibold mr-4 flex items-center">
+                  <IndianRupee size={16} />
+                  {item.payableRent}
                 </p>
                 <Trash2
                   onClick={() => handleRemove(item.id)}
@@ -97,19 +138,31 @@ export default function CartPage() {
             </li>
           ))}
         </ul>
-        <div className="mt-6 flex flex-col items-start">
+        <Separator />
+        <div className="mt-6 flex flex-col items-start text-xs md:text-md lg:text-lg">
           <span className="flex items-center">
-            Total Rent for 1 month: <IndianRupee size={14} /> {calculateTotal()}
+            Total Rent to be paid: <IndianRupee size={14} /> {calculateTotal()}
           </span>
           <span className="flex items-center">
-            Security Deposit: <IndianRupee size={14} /> 1000
+            Security Deposit(Refundable): <IndianRupee size={14} /> 1000
           </span>
           <Separator className="my-4" />
           <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-2 flex items-center">
             Total: <IndianRupee />
-            {calculateTotal()}
+            {calculateTotal() + (securityDepositStatus !== "paid" ? 1000 : 0)}
           </h2>
-          <Button>Checkout</Button>
+          <Button
+            onClick={() => router.push("/agreement-checkout")}
+            className="hidden md:block"
+          >
+            Checkout
+          </Button>
+          <Button
+            onClick={() => router.push("/agreement-checkout")}
+            className="md:hidden fixed bottom-0 left-0 rounded-none w-full"
+          >
+            Checkout
+          </Button>
         </div>
       </div>
     </div>

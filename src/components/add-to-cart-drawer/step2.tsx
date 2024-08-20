@@ -6,7 +6,7 @@ import {
   parseAsString,
 } from "nuqs";
 import { addDays, differenceInDays } from "date-fns";
-import { MoveLeft } from "lucide-react";
+import { IndianRupee, MoveLeft } from "lucide-react";
 
 import type { DateRange } from "react-day-picker";
 import {
@@ -49,7 +49,6 @@ export const AddToCartStep2 = ({
   const firstAvailableRange = getFirstAvailableRange(
     bedData?.occupiedDateRanges,
   );
-  console.log("bedData: ", bedData);
   const [checkIn, setCheckIn] = useQueryState(
     "checkIn",
     parseAsIsoDateTime.withDefault(firstAvailableRange?.from || new Date()),
@@ -65,7 +64,11 @@ export const AddToCartStep2 = ({
     parseAsString.withDefault("1"),
   );
 
-  const [amount, setAmount] = useQueryState("amount", parseAsInteger);
+  const [totalRent, setTotalRent] = useQueryState("totalRent", parseAsInteger);
+  const [payableRent, setPayableRent] = useQueryState(
+    "payableRent",
+    parseAsInteger,
+  );
 
   const [date, setDate] = useState<DateRange | undefined>({
     from: checkIn,
@@ -75,7 +78,12 @@ export const AddToCartStep2 = ({
   useEffect(() => {
     setCheckIn(firstAvailableRange?.from || new Date());
     setCheckOut(firstAvailableRange?.to || addDays(new Date(), 30));
-  }, []);
+    setTotalRent(bedData?.monthlyRent);
+  }, [bedData]);
+
+  useEffect(() => {
+    setTotalRent(bedData?.monthlyRent * Number(numberOfMonths));
+  }, [numberOfMonths]);
 
   if (bedData?.occupiedDateRanges) {
     if (!firstAvailableRange) {
@@ -110,6 +118,16 @@ export const AddToCartStep2 = ({
       if (selectedRange.to) {
         setCheckOut(selectedRange.to);
       }
+
+      const { totalRent: totalAmount, payableRent: payableAmount } =
+        calculateRent(
+          bedData?.monthlyRent,
+          selectedRange.from || new Date(),
+          selectedRange.to || new Date(),
+        );
+
+      setPayableRent(payableAmount);
+      setTotalRent(totalAmount);
     }
   };
 
@@ -124,7 +142,6 @@ export const AddToCartStep2 = ({
       return;
     }
     setCheckOut(to);
-    setAmount(bedData?.monthlyRent * Number(numberOfMonths));
   };
 
   return (
@@ -147,21 +164,17 @@ export const AddToCartStep2 = ({
             <TabsContent value="days">
               {" "}
               <div className="flex flex-col w-full items-center mt-4">
-                <span>
+                <span className="flex items-center">
                   Total days:{" "}
                   {differenceInDays(
                     date?.to || new Date(),
                     date?.from || new Date(),
                   )}{" "}
-                </span>
-                <span>
-                  Total rent:{" "}
-                  {calculateRent(
-                    bedData?.dailyRent,
-                    bedData?.monthlyRent,
-                    checkIn,
-                    checkOut,
-                  )}
+                  | Total rent: <IndianRupee size={14} />
+                  {
+                    calculateRent(bedData?.monthlyRent, checkIn, checkOut)
+                      .totalRent
+                  }
                 </span>
                 <Calendar
                   autoFocus
@@ -190,7 +203,11 @@ export const AddToCartStep2 = ({
               <div className="space-x-11">
                 <span>Total days: {Number(numberOfMonths) * 30}</span>
                 <span>
-                  Total rent: {bedData?.monthlyRent * Number(numberOfMonths)}
+                  Total rent:{" "}
+                  {
+                    calculateRent(bedData?.monthlyRent, checkIn, checkOut)
+                      .totalRent
+                  }
                 </span>
               </div>
               <div className="space-x-11">

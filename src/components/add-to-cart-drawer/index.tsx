@@ -9,7 +9,7 @@ import { AddToCartStep3 } from "@/components/add-to-cart-drawer/step3";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { getBedData, addToCart, getBedsInCart } from "@/db/queries";
-import { logger } from "@/lib/utils";
+import { calculateRent, logger } from "@/lib/utils";
 
 export default function AddToCartDrawer({ roomId }: { roomId: number }) {
   // user states
@@ -21,7 +21,6 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
     "cartItemsCount",
     parseAsInteger.withDefault(0),
   );
-  const [amount, setAmount] = useQueryState("amount", parseAsInteger);
 
   const [bedData, setBedData] = useState<BedInRoomCard[] | null>(null);
   const [cartData, setCartData] = useState<CartItemShort[]>([]);
@@ -71,26 +70,20 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
 
   const handleAddToCart = async () => {
     setLoading(true);
-    if (!checkIn || !checkOut || !guestId || !bedId || !amount) {
+
+    if (!checkIn || !checkOut || !guestId || !bedId) {
       logger("error", "Missing required fields", {
         checkIn,
         checkOut,
         guestId,
         bedId,
-        amount,
       });
       setLoading(false);
       // TODO: Add toast
       return;
     }
 
-    const { status, data } = await addToCart(
-      guestId,
-      bedId,
-      checkIn,
-      checkOut,
-      amount,
-    );
+    const { status, data } = await addToCart(guestId, bedId, checkIn, checkOut);
 
     if (status === "error" || !data) {
       logger("error", "Error in adding to cart", {
