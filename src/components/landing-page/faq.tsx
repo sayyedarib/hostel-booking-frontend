@@ -10,7 +10,7 @@ export default function FAQ() {
   return (
     <div className="py-24 px-8 max-w-5xl mx-auto flex flex-col md:flex-row gap-12">
       <div className="flex flex-col text-left basis-1/2">
-        <p className="sm:text-4xl text-3xl font-[1000] text-base-content">
+        <p className="text-3xl md:text-4xl lg:text-6xl font-extrabold text-base-content">
           Frequently Asked Questions
         </p>
       </div>
@@ -61,18 +61,28 @@ export default function FAQ() {
 
 const faqData = [
   {
-    question: "How secure is my insurance information?",
+    question: "How to book beds?",
     answer:
-      "We prioritize the security of your insurance information. We use advanced encryption and strict data protection measures to ensure your data is safe and confidential.",
+      "Just click on the 'Book Now' or click on rooms in navbar. Add your desired beds into the cart. Click on 'Go to Cart' and proceed with the payment.",
   },
   {
-    question: "How can I customize my insurance coverage?",
+    question: "Is there requirement of any document to book bed?",
     answer:
-      "Our insurance plans are customizable. You can tailor your coverage to meet your specific needs and budget.",
+      "Yes, you need to provide a photo of valid ID proof while adding to into the cart.",
   },
   {
-    question: "Is there a waiting period for insurance claims?",
+    question: "can I book more then one bed at a time?",
     answer:
-      "There may be a waiting period for certain insurance claims, depending on the policy terms and conditions. Please refer to your policy documents for details.",
+      "Yes, you can book multiple beds at a time. Just add them into the cart and proceed with the payment.",
+  },
+  {
+    question: "what is security deposit?",
+    answer:
+      "Security deposit is the amount which you need to pay while booking the bed. This amount will be refunded to you after you leave the hostel with the deduction of any damages if you have done.",
+  },
+  {
+    question: "Can I smoke or drink?",
+    answer:
+      "Smoking and drinking is not allowed in the hostel premises. If you are found smoking, you will be fined.",
   },
 ];

@@ -1,12 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-import Header from "@/components/header";
 import HeroSection from "@/components/landing-page/hero-section";
-import OurServices from "@/components/landing-page/our-services";
-import Gallery from "@/components/landing-page/gallery";
 import Testimonials from "@/components/landing-page/testimonials";
 import Footer from "@/components/landing-page/footer";
 import Quotes from "@/components/quotes";
@@ -19,6 +17,8 @@ export default function Home() {
     triggerOnce: true,
     threshold: 0.1,
   });
+
+  const router = useRouter();
 
   return (
     <>
@@ -79,7 +79,10 @@ export default function Home() {
       >
         <Footer />
       </motion.footer>
-      <Button className="fixed bg-black w-full rounded-none bottom-0 md:hidden">
+      <Button
+        onClick={() => router.push("/rooms")}
+        className="fixed bg-black w-full rounded-none bottom-0 md:hidden"
+      >
         Book Now
       </Button>
     </>

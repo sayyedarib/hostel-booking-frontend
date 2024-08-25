@@ -6,7 +6,7 @@ import { InfiniteMovingCards } from "@/components/ui/infinite-moving-cards";
 export default function Testimonials() {
   return (
     <div className="h-[30rem] rounded-md flex flex-col antialiased space-y-4 items-center justify-center relative max-w-full overflow-hidden">
-      <h3 className="text-2xl md:text-6xl text-primary">
+      <h3 className="text-3xl md:text-4xl lg:text-6xl font-extrabold text-primary">
         Don&apos;t just take our words
       </h3>
       <InfiniteMovingCards

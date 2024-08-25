@@ -97,15 +97,23 @@ export default function Header({
                 Contact
               </Link>
             </li>
+            <li>
+              <SignedIn>
+                <Link href="/cart" className="relative">
+                  <ShoppingCart />
+                  <span className="absolute -right-2 -top-1 bg-primary h-4 w-4 p-1 rounded-full text-sm text-white flex items-center justify-center font-extrabold">
+                    {cartItemsCount}
+                  </span>
+                </Link>
+              </SignedIn>
+            </li>
             <li className="py-2">
-              <div className="bg-[#3D5280] px-5 py-2 rounded-full text-white font-extrabold">
-                <SignedOut>
-                  <SignInButton />
-                </SignedOut>
-                <SignedIn>
-                  <UserButton />
-                </SignedIn>
-              </div>
+              <SignedOut>
+                <SignInButton />
+              </SignedOut>
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
             </li>
           </ul>
         </div>

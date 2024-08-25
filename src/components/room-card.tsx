@@ -19,7 +19,7 @@ import AddToCartDrawer from "./add-to-cart-drawer";
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   return (
     <Card className="w-auto sm:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl">
-      <Link href="/">
+      <Link href="/rooms">
         <Image
           src={roomData.imageUrls?.[0] || "/bg.webp"}
           height="1000"
@@ -36,7 +36,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
             </CardTitle>
             <div className="flex items-center space-x-2 text-yellow-500">
               <Star fill="currentColor" size={16} />
-              <span>4.2</span>
+              <span>4.{Math.floor(Math.random() * 10)}</span>
             </div>
           </div>
           <CardDescription className="text-sm text-gray-600">

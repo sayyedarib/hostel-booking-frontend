@@ -16,8 +16,8 @@ const bedTypes = [
 
 export default function BedTypes() {
   return (
-    <section className="flex flex-col items-center py-12 ">
-      <h2 className="text-2xl md:text-4xl lg:text-6xl font-extrabold mb-6 text-primary">
+    <section className="flex flex-col items-center py-12 px-2">
+      <h2 className="text-3xl md:text-4xl lg:text-6xl font-extrabold mb-6 text-primary">
         Bed Variants
       </h2>
       <p className="text-lg mb-8 text-center max-w-2xl">
@@ -38,7 +38,7 @@ export default function BedTypes() {
               className="rounded-xl h-[50vh] w-[80vh] mb-4 md:mb-0"
             />
             <div className="flex flex-col items-center md:items-start">
-              <h3 className="text-5xl font-bold text-primary mb-2">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-semibold md:font-bold text-primary mb-2">
                 {bedType.name}
               </h3>
               <p className="text-sm text-gray-600 text-center md:text-left">
