@@ -10,7 +10,7 @@ import { getUserOnboadingStatus } from "@/db/queries";
 import { logger } from "@/lib/utils";
 
 export default function AgreementCheckout() {
-  const [currentStep, setCurrentStep] = useState(3);
+  const [currentStep, setCurrentStep] = useState(1);
 
   const handleNext = () => {
     setCurrentStep((prev) => prev + 1);
@@ -27,7 +27,7 @@ export default function AgreementCheckout() {
         logger("error", "Failed to fetch onboarding status");
         return;
       }
-      if (data.onboarded) setCurrentStep(3);
+      if (data.onboarded) setCurrentStep(2);
     }
 
     fetchData();
