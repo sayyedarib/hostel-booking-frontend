@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
-import { paymentTable } from "@/db/schema";
+import { TranscationTable } from "@/db/schema";
 
 export async function GET(request: NextRequest) {
   try {
