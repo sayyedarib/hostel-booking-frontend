@@ -1,10 +1,11 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useCallback } from "react";
 import Image from "next/image";
 import { toWords } from "number-to-words";
 
 import type { ExtendGuest } from "@/interface";
 
 import { cn, formatDate, calculateRent } from "@/lib/utils";
+import { Separator } from "./ui/separator";
 
 interface InvoiceProps {
   invoiceNumber: string;
@@ -31,16 +32,20 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
     },
     ref,
   ) => {
-    const subtotal = items.reduce(
-      (sum, item) =>
-        sum +
-        calculateRent(
-          item.monthlyRent,
-          new Date(item.checkIn),
-          new Date(item.checkOut),
-        ).payableRent,
-      0,
-    );
+    const calculateSubtotal = useCallback(() => {
+      return items.reduce(
+        (sum, item) =>
+          sum +
+          calculateRent(
+            item.monthlyRent,
+            new Date(item.checkIn),
+            new Date(item.checkOut),
+          ).payableRent,
+        0,
+      );
+    }, [items]);
+
+    const subtotal = calculateSubtotal();
     const grandTotal = subtotal + securityDeposit;
 
     return (
@@ -48,25 +53,30 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         ref={ref}
         className={cn(
           className,
-          "p-8 max-w-4xl mx-auto text-base text-gray-900 leading-relaxed font-serif border border-gray-300 shadow-md bg-white",
+          "max-w-4xl mx-auto text-base leading-relaxed font-serif shadow-md bg-white",
         )}
       >
-        <header className="mb-8">
-          <div className="flex justify-between items-center border-b pb-4 mb-4">
+        <header className=" bg-white">
+          <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold">KHAN GROUP OF PG</h1>
               <p>Mobile: 8791476473</p>
               <p>Website: www.aligarhhostel.com</p>
             </div>
-            <Image src="/logo.png" alt="Logo" width={100} height={80} />
+            <Image src="/logo.png" alt="Logo" width={80} height={80} />
           </div>
           <h2 className="text-3xl font-bold text-center uppercase tracking-wide">
             Invoice
           </h2>
-          <p className="text-center text-gray-600">ORIGINAL FOR RECIPIENT</p>
+          <p className="text-center text-gray-600 h-14">
+            ORIGINAL FOR RECIPIENT
+          </p>
         </header>
 
-        <section className="mb-8">
+        <div className="h-1 bg-white w-full" />
+        <Separator />
+        <div className="h-3 bg-white w-full" />
+        <section className=" bg-white h-32">
           <div className="flex justify-between">
             <div>
               <p>
@@ -87,7 +97,9 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
           </div>
         </section>
 
-        <section className="mb-8">
+        <div className="h-3 bg-white w-full" />
+
+        <section className=" bg-white">
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-gray-100">
@@ -128,8 +140,8 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
             </tbody>
           </table>
         </section>
-
-        <section className="mb-8">
+        <div className="h-2 bg-white w-full" />
+        <section className=" bg-white h-36">
           <div className="flex justify-between">
             <div>
               <p>
@@ -153,13 +165,16 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
             </div>
           </div>
         </section>
-
-        <footer className="mt-12 pt-8 border-t">
-          <p className="font-bold">for KHAN GROUP OF PG</p>
-          <div className="mt-8">
+        <div className="h-1 bg-white w-full" />
+        <Separator />
+        <div className="h-1 bg-white w-full" />
+        <footer className="bg-white h-28">
+          <p className="font-bold pb-2">for KHAN GROUP OF PG</p>
+          <div className="h-10 bg-white w-full" />
+          <div>
             <p>Authorized Signatory</p>
           </div>
-          <p className="mt-8 text-sm text-center text-gray-600">
+          <p className="text-sm text-center text-gray-600 pb-2">
             This is a computer generated document and requires no signature |
             ORIGINAL FOR RECIPIENT
           </p>
@@ -169,9 +184,6 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
   },
 );
 
-// Helper function to convert number to words (you'll need to implement this)
-function numberToWords(num: number): string {
-  return ""; // Placeholder
-}
+PrintableInvoice.displayName = "PrintableInvoice";
 
 export default PrintableInvoice;
