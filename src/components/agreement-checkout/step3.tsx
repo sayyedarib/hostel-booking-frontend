@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useReactToPrint } from "react-to-print";
-import Html2Pdf from "html2pdf.js";
+import html2pdf from "html2pdf.js";
 import Image from "next/image";
 import { LoaderCircle } from "lucide-react";
 
@@ -11,8 +11,12 @@ import { createClient } from "@/lib/supabase/client";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
-import { getAgreementFormData, getSecurityDepositStatus } from "@/db/queries";
-import { logger, calculateRent } from "@/lib/utils";
+import {
+  createBooking,
+  getAgreementFormData,
+  getSecurityDepositStatus,
+} from "@/db/queries";
+import { logger, calculateRent, generateToken } from "@/lib/utils";
 import ForwardedPrintableForm from "../printable-registration-form";
 import PrintableInvoice from "../printable-invoice";
 
@@ -25,7 +29,7 @@ export default function Step3({
 }) {
   const supabase = createClient();
 
-  const agreementFormRef = useRef<HTMLDivElement>(null);
+  const agreementRef = useRef<HTMLDivElement>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const [agreementForm, setAgreementForm] = useState<AgreementForm | null>(
@@ -34,6 +38,8 @@ export default function Step3({
 
   const [securityDeposit, setSecurityDeposit] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [invoiceUrl, setInvoiceUrl] = useState<string | null>(null);
+  const [agreementUrl, setAgreementUrl] = useState<string | null>(null);
   const [isPaidChecked, setIsPaidChecked] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -77,79 +83,242 @@ export default function Step3({
     fetchData();
   }, []);
 
-  const uploadToSupabase = async (
-    file: Blob,
-    bucket: string,
-    fileName: string,
-  ) => {
-    const { data, error } = await supabase.storage
-      .from(bucket)
-      .upload(fileName, file);
+  const uploadToSupabase = useCallback(
+    async (file: Blob, bucket: string, fileName: string): Promise<void> => {
+      try {
+        logger("info", "Uploading file to bucket");
+        const { data, error } = await supabase.storage
+          .from(bucket)
+          .upload(fileName, file);
 
-    if (error) {
-      console.error("Error uploading file to Supabase:", error);
-    } else {
-      console.log("File uploaded successfully:", data);
+        const { data: publicUrlData } = supabase.storage
+          .from(bucket)
+          .getPublicUrl(fileName);
+
+        if (publicUrlData) {
+          logger(
+            "info",
+            `File uploaded successfully: ${publicUrlData.publicUrl}`,
+          );
+          if (bucket === "invoice") {
+            setInvoiceUrl(publicUrlData.publicUrl);
+          } else {
+            setAgreementUrl(publicUrlData.publicUrl);
+          }
+        }
+
+        if (error) {
+          logger("error", "Error uploading file to Supabase:", error);
+          throw new Error(`Error uploading file to Supabase: ${error.message}`);
+        } else {
+          console.log("File uploaded successfully:", data);
+        }
+      } catch (error) {
+        logger("error", "Error uploading file to Supabase:", error as Error);
+        throw error;
+      }
+    },
+    [],
+  );
+
+  const handleBeforePrintInvoice = useCallback(async () => {
+    try {
+      const html = invoiceRef.current;
+      if (html) {
+        const options = {
+          margin: 10,
+          filename: `invoice-${new Date().getTime()}.pdf`,
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        };
+
+        logger("info", "Starting PDF generation with html2pdf");
+        const pdfBlob = await html2pdf()
+          .from(html)
+          .set(options)
+          .outputPdf("blob");
+
+        if (pdfBlob instanceof Blob) {
+          logger("info", "PDF generated successfully, downloading invoice PDF");
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(pdfBlob);
+          link.download = options.filename;
+          link.click();
+
+          logger("info", "Uploading invoice PDF to Supabase");
+          await uploadToSupabase(pdfBlob, "invoice", options.filename);
+        } else {
+          throw new Error("Generated PDF is not a valid Blob object");
+        }
+      } else {
+        throw new Error("invoiceRef.current is null or undefined");
+      }
+    } catch (error) {
+      logger("error", "Error in generating or uploading PDF", error as Error);
+    }
+  }, []);
+
+  const handleBeforePrintAgreement = useCallback(async () => {
+    try {
+      const html = agreementRef.current;
+      if (html) {
+        const options = {
+          margin: 10,
+          filename: `agreement-${new Date().getTime()}.pdf`,
+          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        };
+
+        logger("info", "Starting PDF generation with html2pdf");
+        const pdfBlob = await html2pdf()
+          .from(html)
+          .set(options)
+          .outputPdf("blob");
+
+        if (pdfBlob instanceof Blob) {
+          logger(
+            "info",
+            "PDF generated successfully, downloading agreement PDF",
+          );
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(pdfBlob);
+          link.download = options.filename;
+          link.click();
+
+          logger("info", "Uploading agreement PDF to Supabase");
+          await uploadToSupabase(pdfBlob, "agreement", options.filename);
+        } else {
+          throw new Error("Generated PDF is not a valid Blob object");
+        }
+      } else {
+        throw new Error("agreementRef.current is null or undefined");
+      }
+    } catch (error) {
+      logger("error", "Error in generating or uploading PDF", error as Error);
+    }
+  }, []);
+  const handleInvoice = useReactToPrint({
+    content: () => invoiceRef.current,
+    onBeforePrint: handleBeforePrintInvoice,
+    onAfterPrint: async () => {
+      logger("info", "Invoice printed successfully");
+      logger("info", "generating token....");
+      const token = generateToken();
+
+      if (!invoiceUrl || !agreementUrl) {
+        logger("error", "Invoice or agreement URL is missing", {
+          invoiceUrl,
+          agreementUrl,
+        });
+        setLoading(false);
+        return;
+      }
+
+      logger("info", "Creating booking in database");
+      const result = await createBooking({
+        amount: totalAmount + securityDeposit,
+        invoiceUrl,
+        agreementUrl,
+        token,
+      });
+
+      if (result?.status === "success") {
+        // Send confirmation emails
+        if (!result?.data?.id) {
+          // TODO: Add toast
+          logger("error", "Booking ID is missing in response", result);
+          setLoading(false);
+          return;
+        }
+        const response = await fetch("/api/email/booking-confirmation", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ bookingId: result?.data?.id }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to send confirmation emails");
+        }
+      }
+
+      handleNext();
+    },
+  });
+
+  const handlePrintInvoice = async () => {
+    logger("info", "Printing invoice...");
+    try {
+      await handleInvoice();
+    } catch (error) {
+      logger("error", "Error in printing invoice", error as Error);
     }
   };
 
-  const handlePrintInvoice = useReactToPrint({
-    content: () => invoiceRef.current,
-    print: async (printIframe) => {
-      const document = printIframe.contentDocument;
-      if (document) {
-        const html = document.getElementsByClassName("App")[0];
-        const options = {
-          margin: 0,
-          filename: `invoice-${new Date().getTime()}.pdf`,
-        };
-        const exporter = new Html2Pdf(html, options);
-        const pdfBlob = await exporter.getPdf(options);
-
-        // Automatically download the PDF
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(pdfBlob);
-        link.download = options.filename;
-        link.click();
-
-        // Upload to Supabase
-        await uploadToSupabase(pdfBlob, "invoice", options.filename);
-      }
-    },
+  const handleAgreement = useReactToPrint({
+    content: () => agreementRef.current,
+    onBeforePrint: handleBeforePrintAgreement,
+    onAfterPrint: handlePrintInvoice,
   });
 
-  const handlePrintAgreement = useReactToPrint({
-    content: () => agreementFormRef.current,
-    print: async (printIframe) => {
-      const document = printIframe.contentDocument;
-      if (document) {
-        const html = document.getElementsByClassName("App")[0];
-        const options = {
-          margin: 0,
-          filename: `agreement-${new Date().getTime()}.pdf`,
-        };
-        const exporter = new Html2Pdf(html, options);
-        const pdfBlob = await exporter.getPdf(options);
+  const handlePrintAgreement = async () => {
+    logger("info", "Printing invoice...");
+    try {
+      await handleAgreement();
+    } catch (error) {
+      logger("error", "Error in printing invoice", error as Error);
+    }
+  };
 
-        // Automatically download the PDF
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(pdfBlob);
-        link.download = options.filename;
-        link.click();
+  useEffect(() => {
+    const createBookingIfUrlsExist = async () => {
+      if (invoiceUrl && agreementUrl) {
+        logger("info", "Generating token....");
+        const token = generateToken();
 
-        // Upload to Supabase
-        await uploadToSupabase(pdfBlob, "agreement", options.filename);
+        logger("info", "Creating booking in database");
+        const result = await createBooking({
+          amount: totalAmount + securityDeposit,
+          invoiceUrl,
+          agreementUrl,
+          token,
+        });
+
+        if (result?.status === "success") {
+          // Send confirmation emails
+          const response = await fetch("/api/email/booking-confirmation", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ bookingId: result?.data }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to send confirmation emails");
+          }
+        }
+
+        handleNext();
+        setLoading(false);
       }
-    },
-  });
+    };
+
+    createBookingIfUrlsExist();
+  }, [invoiceUrl, agreementUrl]); // Dependency array
 
   const handlePaymentConfirmation = async () => {
     setLoading(true);
-    handlePrintInvoice();
-    handlePrintAgreement();
-    setLoading(false);
 
-    handleNext();
+    try {
+      logger("info", "Generating and uploading invoice");
+      await handleBeforePrintInvoice();
+
+      logger("info", "Generating and uploading agreement");
+      await handleBeforePrintAgreement();
+    } catch (error) {
+      logger("error", "Error in generating or uploading PDF", error as Error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -225,24 +394,23 @@ export default function Step3({
       </div>
 
       {agreementForm && (
-        <ForwardedPrintableForm
-          ref={agreementFormRef}
-          className="hidden"
-          {...agreementForm}
-        />
+        <div className="hidden">
+          <ForwardedPrintableForm ref={agreementRef} {...agreementForm} />
+        </div>
       )}
       {agreementForm && (
-        <PrintableInvoice
-          ref={invoiceRef}
-          invoiceNumber={`INV-${new Date().getTime()}`}
-          invoiceDate={new Date()}
-          customerName={agreementForm?.name}
-          customerPhone={agreementForm?.phone}
-          customerAddress={`${agreementForm?.address}, ${agreementForm?.city}, ${agreementForm?.state}, ${agreementForm?.pin}`}
-          items={agreementForm.guests}
-          securityDeposit={securityDeposit}
-          className="my-invoice mt-10 hidden"
-        />
+        <div className="hidden">
+          <PrintableInvoice
+            ref={invoiceRef}
+            invoiceNumber={`INV-${new Date().getTime()}`}
+            invoiceDate={new Date()}
+            customerName={agreementForm?.name}
+            customerPhone={agreementForm?.phone}
+            customerAddress={`${agreementForm?.address}, ${agreementForm?.city}, ${agreementForm?.state}, ${agreementForm?.pin}`}
+            items={agreementForm.guests}
+            securityDeposit={securityDeposit}
+          />
+        </div>
       )}
     </div>
   );

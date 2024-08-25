@@ -233,7 +233,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
         </div>
         <div className="md:flex items-center">
           <Label htmlFor="guardianName" className="w-52">
-            Guardian's Name:
+            Guardian&apos;s Name:
           </Label>
           <Input
             id="guardianName"
@@ -245,7 +245,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
         </div>
         <div className="md:flex items-center">
           <Label htmlFor="guardianPhone" className="w-52">
-            Guardian's Phone:
+            Guardian&apos;s Phone:
           </Label>
           <Input
             id="guardianPhone"

@@ -48,7 +48,9 @@ export const AddToCartStep2 = ({
 }) => {
   const firstAvailableRange = getFirstAvailableRange(
     bedData?.occupiedDateRanges,
+    30,
   );
+
   const [checkIn, setCheckIn] = useQueryState(
     "checkIn",
     parseAsIsoDateTime.withDefault(firstAvailableRange?.from || new Date()),
@@ -189,7 +191,8 @@ export const AddToCartStep2 = ({
                     })),
                   }}
                   modifiersClassNames={{
-                    booked: "line-through text-red-500",
+                    booked:
+                      "!line-through !text-red-500 hover:bg-none hover:cursor-not-allowed !cursor-not-allowed",
                   }}
                   required
                 />
