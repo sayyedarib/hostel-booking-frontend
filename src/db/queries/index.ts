@@ -9,12 +9,14 @@ import { db } from "@/db";
 import {
   AddressBookTable,
   BedTable,
-  BedOccupancyTable,
+  BedBookingTable,
+  BookingTable,
   CartTable,
   GuestTable,
   PropertyTable,
   RoomTable,
   securityDepositTable,
+  TranscationTable,
   UserTable,
 } from "@/db/schema";
 import {
@@ -300,21 +302,21 @@ export const getBedData = async (roomId: number) => {
         monthlyRent: BedTable.monthlyRent,
         occupiedDateRanges: sql<OccupiedDateRange[]>`
           array_agg(json_build_object(
-            'startDate', ${BedOccupancyTable.checkIn},
-            'endDate', ${BedOccupancyTable.checkOut}
-          )) FILTER (WHERE ${BedOccupancyTable.checkIn} IS NOT NULL)
+            'startDate', ${BedBookingTable.checkIn},
+            'endDate', ${BedBookingTable.checkOut}
+          )) FILTER (WHERE ${BedBookingTable.checkIn} IS NOT NULL)
         `,
         status: sql<string>`
           CASE WHEN EXISTS (
-            SELECT 1 FROM ${BedOccupancyTable}
-            WHERE ${BedOccupancyTable.bedId} = ${BedTable.id}
-            AND ${BedOccupancyTable.checkIn} <= ${fifteenDaysLater.toISOString()}
-            AND ${BedOccupancyTable.checkOut} >= ${currentDate.toISOString()}
+            SELECT 1 FROM ${BedBookingTable}
+            WHERE ${BedBookingTable.bedId} = ${BedTable.id}
+            AND ${BedBookingTable.checkIn} <= ${fifteenDaysLater.toISOString()}
+            AND ${BedBookingTable.checkOut} >= ${currentDate.toISOString()}
           ) THEN 'occupied' ELSE 'available' END
         `,
       })
       .from(BedTable)
-      .leftJoin(BedOccupancyTable, eq(BedTable.id, BedOccupancyTable.bedId))
+      .leftJoin(BedBookingTable, eq(BedTable.id, BedBookingTable.bedId))
       .where(eq(BedTable.roomId, roomId))
       .groupBy(BedTable.id);
 
@@ -397,11 +399,11 @@ export const getOccupancyOfBed = async (bedId: number) => {
     logger("info", "Fetching occupancy of bed", { bedId });
     const occupancy = await db
       .select({
-        startDate: BedOccupancyTable.checkIn,
-        endDate: BedOccupancyTable.checkOut,
+        startDate: BedBookingTable.checkIn,
+        endDate: BedBookingTable.checkOut,
       })
-      .from(BedOccupancyTable)
-      .where(eq(BedOccupancyTable.bedId, bedId));
+      .from(BedBookingTable)
+      .where(eq(BedBookingTable.bedId, bedId));
 
     logger("info", "Fetched occupancy dates");
     return { status: "success", data: occupancy };
@@ -606,9 +608,22 @@ export const getSecurityDepositStatus = async () => {
       .from(securityDepositTable)
       .where(eq(securityDepositTable.userId, userId.data));
     logger("info", "Fetched security deposit status");
+
+    if (securityDeposit.length === 0) {
+      await db
+        .insert(securityDepositTable)
+        .values({
+          userId: userId.data,
+          status: "pending",
+          warningLevel: 0,
+        })
+        .execute();
+      return { status: "success", data: "pending" };
+    }
+
     return { status: "success", data: securityDeposit[0].status };
   } catch (error) {
-    logger("error", "Error fetching security deposit status", { error });
+    logger("error", "Error fetching security deposit status", error as Error);
     return { status: "error", data: null };
   }
 };
@@ -688,15 +703,15 @@ export const getAgreementFormData = async () => {
 };
 
 export const createBooking = async ({
-  bedId,
-  guestId,
-  checkIn,
-  checkOut,
+  amount,
+  invoiceUrl,
+  agreementUrl,
+  token,
 }: {
-  bedId: number;
-  guestId: number;
-  checkIn: string;
-  checkOut: string;
+  amount: number;
+  invoiceUrl: string;
+  agreementUrl: string;
+  token: string;
 }) => {
   try {
     const userId = await getUserId();
@@ -705,45 +720,181 @@ export const createBooking = async ({
       logger("info", "User not found");
       return { status: "error", message: "User not found" };
     }
+    logger("info", "Creating booking", { userId });
 
-    logger("info", "Creating booking", {
-      userId,
-      guestId,
-      bedId,
-      checkIn,
-      checkOut,
-    });
+    const cartItems = await db
+      .select({
+        guestId: CartTable.guestId,
+        bedId: CartTable.bedId,
+        checkIn: CartTable.checkIn,
+        checkOut: CartTable.checkOut,
+      })
+      .from(CartTable)
+      .where(eq(CartTable.userId, userId.data));
+
+    let bookingId: { id: number }[];
 
     await db.transaction(async (trx) => {
-      await trx
-        .insert(BedOccupancyTable)
-        .values({
-          bedId,
-          guestId,
-          checkIn,
-          checkOut,
+      try {
+        bookingId = await trx
+          .insert(BookingTable)
+          .values({
+            userId: userId.data,
+            agreementUrl,
+          })
+          .returning({
+            id: BookingTable.id,
+          });
+
+        const bedBookings: {
+          bedId: number;
+          guestId: number;
+          checkIn: string;
+          checkOut: string;
+          bookingId: number;
+          status: "booked" | "checked_in" | "checked_out" | "cancelled";
+        }[] = cartItems.map((item) => ({
+          bedId: item.bedId,
+          guestId: item.guestId,
+          checkIn: item.checkIn,
+          checkOut: item.checkOut,
+          bookingId: bookingId[0].id,
           status: "booked",
-        })
-        .execute();
+        }));
 
-      await trx
-        .delete(CartTable)
-        .where(
-          and(
-            eq(CartTable.userId, userId.data),
-            eq(CartTable.guestId, guestId),
-            eq(CartTable.bedId, bedId),
-            eq(CartTable.checkIn, checkIn),
-            eq(CartTable.checkOut, checkOut),
-          ),
-        )
-        .execute();
+        try {
+          await trx.insert(BedBookingTable).values(bedBookings);
+        } catch (error) {
+          console.error(
+            `[ERROR] ${new Date().toISOString()} - Error inserting bed bookings:`,
+            error,
+          );
+          throw error;
+        }
+
+        try {
+          await trx
+            .update(securityDepositTable)
+            .set({
+              userId: userId.data,
+              status: "paid",
+            })
+            .where(eq(securityDepositTable.userId, userId.data))
+            .execute();
+        } catch (error) {
+          console.error(
+            `[ERROR] ${new Date().toISOString()} - Error updating security deposit:`,
+            error,
+          );
+          throw error;
+        }
+
+        try {
+          console.log(
+            "Inserting transaction",
+            userId.data,
+            amount,
+            token,
+            invoiceUrl,
+          );
+          await trx.insert(TranscationTable).values({
+            userId: userId.data,
+            amount,
+            token,
+            invoiceUrl,
+          });
+        } catch (error) {
+          console.error(
+            `[ERROR] ${new Date().toISOString()} - Error inserting transaction:`,
+            error,
+          );
+          throw error;
+        }
+
+        try {
+          await trx
+            .delete(CartTable)
+            .where(eq(CartTable.userId, userId.data))
+            .execute();
+        } catch (error) {
+          console.error(
+            `[ERROR] ${new Date().toISOString()} - Error deleting cart items:`,
+            error,
+          );
+          throw error;
+        }
+        logger("info", "Booking created successfully");
+        return {
+          status: "success",
+          message: "Booking created successfully",
+          data: bookingId[0].id,
+        };
+      } catch (error) {
+        console.error(
+          `[ERROR] ${new Date().toISOString()} - Error in transaction:`,
+          error,
+        );
+        throw error;
+      }
     });
-
-    logger("info", "Booking created successfully");
-    return { status: "success" };
   } catch (error) {
-    logger("error", "Error in creating booking", { error });
-    return { status: "error", message: "Error creating booking" };
+    logger("error", "Error in creating booking: ", error as Error);
+    return {
+      status: "error",
+      message: "Error in creating booking",
+      data: { id: null },
+    };
+  }
+};
+
+export const getBookingDetails = async (bookingId: number) => {
+  try {
+    const bookingDetails = await db
+      .select({
+        id: BookingTable.id,
+        userId: BookingTable.userId,
+        agreementUrl: BookingTable.agreementUrl,
+        createdAt: BookingTable.createdAt,
+        userName: UserTable.name,
+        userEmail: UserTable.email,
+        userPhone: UserTable.phone,
+        amount: TranscationTable.amount,
+        invoiceUrl: TranscationTable.invoiceUrl,
+      })
+      .from(BookingTable)
+      .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
+      .innerJoin(
+        TranscationTable,
+        eq(BookingTable.userId, TranscationTable.userId),
+      )
+      .where(eq(BookingTable.id, bookingId))
+      .limit(1);
+
+    if (bookingDetails.length === 0) {
+      return { status: "error", data: null };
+    }
+
+    const bedBookings = await db
+      .select({
+        bedCode: BedTable.bedCode,
+        roomCode: RoomTable.roomCode,
+        checkIn: BedBookingTable.checkIn,
+        checkOut: BedBookingTable.checkOut,
+      })
+      .from(BedBookingTable)
+      .innerJoin(BedTable, eq(BedBookingTable.bedId, BedTable.id))
+      .innerJoin(RoomTable, eq(BedTable.roomId, RoomTable.id))
+      .where(eq(BedBookingTable.bookingId, bookingId));
+
+    return {
+      status: "success",
+      data: {
+        ...bookingDetails[0],
+        bedBookings,
+      },
+    };
+  } catch (error) {
+    logger("error", "Error fetching booking details", { error });
+    return { status: "error", data: null };
   }
 };

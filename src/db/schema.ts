@@ -148,6 +148,18 @@ export const CartTable = pgTable("cart", {
     .$onUpdate(() => new Date()),
 });
 
+export const BookingTable = pgTable("booking", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
+  agreementUrl: text("agreement_url").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
 const statusEnum = pgEnum("status", [
   "booked",
   "checked_in",
@@ -155,7 +167,7 @@ const statusEnum = pgEnum("status", [
   "cancelled",
 ]);
 
-export const BedOccupancyTable = pgTable("bed_occupancy", {
+export const BedBookingTable = pgTable("bed_booking", {
   id: serial("id").primaryKey(),
   bedId: integer("bed_id")
     .notNull()
@@ -165,8 +177,10 @@ export const BedOccupancyTable = pgTable("bed_occupancy", {
     .references(() => GuestTable.id),
   checkIn: date("check_in").notNull(),
   checkOut: date("check_out").notNull(),
+  bookingId: integer("booking_id")
+    .notNull()
+    .references(() => BookingTable.id),
   status: statusEnum("status").notNull().default("booked"),
-  userRentId: integer("user_rent_id").references(() => UserRentTable.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -198,10 +212,21 @@ export const TranscationTable = pgTable("transaction", {
   userId: integer("user_id")
     .notNull()
     .references(() => UserTable.id),
-  userRentId: integer("user_rent")
-    .notNull()
-    .references(() => UserRentTable.id),
   amount: integer("amount").notNull(),
-  token: text("token"),
+  token: text("token").notNull(),
+  verified: boolean("verified").notNull().default(false),
+  invoiceUrl: text("invoice_url").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const AgreementTable = pgTable("agreement", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
+  agreementUrl: text("agreement_url").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
 });
