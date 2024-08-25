@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ImagesSlider } from "@/components/ui/images-slider";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+import { CardStack } from "../ui/card-stack";
 
 export default function HeroSection() {
   const images = [
@@ -14,33 +15,54 @@ export default function HeroSection() {
     "/img/rooms/room7.webp",
     "/img/rooms/room5.webp",
   ];
+
+  const acheievers = [
+    {
+      name: "Aarib",
+      rank: "2",
+      src: "/acheivers/11.png",
+    },
+    {
+      name: "Aarib",
+      rank: "2",
+      src: "/acheivers/sumair.png",
+    },
+    {
+      name: "Aarib",
+      rank: "2",
+      src: "/acheivers/11.png",
+    },
+  ];
   return (
-    <ImagesSlider className="min-h-screen" images={images}>
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: -80,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          duration: 0.6,
-        }}
-        className="z-50 flex flex-col justify-center items-center"
-      >
-        <motion.p className="font-bold text-xl md:text-6xl text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 py-4">
-          Looking for Room!! <br /> it&apos;s few clicks away before you own it.
-        </motion.p>
-        <Link
-          href="/form"
-          className="px-6 py-3 text-lg backdrop-blur-sm border hover:bg-red-300/30 bg-red-300/10 border-red-500/20 text-white mx-auto text-center rounded-full relative mt-4"
-        >
-          <span>Book now →</span>
-          <div className="absolute inset-x-0  h-px -bottom-px bg-gradient-to-r w-3/4 mx-auto from-transparent via-red-500 to-transparent" />
-        </Link>
-      </motion.div>
-    </ImagesSlider>
+    <div className="space-y-4 flex flex-col items-center">
+      <CardStack items={acheievers} />
+      <div className="text-2xl sm:text-4xl md:text-6xl text-[#3D5280]">
+        Experience Premium Hostel Living, <br className="hidden sm:block" />{" "}
+        Designed for Your Children&apos;s Success.
+      </div>
+      <p className="text-sm md:text-xl lg:text-3xl text-neutral-500">
+        Your children is our responsibility. <br className="hidden sm:block" />{" "}
+        We provide home away from home.
+      </p>
+      <Button className="bg-primary rounded-full">Book Now</Button>
+
+      {/* <div className="pt-24 text-sm md:text-xl lg:text-2xl text-neutral-500">
+        <span>we have acheived so far...</span>{" "}
+        <div className="flex gap-7 text-xs md:text-md lg:text-lg justify-center">
+          <div className="flex flex-col">
+            <span>1472+</span>
+            <span>Booking</span>
+          </div>
+          <div className="flex flex-col">
+            <span>100+</span>
+            <span className="w-16 md:w-full">Selection every year</span>
+          </div>
+          <div className="flex flex-col">
+            <span>100+</span>
+            <span>Beds</span>
+          </div>
+        </div>
+      </div> */}
+    </div>
   );
 }

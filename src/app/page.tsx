@@ -2,13 +2,17 @@
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
+import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
-import SearchBar from "@/components/search-bar"; // Updated import
 import HeroSection from "@/components/landing-page/hero-section";
 import OurServices from "@/components/landing-page/our-services";
 import Gallery from "@/components/landing-page/gallery";
 import Testimonials from "@/components/landing-page/testimonials";
 import Footer from "@/components/landing-page/footer";
+import Quotes from "@/components/quotes";
+import FAQ from "@/components/landing-page/faq";
+import Facilities from "@/components/landing-page/facilities";
+import BedTypes from "@/components/landing-page/bed-types";
 
 export default function Home() {
   const [ref, inView] = useInView({
@@ -17,15 +21,9 @@ export default function Home() {
   });
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="flex flex-col gap-10 items-center"
-    >
-      <section className="w-full relative max-h-screen flex flex-col gap-10 items-start justify-center">
+    <>
+      <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center">
         <HeroSection />
-        <SearchBar className="hidden md:flex" />
       </section>
 
       <motion.div
@@ -33,18 +31,35 @@ export default function Home() {
         initial={{ opacity: 0, y: 50 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
-        className="relative flex flex-col items-center w-full gap-8"
+        className="w-full h-[50vh]"
       >
-        <OurServices />
+        <Quotes text="test" />
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.8 }}
-        className="max-w-full flex flex-col items-center gap-8"
+        className="max-w-full bg-[#EDE8F5]/50 min-h-[70vh]"
       >
-        <Gallery />
+        <Facilities />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8 }}
+        className="max-w-full min-h-[70vh]"
+      >
+        <BedTypes />
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8 }}
+      >
+        <FAQ />
       </motion.div>
 
       <motion.div
@@ -64,8 +79,9 @@ export default function Home() {
       >
         <Footer />
       </motion.footer>
-
-      <SearchBar className="md:hidden relative shadow-2xl border-t border-neutral-100" />
-    </motion.div>
+      <Button className="fixed bg-black w-full rounded-none bottom-0 md:hidden">
+        Book Now
+      </Button>
+    </>
   );
 }

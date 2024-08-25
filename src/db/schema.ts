@@ -8,166 +8,225 @@ import {
   numeric,
   boolean,
   date,
+  pgEnum,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { stat } from "fs";
 
-export const buildingTable = pgTable("building", {
+export const PropertyOwnerTable = pgTable("property_owner", {
   id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  clerkId: text("clerk_id").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const PropertyTable = pgTable("property", {
+  id: serial("id").primaryKey(),
+  propertyOwnerId: integer("property_owner_id")
+    .notNull()
+    .references(() => PropertyOwnerTable.id),
   name: text("name").notNull(),
   address: text("address").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
-
-export const roomTypeTable = pgTable("room_type", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  capacity: integer("capacity").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
-
-export const roomTable = pgTable("room", {
-  id: serial("id").primaryKey(),
-  buildingId: integer("building_id")
-    .notNull()
-    .references(() => buildingTable.id),
-  roomTypeId: integer("room_type_id")
-    .notNull()
-    .references(() => roomTypeTable.id),
-  roomNumber: text("room_number").notNull(),
-  dailyPrice: numeric("daily_price").notNull(),
-  monthlyPrice: numeric("monthly_price").notNull(),
-  genderRestriction: text("gender_restriction"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  pin: text("pin").notNull(),
+  country: text("country").notNull(),
+  mapUrl: text("map_url"),
   imageUrls: text("image_urls")
+    .array()
     .notNull()
     .default(sql`'{}'::text[]`),
-});
-
-export const bedTable = pgTable("bed", {
-  id: serial("id").primaryKey(),
-  roomId: integer("room_id")
-    .notNull()
-    .references(() => roomTable.id),
-  bedType: text("bed_type").notNull(),
-  bedCode: text("bed_code").notNull(),
-  occupied: boolean("occupied").notNull().default(false),
-  dailyPrice: numeric("daily_price").notNull(),
-  monthlyPrice: numeric("monthly_price").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
 });
 
-export const guestTable = pgTable(
-  "guest",
-  {
-    id: serial("id").primaryKey(),
-    clerkId: text("clerk_id").notNull(),
-    name: text("name").notNull(),
-    userName: text("user_name").notNull(),
-    email: text("email").notNull(),
-    phone: text("phone").notNull().default(""),
-    dob: date("dob"),
-    address: text("address").notNull().default(""),
-    aadhaar: numeric("aadhaar"),
-    gender: text("gender").default(""),
-    googlePic: text("google_pic"),
-    guardianName: text("guardian_name"),
-    guardianPhone: text("guardian_phone"),
-    createdAt: timestamp("created_at").notNull().defaultNow(),
-    updatedAt: timestamp("updated_at")
-      .notNull()
-      .$onUpdate(() => new Date()),
-  },
-  (table) => {
-    return {
-      userNameUnique: uniqueIndex("user_name_unique").on(table.userName),
-    };
-  },
-);
-
-export const bookingTable = pgTable("booking", {
+export const AddressBookTable = pgTable("address_book", {
   id: serial("id").primaryKey(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").notNull(),
+  pin: text("pin").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const RoomTable = pgTable("room", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id")
+    .notNull()
+    .references(() => PropertyTable.id),
+  roomCode: text("code").notNull(),
+  floor: integer("floor").notNull().default(0),
+  gender: text("gender").notNull().default("male"),
+  imageUrls: text("image_urls").array(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const BedTable = pgTable("bed", {
+  id: serial("id").primaryKey(),
+  roomId: integer("room_id")
+    .notNull()
+    .references(() => RoomTable.id),
+  bedCode: text("code").notNull(),
+  type: text("type").notNull(),
+  monthlyRent: integer("monthly_rent").notNull(),
+  dailyRent: integer("daily_rent").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const UserTable = pgTable("user", {
+  id: serial("id").primaryKey(),
+  clerkId: text("clerk_id").notNull(),
+  addressId: integer("address_id").references(() => AddressBookTable.id),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  dob: date("dob"),
+  imageUrl: text("image_url").notNull(),
+  idUrl: text("id_url"),
+  guardianName: text("guardian_name"),
+  guardianPhone: text("guardian_phone"),
+  guardianPhoto: text("guardian_photo"),
+  guardianIdUrl: text("guardian_id_url"),
+  signature: text("signature"),
+  onboarded: boolean("onboarded").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const GuestTable = pgTable("guest", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
+  name: text("name").notNull(),
+  phone: text("phone").notNull(),
+  email: text("email").notNull(),
+  dob: date("dob").notNull(),
+  purpose: text("purpose").notNull(),
+  photoUrl: text("photo_url").notNull(),
+  aadhaarUrl: text("aadhaar_url").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const CartTable = pgTable("cart", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
   guestId: integer("guest_id")
     .notNull()
-    .references(() => guestTable.id),
-  roomId: integer("room_id")
+    .references(() => GuestTable.id),
+  bedId: integer("bed_id")
     .notNull()
-    .references(() => roomTable.id),
-  bedId: integer("bed_id").references(() => bedTable.id),
-  checkInDate: date("check_in_date").notNull(),
-  checkOutDate: date("check_out_date").notNull(),
-  status: text("status").notNull().default("active"),
+    .references(() => BedTable.id),
+  checkIn: date("check_in").notNull(),
+  checkOut: date("check_out").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
 });
 
-export const bedOccupancyTable = pgTable(
-  "bed_occupancy",
-  {
-    id: serial("id").primaryKey(),
-    bedId: integer("bed_id")
-      .notNull()
-      .references(() => bedTable.id),
-    isOccupied: boolean("is_occupied").notNull().default(false),
-    currentBookingId: integer("current_booking_id").references(
-      () => bookingTable.id,
-    ),
-    lastUpdated: timestamp("last_updated").notNull().defaultNow(),
-  },
-  (table) => {
-    return {
-      bedIdUnique: uniqueIndex("bed_id_unique").on(table.bedId),
-    };
-  },
-);
-
-export const paymentTable = pgTable("payment", {
+export const BookingTable = pgTable("booking", {
   id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
+  agreementUrl: text("agreement_url").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+const statusEnum = pgEnum("status", [
+  "booked",
+  "checked_in",
+  "checked_out",
+  "cancelled",
+]);
+
+export const BedBookingTable = pgTable("bed_booking", {
+  id: serial("id").primaryKey(),
+  bedId: integer("bed_id")
+    .notNull()
+    .references(() => BedTable.id),
+  guestId: integer("guest_id")
+    .notNull()
+    .references(() => GuestTable.id),
+  checkIn: date("check_in").notNull(),
+  checkOut: date("check_out").notNull(),
   bookingId: integer("booking_id")
     .notNull()
-    .references(() => bookingTable.id),
+    .references(() => BookingTable.id),
+  status: statusEnum("status").notNull().default("booked"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const UserRentTable = pgTable("user_rent", {
+  id: serial("id").primaryKey(),
+  totalAmount: integer("total_amount").notNull(),
+  paidAmount: integer("paid_amount").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at")
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+const securityDepositEnum = pgEnum("status", ["pending", "paid", "lost"]);
+
+export const securityDepositTable = pgTable("security_deposit", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  status: securityDepositEnum("status").notNull().default("pending"),
+  warningLevel: integer("warning_level").notNull().default(0),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const TranscationTable = pgTable("transaction", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
   amount: integer("amount").notNull(),
   token: text("token").notNull(),
   verified: boolean("verified").notNull().default(false),
+  invoiceUrl: text("invoice_url").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const AgreementTable = pgTable("agreement", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
+  agreementUrl: text("agreement_url").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
-});
-
-export const agreementTable = pgTable("agreement", {
-  id: serial("id").primaryKey(),
-  guestName: text("guest_name").notNull(),
-  guestAddress: text("guest_address").notNull(),
-  agreementDate: date("agreement_date").notNull(),
-  duration: integer("duration").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at")
-    .notNull()
-    .$onUpdate(() => new Date()),
-});
-
-export const tempConfirmationTable = pgTable("temp_confirmation", {
-  id: serial("id").primaryKey(),
-  guestName: text("guest_name").notNull(),
-  guestEmail: text("guest_email").notNull(),
-  guestPhone: text("guest_phone").notNull(),
-  room: text("room_number").notNull(),
-  checkIn: date("check_in").notNull(),
-  checkOut: date("check_out").notNull(),
-  totalAmount: integer("total_amount").notNull(),
 });

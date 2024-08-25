@@ -4,7 +4,6 @@ import { useContext, useState } from "react";
 import { addDays, format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { DateRange } from "react-day-picker";
-import { useQueryParam } from "nextjs-query-param";
 import { z } from "zod";
 
 import { cn } from "@/lib/utils";
@@ -91,5 +90,44 @@ export default function DatePickerWithRange({
         </PopoverContent>
       </Popover>
     </div>
+  );
+}
+
+interface DatePickerProps {
+  selected: Date | undefined;
+  onChange: (date: Date | undefined) => void;
+  placeholderText: string;
+}
+
+export function DatePicker({
+  selected,
+  onChange,
+  placeholderText,
+  ...props
+}: DatePickerProps) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant={"outline"}
+          className={cn(
+            "w-[280px] justify-start text-left font-normal",
+            !selected && "text-muted-foreground",
+          )}
+        >
+          <CalendarIcon className="mr-2 h-4 w-4" />
+          {selected ? format(selected, "PPP") : <span>{placeholderText}</span>}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0">
+        <Calendar
+          mode="single"
+          selected={selected}
+          onSelect={onChange}
+          {...props}
+          autoFocus
+        />
+      </PopoverContent>
+    </Popover>
   );
 }

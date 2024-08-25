@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <>
       <div className="flex flex-col gap-3">
-        <h3 className="text-3xl lg:text-6xl text-red-500">Contact Us</h3>
+        <h3 className="text-3xl lg:text-6xl text-primary">Contact Us</h3>
         <div className="text-lg flex items-center gap-1 ">
           <Phone />
           <p>+91 8791476473</p>

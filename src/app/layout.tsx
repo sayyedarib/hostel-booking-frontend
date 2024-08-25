@@ -7,9 +7,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
-import { CurrentBookingProvider } from "@/contexts/CurrentBookingContext";
 
-const inter = Playfair_Display({ subsets: ["latin"], weight: "400" });
+const inter = Playfair_Display({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Hostel in Aligarh",
@@ -32,11 +31,9 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <CurrentBookingProvider>
-              <Header className="fixed top-0 left-0 right-0 z-50" />
-              {children}
-              <SpeedInsights />
-            </CurrentBookingProvider>
+            <Header className="fixed top-0 left-0 right-0 z-50" />
+            {children}
+            <SpeedInsights />
           </ThemeProvider>
         </body>
       </html>

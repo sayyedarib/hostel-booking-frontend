@@ -3,10 +3,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { UserJSON, WebhookEvent } from "@clerk/nextjs/server";
 
-import {
-  checkIfGuestExistsByClerkId,
-  createGuestWithClerk,
-} from "@/db/queries";
+import { checkUserExists, createUser } from "@/db/queries";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
@@ -68,17 +65,17 @@ export async function POST(req: Request) {
     phone_numbers,
   } = evt.data as UserJSON;
 
-  let userInfo = await checkIfGuestExistsByClerkId(id);
+  let userInfo = await checkUserExists(id);
 
   if (eventType === "user.created") {
     const newUser = {
-      name: first_name + " " + last_name,
-      email: email_addresses[0]?.email_address as string,
-      googlePic: image_url,
-      phone: phone_numbers[0]?.phone_number as string,
       clerkId: id,
+      name: first_name + " " + last_name,
+      phone: phone_numbers[0]?.phone_number as string,
+      email: email_addresses[0]?.email_address as string,
+      imageUrl: image_url,
     };
-    userInfo = await createGuestWithClerk(newUser);
+    userInfo = await createUser(newUser);
   }
 
   return new Response("", { status: 200 });
