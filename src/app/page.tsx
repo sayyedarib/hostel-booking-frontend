@@ -4,7 +4,6 @@ import { useInView } from "react-intersection-observer";
 
 import { Button } from "@/components/ui/button";
 import Header from "@/components/header";
-import SearchBar from "@/components/search-bar"; // Updated import
 import HeroSection from "@/components/landing-page/hero-section";
 import OurServices from "@/components/landing-page/our-services";
 import Gallery from "@/components/landing-page/gallery";

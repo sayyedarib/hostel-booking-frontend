@@ -38,7 +38,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import BedReservationCard from "@/components/bed-reservation-card";
 
 export default function Room({ params }: { params: { roomid: string } }) {
   const pathname = usePathname();

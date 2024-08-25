@@ -54,7 +54,9 @@ export default function CartPage() {
 
       setCartItems(enhancedData);
       setCartItemsCount(enhancedData.length);
-      setSecurityDepositStatus(securityDepositData);
+      setSecurityDepositStatus(
+        securityDepositData as "paid" | "pending" | "lost",
+      );
     };
 
     fetchCartItems();

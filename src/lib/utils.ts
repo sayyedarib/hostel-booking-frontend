@@ -104,6 +104,7 @@ export const checkOverlap = (
 
 export const getFirstAvailableRange = (
   occupiedDateRanges: OccupiedDateRange[],
+  duration = 2,
 ): DateRange | undefined => {
   if (!occupiedDateRanges?.length) return undefined;
 
@@ -125,9 +126,8 @@ export const getFirstAvailableRange = (
       { from: firstAvailableDate, to: firstAvailableDate },
       occupiedDateRanges,
     ) &&
-    availableDays < 7
+    availableDays < duration
   ) {
-    firstAvailableDate.setDate(firstAvailableDate.getDate() + 1);
     availableDays++;
   }
 

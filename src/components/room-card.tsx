@@ -21,7 +21,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
     <Card className="w-auto sm:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl">
       <Link href="/">
         <Image
-          src="/bg.webp"
+          src={roomData.imageUrls?.[0] || "/bg.webp"}
           height="1000"
           width="1000"
           className="h-64 w-full object-cover rounded-t-xl"
