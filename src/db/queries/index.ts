@@ -300,6 +300,7 @@ export const getBedData = async (roomId: number) => {
         bedCode: BedTable.bedCode,
         dailyRent: BedTable.dailyRent,
         monthlyRent: BedTable.monthlyRent,
+        bedType: BedTable.type,
         occupiedDateRanges: sql<OccupiedDateRange[]>`
           array_agg(json_build_object(
             'startDate', ${BedBookingTable.checkIn},

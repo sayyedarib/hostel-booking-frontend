@@ -53,7 +53,7 @@ export const AddToCartStep1 = ({
 
   return (
     <>
-      <div className="mx-auto w-full md:w-1/2 lg:w-1/3 p-6 h-full bg-white shadow-lg rounded-lg">
+      <div className="mx-auto w-full md:w-1/2 lg:w-1/3 p-6 h-full bg-white md:shadow-lg rounded-lg">
         <DrawerHeader>
           <DrawerTitle className="text-2xl font-semibold">
             Select Your Bed
@@ -90,11 +90,10 @@ export const AddToCartStep1 = ({
                 onClick={() => handleBedSelect(bed.id)}
               >
                 <span>
-                  <b>Bed Code: </b>
-                  {bed.bedCode}
+                  {bed.bedCode} | {bed.bedType}
                 </span>
                 <span>
-                  <b>Rent: </b> {bed.dailyRent}/day - {bed.monthlyRent}/month
+                  ₹{bed.dailyRent}/day - ₹{bed.monthlyRent}/month
                 </span>
               </div>
             ))}

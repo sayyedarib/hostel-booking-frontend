@@ -8,6 +8,7 @@ export interface BedInRoomCard {
   bedCode: string;
   dailyRent: number;
   monthlyRent: number;
+  bedType: string;
   status: string;
   occupiedDateRanges: OccupiedDateRange[];
 }

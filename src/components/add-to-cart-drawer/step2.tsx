@@ -165,14 +165,14 @@ export const AddToCartStep2 = ({
             </TabsList>
             <TabsContent value="days">
               {" "}
-              <div className="flex flex-col w-full items-center mt-4">
+              <div className="flex flex-col w-full items-center mt-4 text-sm md:text-md">
                 <span className="flex items-center">
                   Total days:{" "}
                   {differenceInDays(
                     date?.to || new Date(),
                     date?.from || new Date(),
                   )}{" "}
-                  | Total rent: <IndianRupee size={14} />
+                  | Total rent: ₹
                   {
                     calculateRent(bedData?.monthlyRent, checkIn, checkOut)
                       .totalRent
@@ -198,7 +198,10 @@ export const AddToCartStep2 = ({
                 />
               </div>
             </TabsContent>
-            <TabsContent value="months" className="space-y-2 flex flex-col text-md md:text-2xl">
+            <TabsContent
+              value="months"
+              className="space-y-2 flex flex-col text-sm md:text-lg"
+            >
               <span>
                 <b>NOTE:</b>
                 Only you will have to pay for the first month in advance
@@ -206,7 +209,7 @@ export const AddToCartStep2 = ({
               <div className="space-x-11">
                 <span>Total days: {Number(numberOfMonths) * 30}</span>
                 <span>
-                  Total rent:{" "}
+                  Total rent: ₹
                   {
                     calculateRent(bedData?.monthlyRent, checkIn, checkOut)
                       .totalRent
