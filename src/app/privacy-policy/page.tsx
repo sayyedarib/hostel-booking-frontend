@@ -15,7 +15,7 @@ export default async function PrivacyPolicy() {
 
       <section className="mb-6">
         <h2 className="text-2xl font-semibold mb-3">1. Introduction</h2>
-        <p>AligarhHostel.com ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and share information about you when you use our website and services.</p>
+        <p>AligarhHostel.com (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;) is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and share information about you when you use our website and services.</p>
       </section>
 
       <section className="mb-6">
@@ -64,7 +64,7 @@ export default async function PrivacyPolicy() {
 
       <section className="mb-6">
         <h2 className="text-2xl font-semibold mb-3">8. Contact Us</h2>
-        <p>For questions about this policy, contact us at <a href="mailto:contact@aligarhhostel.com" className="text-blue-600 hover:underline">support@aligarhhostel.com</a>.</p>
+        <p>For questions about this policy, contact us at <a href="mailto:support@aligarhhostel.com" className="text-blue-600 hover:underline">support@aligarhhostel.com</a>.</p>
       </section>
 
       <Link href="/" className="text-blue-600 hover:underline">
