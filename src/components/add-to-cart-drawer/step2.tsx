@@ -206,7 +206,7 @@ export const AddToCartStep2 = ({
                 <b>NOTE:</b>
                 Only you will have to pay for the first month in advance
               </span>
-              <div className="space-x-11">
+              <div className="flex justify-between">
                 <span>Total days: {Number(numberOfMonths) * 30}</span>
                 <span>
                   Total rent: ₹
@@ -216,7 +216,7 @@ export const AddToCartStep2 = ({
                   }
                 </span>
               </div>
-              <div className="space-x-4 md:space-x-8 lg:space-x-11">
+              <div className="flex justify-between">
                 <span>CheckIn: {formatDate(checkIn)} </span>
                 <span>CheckOut: {formatDate(checkOut)}</span>
               </div>
