@@ -1,5 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
-
 const nodemailer = require("nodemailer");
 
 export const transporter = nodemailer.createTransport({
@@ -16,6 +14,3 @@ export const transporter = nodemailer.createTransport({
   },
 });
 
-export const getClerkId = () => {
-  return auth().userId;
-};

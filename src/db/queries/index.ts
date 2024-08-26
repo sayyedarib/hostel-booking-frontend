@@ -4,7 +4,6 @@ import { eq, and, count, sql, inArray } from "drizzle-orm";
 import type { OccupiedDateRange } from "@/interface";
 
 import { logger } from "@/lib/utils";
-import { getClerkId } from "@/lib/server-utils";
 import { db } from "@/db";
 import {
   AddressBookTable,
@@ -25,6 +24,12 @@ import {
   CreateGuest,
   CreateAddress,
 } from "@/interface";
+
+import { auth } from "@clerk/nextjs/server";
+
+const getClerkId = () => {
+  return auth().userId;
+};
 
 export const createUser = async ({
   clerkId,
