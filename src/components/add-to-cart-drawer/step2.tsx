@@ -198,7 +198,7 @@ export const AddToCartStep2 = ({
                 />
               </div>
             </TabsContent>
-            <TabsContent value="months" className="space-y-2 flex flex-col">
+            <TabsContent value="months" className="space-y-2 flex flex-col text-md md:text-2xl">
               <span>
                 <b>NOTE:</b>
                 Only you will have to pay for the first month in advance
@@ -213,7 +213,7 @@ export const AddToCartStep2 = ({
                   }
                 </span>
               </div>
-              <div className="space-x-11">
+              <div className="space-x-4 md:space-x-8 lg:space-x-11">
                 <span>CheckIn: {formatDate(checkIn)} </span>
                 <span>CheckOut: {formatDate(checkOut)}</span>
               </div>
