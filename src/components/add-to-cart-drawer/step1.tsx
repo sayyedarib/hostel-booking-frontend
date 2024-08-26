@@ -79,7 +79,7 @@ export const AddToCartStep1 = ({
               <span>Available</span>
             </div>
           </div>
-          <div className="grid grid-cols-2 grid-rows-2 gap-4">
+          <div className="grid grid-cols-2 grid-rows-2 gap-4 text-sm md:text-md">
             {bedData?.map((bed, index) => (
               <div
                 key={index}
