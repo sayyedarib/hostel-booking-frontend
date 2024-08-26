@@ -33,7 +33,7 @@ export default function Rooms() {
 
   return (
     <div className="flex justify-center items-center">
-      <div className="mt-12 relative flex flex-wrap gap-10 items-center justify-center -z-1">
+      <div className="my-12 relative flex flex-wrap gap-10 items-center justify-center -z-1">
         {rooms.map((room) => (
           <RoomCardComponent key={room.roomCode} roomData={room} />
         ))}
