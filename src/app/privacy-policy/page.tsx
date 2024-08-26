@@ -1,7 +1,7 @@
 "use server"
 import Link from 'next/link';
 
-export default function PrivacyPolicy() {
+export default async function PrivacyPolicy() {
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -64,7 +64,7 @@ export default function PrivacyPolicy() {
 
       <section className="mb-6">
         <h2 className="text-2xl font-semibold mb-3">8. Contact Us</h2>
-        <p>For questions about this policy, contact us at <a href="mailto:contact@aligarhhostel.com" className="text-blue-600 hover:underline">contact@aligarhhostel.com</a>.</p>
+        <p>For questions about this policy, contact us at <a href="mailto:contact@aligarhhostel.com" className="text-blue-600 hover:underline">support@aligarhhostel.com</a>.</p>
       </section>
 
       <Link href="/" className="text-blue-600 hover:underline">
