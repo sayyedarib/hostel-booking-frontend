@@ -1,7 +1,7 @@
 export interface CreateUser {
   clerkId: string;
   name: string;
-  phone: string;
+  phone?: string;
   email: string;
   dob?: Date;
   imageUrl: string;

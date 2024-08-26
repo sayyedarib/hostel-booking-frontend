@@ -29,7 +29,7 @@ import {
 export const createUser = async ({
   clerkId,
   name,
-  phone,
+  phone="",
   email,
   imageUrl,
 }: CreateUser) => {

@@ -8,7 +8,7 @@ import { checkUserExists, createUser } from "@/db/queries";
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
   const CLERK_WEBHOOK_SECRET = process.env.NEXT_PUBLIC_CLERK_WEBHOOK_SECRET;
-
+  console.log("CLERK_WEBHOOK_SECRET", CLERK_WEBHOOK_SECRET);
   if (!CLERK_WEBHOOK_SECRET) {
     throw new Error(
       "Please add CLERK_WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local",
@@ -62,16 +62,15 @@ export async function POST(req: Request) {
     last_name,
     email_addresses,
     image_url,
-    phone_numbers,
   } = evt.data as UserJSON;
 
   let userInfo = await checkUserExists(id);
-
+  console.log("userInfo", userInfo);
   if (eventType === "user.created") {
+    console.log("creating user....");
     const newUser = {
       clerkId: id,
       name: first_name + " " + last_name,
-      phone: phone_numbers[0]?.phone_number as string,
       email: email_addresses[0]?.email_address as string,
       imageUrl: image_url,
     };
