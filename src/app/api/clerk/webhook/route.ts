@@ -7,7 +7,7 @@ import { checkUserExists, createUser } from "@/db/queries";
 
 export async function POST(req: Request) {
   // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
-  const CLERK_WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
+  const CLERK_WEBHOOK_SECRET = process.env.NEXT_PUBLIC_CLERK_WEBHOOK_SECRET;
 
   if (!CLERK_WEBHOOK_SECRET) {
     throw new Error(
