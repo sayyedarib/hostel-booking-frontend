@@ -1,5 +1,4 @@
-// app/services/page.tsx
-
+"use server"
 import { Check } from 'lucide-react';
 
 const services = [
