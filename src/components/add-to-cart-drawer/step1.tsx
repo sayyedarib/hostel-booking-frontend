@@ -93,7 +93,7 @@ export const AddToCartStep1 = ({
                   {bed.bedCode} | {bed.bedType}
                 </span>
                 <span>
-                  ₹{bed.dailyRent}/day - ₹{bed.monthlyRent}/month
+                  ₹{bed.dailyRent}/dy - ₹{bed.monthlyRent}/mn
                 </span>
               </div>
             ))}
