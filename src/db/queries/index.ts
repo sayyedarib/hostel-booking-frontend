@@ -72,6 +72,7 @@ export const checkUserExists = async (clerkId: string) => {
 export const getUserId = async () => {
   try {
     const clerkId = getClerkId();
+    logger("info", "Fetching user ID", { clerkId });  
     if (!clerkId) {
       logger("info", "Clerk ID not found");
       return { status: "error", data: null };
@@ -81,9 +82,9 @@ export const getUserId = async () => {
       .select()
       .from(UserTable)
       .where(eq(UserTable.clerkId, clerkId));
-
-    logger("info", "UserId found", { userId: user[0].id, clerkId });
-    return { status: "success", data: user[0].id };
+    logger("info", "User have been found", user);
+    logger("info", "UserId found", { userId: user[0]?.id, clerkId });
+    return { status: "success", data: user[0]?.id };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
