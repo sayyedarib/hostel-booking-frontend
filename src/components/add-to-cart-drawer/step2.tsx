@@ -24,6 +24,7 @@ import {
   calculateRent,
   checkOverlap,
   formatDate,
+  formatDateWithoutYear,
   getFirstAvailableRange,
 } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -200,13 +201,13 @@ export const AddToCartStep2 = ({
             </TabsContent>
             <TabsContent
               value="months"
-              className="space-y-2 flex flex-col text-sm md:text-lg"
+              className="space-y-2 flex flex-col text-sm md:text-md"
             >
               <span>
                 <b>NOTE:</b>
                 Only you will have to pay for the first month in advance
               </span>
-              <div className="flex justify-between">
+              <div className="flex justify-between w-full">
                 <span>Total days: {Number(numberOfMonths) * 30}</span>
                 <span>
                   Total rent: ₹
@@ -216,9 +217,9 @@ export const AddToCartStep2 = ({
                   }
                 </span>
               </div>
-              <div className="flex justify-between">
-                <span>CheckIn: {formatDate(checkIn)} </span>
-                <span>CheckOut: {formatDate(checkOut)}</span>
+              <div className="flex justify-between w-full">
+                <span>CheckIn: {formatDateWithoutYear(checkIn)} </span>
+                <span>CheckOut: {formatDateWithoutYear(checkOut)}</span>
               </div>
               <Separator className="my-8" />
               <DropdownMenu>

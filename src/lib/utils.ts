@@ -19,6 +19,14 @@ export const formatDate = (date: Date): string => {
   });
 };
 
+export const formatDateWithoutYear = (date: Date): string => {
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export function absoluteUrl(path: string) {
   return `${process.env.NEXT_PUBLIC_APP_URL}${path}`;
 }
