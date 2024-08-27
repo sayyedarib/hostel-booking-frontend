@@ -35,7 +35,7 @@ export default function BedTypes() {
               height={1000}
               width={1000}
               alt={bedType.name}
-              className="rounded-xl h-[35vh] w-[50vh] mb-4 md:mb-0"
+              className="rounded-xl h-[32vh] md:h-[35vh] w-[50vh] mb-4 md:mb-0"
             />
             <div className="flex flex-col items-center md:items-start">
               <h3 className="text-2xl md:text-3xl lg:text-4xl font-semibold md:font-bold text-primary mb-2">
