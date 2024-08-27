@@ -80,7 +80,7 @@ export default function Header({
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-14 left-2 right-2 bg-neutral-100/50 backdrop-blur-3xl rounded-3xl rounded-t z-20 shadow-md">
+        <div className="md:hidden sticky top-14 left-2 right-2 bg-neutral-100/50 backdrop-blur-3xl rounded-3xl rounded-t z-20 shadow-md">
           <ul className="flex flex-col items-center py-4">
             <li className="py-2">
               <Link href="/rooms" onClick={toggleMenu}>
