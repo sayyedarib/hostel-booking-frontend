@@ -1,4 +1,6 @@
 import { Home, Phone } from "lucide-react";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -11,12 +13,21 @@ export default function Footer() {
           <Phone />
           <p>+91 8791476473</p>
         </div>
-        <div className="text-lg flex items-center gap-1 ">
-          <Home size="24" />
+        <div className="text-lg flex items-center gap-1 max-w-[40vw]">
+          <Home size="48" />
           <p>
-            Campus View Appartment, beside Kings Academy, Saheh bagh, Aligarh,
-            UP
+            Khan Group of PG and Hostels (Boys & Girls), Campus View Appartment,
+            Near Sultan Jahan Coaching Center, beside Wings Academy, Shamshad
+            Market, Aligarh, Uttar Pradesh 202002
           </p>
+        </div>
+        <div>
+          <Button variant={"link"}>
+            <Link href="/privacy-policy">Privacy Policy</Link>
+          </Button>
+          <Button variant={"link"}>
+            <Link href="/terms-of-service">Terms of Service</Link>
+          </Button>
         </div>
       </div>
       <iframe

@@ -68,10 +68,10 @@ const faqData = [
   {
     question: "Is there requirement of any document to book bed?",
     answer:
-      "Yes, you need to provide a photo of valid ID proof while adding to into the cart.",
+      "Yes, you need to provide a photo of valid ID proof while adding bed into the cart.",
   },
   {
-    question: "can I book more then one bed at a time?",
+    question: "Can I book more then one bed at a time?",
     answer:
       "Yes, you can book multiple beds at a time. Just add them into the cart and proceed with the payment.",
   },
@@ -83,6 +83,6 @@ const faqData = [
   {
     question: "Can I smoke or drink?",
     answer:
-      "Smoking and drinking is not allowed in the hostel premises. If you are found smoking, you will be fined.",
+      "Smoking and drinking is not allowed in the hostel premises. If you are found doing so, you will be fined.",
   },
 ];

@@ -119,7 +119,7 @@ const ContactInfoSection = () => {
           icon={<MapPin className="h-6 w-6" />}
           title="Address"
           details={[
-            "Near Sultan Jahan Coaching Center, beside Wings Academy, Shamshad Market, Aligarh, Uttar Pradesh 202002",
+            "Khan Group of PG and Hostels (Boys & Girls), Campus View Appartment, Near Sultan Jahan Coaching Center, beside Wings Academy, Shamshad Market, Aligarh, Uttar Pradesh 202002",
           ]}
         />
         {/* Add other contact information sections here */}
