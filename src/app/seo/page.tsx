@@ -1,5 +1,5 @@
 "use server";
-export default function SEOPage() {
+export default async function SEOPage() {
   return (
     <div>
       <h1>SEO Optimization for Aligarh Hostel Management</h1>
