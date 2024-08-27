@@ -58,7 +58,11 @@ export const AddToCartStep3 = ({
     setUploading(true);
     const fileName = `${name}_${Date.now()}`;
     toast({
-      title: "Uploading guest image",
+      description: (
+        <div className="flex items-center">
+          <LoaderCircle className="animate-spin mr-2" /> Uploading guest image
+        </div>
+      ),
     });
     logger("info", "Uploading guest image", { fileName });
     const { data, error } = await supabase.storage
@@ -89,7 +93,11 @@ export const AddToCartStep3 = ({
 
     const fileName = `${name}_${Date.now()}`;
     toast({
-      title: "Uploading aadhaar image",
+      description: (
+        <div className="flex items-center">
+          <LoaderCircle className="animate-spin mr-2" /> Uploading aadhaar image
+        </div>
+      ),
     });
     logger("info", "Uploading aadhaar image", { fileName });
 
@@ -135,7 +143,11 @@ export const AddToCartStep3 = ({
     }
 
     toast({
-      title: "Creating guest",
+      description: (
+        <div className="flex items-center">
+          <LoaderCircle className="animate-spin mr-2" /> Creating guest
+        </div>
+      ),
     });
     logger("info", "Creating guest", { name, phone, email });
     setCreatingGuest(true);

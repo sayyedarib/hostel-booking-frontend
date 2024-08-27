@@ -65,7 +65,11 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
         }
 
         toast({
-          title: `Uploading ${field}`,
+          description: (
+            <div className="flex items-center">
+              <LoaderCircle className="animate-spin mr-2" /> Uploading {field}
+            </div>
+          ),
         });
         logger("info", `Uploading ${field}`);
         setImageUploading(true);
