@@ -13,7 +13,7 @@ export default function Footer() {
           <Phone />
           <p>+91 8791476473</p>
         </div>
-        <div className="text-lg flex items-center gap-1 max-w-[40vw]">
+        <div className="text-lg flex items-center gap-1 max-w-full lg:max-w-[40vw]">
           <Home size="48" />
           <p>
             Khan Group of PG and Hostels (Boys & Girls), Campus View Appartment,
