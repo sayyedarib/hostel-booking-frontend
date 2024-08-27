@@ -28,7 +28,7 @@ export default function RootLayout({
         <body className={cn(inter.className, "relative")}>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >
