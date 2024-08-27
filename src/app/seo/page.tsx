@@ -4,13 +4,15 @@ export default async function SEOPage() {
     <div>
       <h1>SEO Optimization for Aligarh Hostel Management</h1>
       <p>
-        Welcome to <strong>Aligarh Hostel</strong>, the leading choice for
-        affordable and comfortable accommodations in Aligarh. Our hostel offers
-        a variety of room types, including <strong>2-seater</strong>,{" "}
-        <strong>3-seater</strong>, and <strong>4-seater</strong> options, all
-        featuring bunk beds. With competitive rates starting at just{" "}
-        <strong>INR 300 per day</strong> or <strong>INR 4500 per month</strong>,
-        we provide exceptional value for students and professionals alike.
+        Welcome to <strong>Aligarh Hostel</strong>, also known as{" "}
+        <strong>Khan group of Hostels and Guest House</strong>, the leading
+        choice for affordable and comfortable accommodations in Aligarh. Our
+        hostel offers a variety of room types, including{" "}
+        <strong>2-seater</strong>, <strong>3-seater</strong>, and{" "}
+        <strong>4-seater</strong> options, all featuring bunk beds. With
+        competitive rates starting at just <strong>INR 300 per day</strong> or{" "}
+        <strong>INR 4500 per month</strong>, we provide exceptional value for
+        students and professionals alike.
       </p>
 
       <h2>Outstanding Amenities</h2>
@@ -50,7 +52,10 @@ export default async function SEOPage() {
         <strong>best hotel</strong> option for students and professionals. Our
         commitment to quality living standards, safety, and a conducive study
         environment makes us the top choice for those seeking accommodation in
-        Aligarh.
+        Aligarh. Whether you are looking for a{" "}
+        <strong>hostel in Aligarh</strong>,{" "}
+        <strong>guest house in Aligarh</strong>, or{" "}
+        <strong>PG in Aligarh</strong>, we have you covered.
       </p>
 
       <h2>Frequently Asked Questions</h2>
@@ -84,7 +89,8 @@ export default async function SEOPage() {
         For further inquiries or to learn more about our hostel services,
         including our in-house hygienic food options, feel free to reach out via
         our <a href="/contact">Contact Page</a>. We look forward to welcoming
-        you to Aligarh Hostel!
+        you to Aligarh Hostel, the best and cheapest hostel in Aligarh, also
+        known as Khan group of Hostels and Guest House.
       </p>
     </div>
   );
