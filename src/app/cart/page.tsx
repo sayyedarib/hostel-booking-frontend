@@ -16,6 +16,7 @@ import { calculateRent, logger } from "@/lib/utils";
 import { CartItem } from "@/interface";
 import { Separator } from "@/components/ui/separator";
 import { differenceInDays } from "date-fns";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function CartPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function CartPage() {
     "cartItemsCount",
     parseAsInteger.withDefault(0),
   );
+  const { toast } = useToast();
   const [securityDepositStatus, setSecurityDepositStatus] = useState<
     "paid" | "pending" | "lost" | null
   >("pending");
@@ -70,7 +72,11 @@ export default function CartPage() {
       setCartItemsCount(cartItemsCount - 1);
       setCartItems(cartItems.filter((item) => item.id !== cartId));
     } else {
-      // TODO: Add toast
+      toast({
+        variant: "destructive",
+        title: "Something went wrong",
+        description: "Failed to remove item from cart, Please try again later",
+      });
       logger("error", "Failed to remove item from cart");
       return;
     }

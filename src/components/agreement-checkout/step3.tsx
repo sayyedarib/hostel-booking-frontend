@@ -19,6 +19,8 @@ import {
 import { logger, calculateRent, generateToken } from "@/lib/utils";
 import ForwardedPrintableForm from "../printable-registration-form";
 import PrintableInvoice from "../printable-invoice";
+import { Description } from "@radix-ui/react-dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 export default function Step3({
   handleNext,
@@ -27,6 +29,7 @@ export default function Step3({
   handleNext: () => void;
   handlePrev: () => void;
 }) {
+  const { toast } = useToast();
   const supabase = createClient();
 
   const agreementRef = useRef<HTMLDivElement>(null);
@@ -195,6 +198,7 @@ export default function Step3({
       logger("error", "Error in generating or uploading PDF", error as Error);
     }
   }, []);
+
   const handleInvoice = useReactToPrint({
     content: () => invoiceRef.current,
     onBeforePrint: handleBeforePrintInvoice,
@@ -222,8 +226,13 @@ export default function Step3({
 
       if (result?.status === "success") {
         // Send confirmation emails
+
         if (!result?.data?.id) {
-          // TODO: Add toast
+          toast({
+            variant: "destructive",
+            title: "Booking ID is missing in response",
+            description: `${result}`,
+          });
           logger("error", "Booking ID is missing in response", result);
           setLoading(false);
           return;

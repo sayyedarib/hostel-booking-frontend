@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 import { updateUserSignature } from "@/db/queries";
 import { logger } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 const checkboxItems = [
   {
@@ -49,6 +50,7 @@ export default function Step2({
   const signatureRef = useRef<SignatureCanvas>(null);
   const [signature, setSignature] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
 
   const [checkedItems, setCheckedItems] = useState(
     checkboxItems.reduce(
@@ -119,7 +121,10 @@ export default function Step2({
 
         if (status !== "success") {
           logger("error", "Failed to update user signature");
-          // TODO: Add toast
+          toast({
+            variant: "destructive",
+            title: "Failed to update user signature",
+          });
           return;
         }
 

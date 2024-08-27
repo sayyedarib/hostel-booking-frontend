@@ -37,6 +37,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "../ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 export const AddToCartStep2 = ({
   bedData,
@@ -51,6 +52,8 @@ export const AddToCartStep2 = ({
     bedData?.occupiedDateRanges,
     30,
   );
+
+  const { toast } = useToast();
 
   const [checkIn, setCheckIn] = useQueryState(
     "checkIn",
@@ -141,7 +144,10 @@ export const AddToCartStep2 = ({
     const overlap = checkOverlap({ from, to }, bedData?.occupiedDateRanges);
 
     if (overlap) {
-      // TODO: Add toast notification that the selected date range is not available
+      toast({
+        variant: "destructive",
+        title: "Selected date range is not avaliable",
+      });
       return;
     }
     setCheckOut(to);
