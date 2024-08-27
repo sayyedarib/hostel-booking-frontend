@@ -85,7 +85,7 @@ const ContactPage = () => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full rounded bg-blue-500 text-white px-6 py-2.5 text-xs font-medium uppercase leading-normal transition duration-200 ease-in-out hover:bg-sky-600 focus:bg-sky-700"
+                  className="w-full rounded bg-blue-500 mt-4 text-white px-6 py-2.5 text-xs font-medium uppercase leading-normal transition duration-200 ease-in-out hover:bg-sky-600 focus:bg-sky-700"
                 >
                   Send
                 </Button>
