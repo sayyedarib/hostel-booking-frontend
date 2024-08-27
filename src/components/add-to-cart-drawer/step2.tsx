@@ -37,6 +37,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { Label } from "../ui/label";
+import { useToast } from "@/components/ui/use-toast";
 
 export const AddToCartStep2 = ({
   bedData,
@@ -49,28 +50,30 @@ export const AddToCartStep2 = ({
 }) => {
   const firstAvailableRange = getFirstAvailableRange(
     bedData?.occupiedDateRanges,
-    30,
+    30
   );
+
+  const { toast } = useToast();
 
   const [checkIn, setCheckIn] = useQueryState(
     "checkIn",
-    parseAsIsoDateTime.withDefault(firstAvailableRange?.from || new Date()),
+    parseAsIsoDateTime.withDefault(firstAvailableRange?.from || new Date())
   );
   const [checkOut, setCheckOut] = useQueryState(
     "checkOut",
     parseAsIsoDateTime.withDefault(
-      firstAvailableRange?.to || addDays(new Date(), 30),
-    ),
+      firstAvailableRange?.to || addDays(new Date(), 30)
+    )
   );
   const [numberOfMonths, setNumberOfMonths] = useQueryState(
     "numberOfMonths",
-    parseAsString.withDefault("1"),
+    parseAsString.withDefault("1")
   );
 
   const [totalRent, setTotalRent] = useQueryState("totalRent", parseAsInteger);
   const [payableRent, setPayableRent] = useQueryState(
     "payableRent",
-    parseAsInteger,
+    parseAsInteger
   );
 
   const [date, setDate] = useState<DateRange | undefined>({
@@ -126,7 +129,7 @@ export const AddToCartStep2 = ({
         calculateRent(
           bedData?.monthlyRent,
           selectedRange.from || new Date(),
-          selectedRange.to || new Date(),
+          selectedRange.to || new Date()
         );
 
       setPayableRent(payableAmount);
@@ -141,7 +144,10 @@ export const AddToCartStep2 = ({
     const overlap = checkOverlap({ from, to }, bedData?.occupiedDateRanges);
 
     if (overlap) {
-      // TODO: Add toast notification that the selected date range is not available
+      toast({
+        variant: "destructive",
+        title: "Selected date range is not avaliable",
+      });
       return;
     }
     setCheckOut(to);
@@ -171,7 +177,7 @@ export const AddToCartStep2 = ({
                   Total days:{" "}
                   {differenceInDays(
                     date?.to || new Date(),
-                    date?.from || new Date(),
+                    date?.from || new Date()
                   )}{" "}
                   | Total rent: ₹
                   {
