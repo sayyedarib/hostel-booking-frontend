@@ -1,9 +1,12 @@
+"use server"
+
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Container from "@/components/ui/container";
+import Link from "next/link";
 
-export default function AboutPage() {
+export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Container>
@@ -117,7 +120,11 @@ export default function AboutPage() {
             We are always looking for passionate students to join our hostel. If
             you are dedicated to your studies, we would love to have you.
           </p>
-          <Button className="mt-8">Contact Us</Button>
+          <Button className="mt-8">
+            <Link href="/contact">
+              Contact Us
+            </Link>
+          </Button>
         </section>
       </Container>
     </div>
