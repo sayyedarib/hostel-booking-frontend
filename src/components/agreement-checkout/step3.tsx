@@ -19,8 +19,6 @@ import {
 import { logger, calculateRent, generateToken } from "@/lib/utils";
 import ForwardedPrintableForm from "../printable-registration-form";
 import PrintableInvoice from "../printable-invoice";
-import { Description } from "@radix-ui/react-dialog";
-import { useToast } from "@/components/ui/use-toast";
 
 export default function Step3({
   handleNext,
@@ -35,7 +33,7 @@ export default function Step3({
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const [agreementForm, setAgreementForm] = useState<AgreementForm | null>(
-    null
+    null,
   );
 
   const [securityDeposit, setSecurityDeposit] = useState<number>(0);
@@ -62,12 +60,12 @@ export default function Step3({
           totalRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut)
+            new Date(guest.checkOut),
           ).totalRent,
           payableRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut)
+            new Date(guest.checkOut),
           ).payableRent,
         })),
       };
@@ -76,8 +74,8 @@ export default function Step3({
       setTotalAmount(
         enhancedAgreementData.guests.reduce(
           (acc, item) => acc + item.payableRent,
-          0
-        )
+          0,
+        ),
       );
       setAgreementForm(agreementData);
     };
@@ -100,7 +98,7 @@ export default function Step3({
         if (publicUrlData) {
           logger(
             "info",
-            `File uploaded successfully: ${publicUrlData.publicUrl}`
+            `File uploaded successfully: ${publicUrlData.publicUrl}`,
           );
           if (bucket === "invoice") {
             setInvoiceUrl(publicUrlData.publicUrl);
@@ -120,7 +118,7 @@ export default function Step3({
         throw error;
       }
     },
-    []
+    [],
   );
 
   const handleBeforePrintInvoice = useCallback(async () => {
@@ -178,7 +176,7 @@ export default function Step3({
         if (pdfBlob instanceof Blob) {
           logger(
             "info",
-            "PDF generated successfully, downloading agreement PDF"
+            "PDF generated successfully, downloading agreement PDF",
           );
           const link = document.createElement("a");
           link.href = URL.createObjectURL(pdfBlob);
@@ -222,17 +220,10 @@ export default function Step3({
         token,
       });
 
-      const { toast } = useToast();
-
       if (result?.status === "success") {
         // Send confirmation emails
-
         if (!result?.data?.id) {
-          toast({
-            variant: "destructive",
-            title: "Booking ID is missing in response",
-            description: `${result}`,
-          });
+          // TODO: Add toast
           logger("error", "Booking ID is missing in response", result);
           setLoading(false);
           return;

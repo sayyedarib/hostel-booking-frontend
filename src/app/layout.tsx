@@ -8,7 +8,6 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import { cn } from "@/lib/utils";
-import { Toaster } from "@/components/ui/toaster";
 
 const inter = Playfair_Display({ subsets: ["latin"] });
 
@@ -35,7 +34,6 @@ export default function RootLayout({
           >
             <Header className="fixed top-0 left-0 right-0 z-50" />
             {children}
-            <Toaster />
             <SpeedInsights />
             <Analytics />
           </ThemeProvider>

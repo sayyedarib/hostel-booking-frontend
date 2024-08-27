@@ -11,12 +11,9 @@ import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { updateUserSubProfile, createAddress } from "@/db/queries";
 import { logger } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
 
 export default function Step1({ handleNext }: { handleNext: () => void }) {
   const supabase = createClient();
-
-  const { toast } = useToast();
 
   const [formData, setFormData] = useState<UserSubProfile>({
     applicantPhoto: "",
@@ -36,7 +33,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
 
   const handleImageUpload = async (
     e: ChangeEvent<HTMLInputElement>,
-    field: string
+    field: string,
   ) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -64,9 +61,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
             return;
         }
 
-        toast({
-          title: `Uploading ${field}`,
-        });
+        // TODO: Add toast
         logger("info", `Uploading ${field}`);
         setImageUploading(true);
         // Upload file to the appropriate Supabase bucket
@@ -76,10 +71,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
         setImageUploading(false);
 
         if (error) {
-          toast({
-            variant: "destructive",
-            title: `Error uploading image: ${error}`,
-          });
+          // TODO: Add toast
           logger("error", "Error uploading image:", error);
           return;
         }
@@ -96,10 +88,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
             [field]: publicUrlData.publicUrl,
           }));
         } else {
-          toast({
-            variant: "destructive",
-            title: "Failed to get public URL of uploaded image",
-          });
+          // TODO: Add toast
           logger("error", "Failed to get public URL of uploaded image");
           return;
         }
@@ -109,17 +98,14 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
       } catch (error) {
         setImageUploading(false);
         logger("error", "Error uploading image:", error as Error);
-        toast({
-          variant: "destructive",
-          title: "Something went wrong",
-        });
+        // TODO: Add toast
         return;
       }
     }
   };
 
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -136,10 +122,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
       });
 
       if (!addressId) {
-        toast({
-          variant: "destructive",
-          title: "Failed to create address",
-        });
+        // TODO: add toast
         logger("error", "Failed to create address");
         return;
       }
@@ -157,10 +140,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
       });
 
       if (status !== "success") {
-        toast({
-          variant: "destructive",
-          title: "Failed to update user sub-profile",
-        });
+        // TODO: Add toast
         setLoading(false);
         logger("error", "Failed to update user sub-profile");
         return;
@@ -173,10 +153,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
       setLoading(false);
       logger("error", "Error updating user sub-profile:", error as Error);
 
-      toast({
-        variant: "destructive",
-        title: "Error updating user sub-profile:",
-      });
+      //   TODO: Add toast
       return;
     }
   };

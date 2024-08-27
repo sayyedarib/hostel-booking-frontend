@@ -8,24 +8,19 @@ import { getAllRoomCards } from "@/db/queries";
 import { RoomCardComponent } from "@/components/room-card";
 import { Button } from "@/components/ui/button";
 import { logger } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
 
 export default function Rooms() {
   const router = useRouter();
 
   const [rooms, setRooms] = useState<RoomCard[]>([]);
   const [fetching, setFetching] = useState(true);
-  const { toast } = useToast();
 
   useEffect(() => {
     const fetchRooms = async () => {
       const { status, data } = await getAllRoomCards();
 
       if (status === "error" || !data) {
-        toast({
-          title: "Something went wrong",
-          description: "Failed to fetch rooms, Please try again later",
-        });
+        // TODO: show toast
         setFetching(false);
         logger("error", "Failed to fetch rooms");
         return;
