@@ -21,7 +21,7 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
   const { toast } = useToast();
   const [cartItemsCount, setCartItemsCount] = useQueryState(
     "cartItemsCount",
-    parseAsInteger.withDefault(0)
+    parseAsInteger.withDefault(0),
   );
 
   const [bedData, setBedData] = useState<BedInRoomCard[] | null>(null);

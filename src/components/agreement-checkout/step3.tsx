@@ -29,13 +29,14 @@ export default function Step3({
   handleNext: () => void;
   handlePrev: () => void;
 }) {
+  const { toast } = useToast();
   const supabase = createClient();
 
   const agreementRef = useRef<HTMLDivElement>(null);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const [agreementForm, setAgreementForm] = useState<AgreementForm | null>(
-    null
+    null,
   );
 
   const [securityDeposit, setSecurityDeposit] = useState<number>(0);
@@ -62,12 +63,12 @@ export default function Step3({
           totalRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut)
+            new Date(guest.checkOut),
           ).totalRent,
           payableRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut)
+            new Date(guest.checkOut),
           ).payableRent,
         })),
       };
@@ -76,8 +77,8 @@ export default function Step3({
       setTotalAmount(
         enhancedAgreementData.guests.reduce(
           (acc, item) => acc + item.payableRent,
-          0
-        )
+          0,
+        ),
       );
       setAgreementForm(agreementData);
     };
@@ -100,7 +101,7 @@ export default function Step3({
         if (publicUrlData) {
           logger(
             "info",
-            `File uploaded successfully: ${publicUrlData.publicUrl}`
+            `File uploaded successfully: ${publicUrlData.publicUrl}`,
           );
           if (bucket === "invoice") {
             setInvoiceUrl(publicUrlData.publicUrl);
@@ -120,7 +121,7 @@ export default function Step3({
         throw error;
       }
     },
-    []
+    [],
   );
 
   const handleBeforePrintInvoice = useCallback(async () => {
@@ -178,7 +179,7 @@ export default function Step3({
         if (pdfBlob instanceof Blob) {
           logger(
             "info",
-            "PDF generated successfully, downloading agreement PDF"
+            "PDF generated successfully, downloading agreement PDF",
           );
           const link = document.createElement("a");
           link.href = URL.createObjectURL(pdfBlob);
@@ -197,6 +198,7 @@ export default function Step3({
       logger("error", "Error in generating or uploading PDF", error as Error);
     }
   }, []);
+
   const handleInvoice = useReactToPrint({
     content: () => invoiceRef.current,
     onBeforePrint: handleBeforePrintInvoice,
@@ -221,8 +223,6 @@ export default function Step3({
         agreementUrl,
         token,
       });
-
-      const { toast } = useToast();
 
       if (result?.status === "success") {
         // Send confirmation emails

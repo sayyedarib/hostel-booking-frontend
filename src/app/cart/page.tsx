@@ -23,7 +23,7 @@ export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartItemsCount, setCartItemsCount] = useQueryState(
     "cartItemsCount",
-    parseAsInteger.withDefault(0)
+    parseAsInteger.withDefault(0),
   );
   const { toast } = useToast();
   const [securityDepositStatus, setSecurityDepositStatus] = useState<
@@ -46,12 +46,12 @@ export default function CartPage() {
         totalRent: calculateRent(
           item.monthlyRent,
           new Date(item.checkIn),
-          new Date(item.checkOut)
+          new Date(item.checkOut),
         ).totalRent,
         payableRent: calculateRent(
           item.monthlyRent,
           new Date(item.checkIn),
-          new Date(item.checkOut)
+          new Date(item.checkOut),
         ).payableRent,
       }));
 
@@ -59,7 +59,7 @@ export default function CartPage() {
       setCartItems(enhancedData);
       setCartItemsCount(enhancedData.length);
       setSecurityDepositStatus(
-        securityDepositData as "paid" | "pending" | "lost"
+        securityDepositData as "paid" | "pending" | "lost",
       );
     };
 
@@ -128,7 +128,7 @@ export default function CartPage() {
                       <p className="text-gray-500">
                         {differenceInDays(
                           new Date(item.checkOut),
-                          new Date(item.checkIn)
+                          new Date(item.checkIn),
                         )}{" "}
                         Days |{" "}
                         {new Date(item.checkIn).toLocaleDateString("en-US", {

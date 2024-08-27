@@ -36,7 +36,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
 
   const handleImageUpload = async (
     e: ChangeEvent<HTMLInputElement>,
-    field: string
+    field: string,
   ) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -119,7 +119,7 @@ export default function Step1({ handleNext }: { handleNext: () => void }) {
   };
 
   const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

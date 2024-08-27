@@ -58,8 +58,8 @@ export default function Step2({
         acc[item.id] = false;
         return acc;
       },
-      {} as Record<string, boolean>
-    )
+      {} as Record<string, boolean>,
+    ),
   );
 
   const allChecked = Object.values(checkedItems).every(Boolean);

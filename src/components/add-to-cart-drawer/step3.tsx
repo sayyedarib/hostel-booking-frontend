@@ -47,7 +47,7 @@ export const AddToCartStep3 = ({
   }, [guestId]);
 
   const handleGuestImageUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
 
@@ -79,7 +79,7 @@ export const AddToCartStep3 = ({
   };
 
   const handleAadhaarUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
 
@@ -124,7 +124,7 @@ export const AddToCartStep3 = ({
         phone,
         dob,
         aadhaarUrl,
-        photoUrl
+        photoUrl,
       );
       logger("error", "All fields are required");
       toast({
