@@ -13,4 +13,3 @@ export const transporter = nodemailer.createTransport({
     pass: process.env.NEXT_PUBLIC_EMAIL_PWD,
   },
 });
-

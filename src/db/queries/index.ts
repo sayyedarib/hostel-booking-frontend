@@ -34,7 +34,7 @@ const getClerkId = () => {
 export const createUser = async ({
   clerkId,
   name,
-  phone="",
+  phone = "",
   email,
   imageUrl,
 }: CreateUser) => {
@@ -77,7 +77,7 @@ export const checkUserExists = async (clerkId: string) => {
 export const getUserId = async () => {
   try {
     const clerkId = getClerkId();
-    logger("info", "Fetching user ID", { clerkId });  
+    logger("info", "Fetching user ID", { clerkId });
     if (!clerkId) {
       logger("info", "Clerk ID not found");
       return { status: "error", data: null };

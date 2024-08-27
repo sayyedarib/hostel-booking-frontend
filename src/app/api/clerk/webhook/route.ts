@@ -56,13 +56,8 @@ export async function POST(req: Request) {
   const eventType = evt.type;
   console.log("clerk webhook body:", body);
 
-  const {
-    id,
-    first_name,
-    last_name,
-    email_addresses,
-    image_url,
-  } = evt.data as UserJSON;
+  const { id, first_name, last_name, email_addresses, image_url } =
+    evt.data as UserJSON;
 
   let userInfo = await checkUserExists(id);
   console.log("userInfo", userInfo);
