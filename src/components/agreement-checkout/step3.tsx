@@ -334,9 +334,6 @@ export default function Step3({
     <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl flex flex-col md:flex-row">
       <div className="flex md:flex-col gap-3 md:w-1/2 items-center">
         <div>
-          <h3 className="text-2xl font-bold mb-4 text-gray-800">
-            Bank Details:
-          </h3>
           <Image
             width={250}
             height={250}
@@ -347,14 +344,13 @@ export default function Step3({
         </div>
 
         <div>
-          <p className="text-gray-600">UPI: 1234567890@hdfcbank</p>
-          <p className="text-gray-600">Account: 1234567890</p>
-          <p className="text-gray-600">IFSC: HDFC0001234</p>
-          <p className="text-gray-600">Branch: HDFC Bank, Bangalore</p>
+          <p className="text-gray-600">UPI: sayyedaribhussain4321@okhdfcbank</p>
+          <p className="text-gray-600">Account: 50100430236612</p>
+          <p className="text-gray-600">IFSC: HDFC0009579</p>
+          <p className="text-gray-600">Branch: MANGLI NICHI</p>
         </div>
       </div>
       <div className="flex flex-col gap-3 md:w-1/2">
-        <h1 className="text-xl font-semibold text-gray-800">Summary</h1>
         <Separator />
         <span className="text-gray-600">
           Total Bed(s): <strong>{agreementForm?.guests.length}</strong>
