@@ -67,7 +67,10 @@ export const RoomTable = pgTable("room", {
   roomCode: text("code").notNull(),
   floor: integer("floor").notNull().default(0),
   gender: text("gender").notNull().default("male"),
-  imageUrls: text("image_urls").array(),
+  imageUrls: text("image_urls")
+    .array()
+    .notNull()
+    .default(["/img/rooms/Room_5_1.jpeg"]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -229,4 +232,16 @@ export const AgreementTable = pgTable("agreement", {
   updatedAt: timestamp("updated_at")
     .notNull()
     .$onUpdate(() => new Date()),
+});
+
+export const ReviewTable = pgTable("review", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => UserTable.id),
+  roomId: integer("room_id").references(() => RoomTable.id),
+  rating: integer("rating"),
+  review: text("review"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").$onUpdate(() => new Date()),
 });

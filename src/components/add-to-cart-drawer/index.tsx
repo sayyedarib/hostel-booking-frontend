@@ -9,10 +9,16 @@ import { AddToCartStep3 } from "@/components/add-to-cart-drawer/step3";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { getBedData, addToCart, getBedsInCart } from "@/db/queries";
-import { calculateRent, logger } from "@/lib/utils";
+import { calculateRent, logger, cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
-export default function AddToCartDrawer({ roomId }: { roomId: number }) {
+export default function AddToCartDrawer({
+  roomId,
+  className,
+}: {
+  roomId: number;
+  className?: string;
+}) {
   // user states
   const [bedId, setBedId] = useQueryState("bedId", parseAsInteger);
   const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
@@ -133,7 +139,10 @@ export default function AddToCartDrawer({ roomId }: { roomId: number }) {
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
         <Button
-          className="w-full py-2 bg-primary text-white rounded-lg text-center font-semibold hover:bg-primary-dark transition-colors"
+          className={cn(
+            className,
+            "w-full py-2 bg-primary text-white text-center font-semibold hover:bg-primary-dark transition-colors",
+          )}
           onClick={() => setIsOpen(true)}
         >
           Add Bed to Cart

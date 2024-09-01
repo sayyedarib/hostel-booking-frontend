@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -121,9 +121,7 @@ export default async function AboutPage() {
             you are dedicated to your studies, we would love to have you.
           </p>
           <Button className="mt-8">
-            <Link href="/contact">
-              Contact Us
-            </Link>
+            <Link href="/contact">Contact Us</Link>
           </Button>
         </section>
       </Container>

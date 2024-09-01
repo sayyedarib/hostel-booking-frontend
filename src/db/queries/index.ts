@@ -13,6 +13,7 @@ import {
   CartTable,
   GuestTable,
   PropertyTable,
+  ReviewTable,
   RoomTable,
   securityDepositTable,
   TranscationTable,
@@ -362,8 +363,6 @@ export const getBedsInCart = async (roomId: number) => {
   }
 };
 
-// In your queries file (e.g., db/queries.ts)
-
 export const getCartItemsGrouped = async () => {
   try {
     const userId = await getUserId();
@@ -573,6 +572,48 @@ export const getCartItems = async () => {
       data: null,
       message: "Error fetching cart items",
     };
+  }
+};
+
+export const getRoomData = async (roomId: number) => {
+  try {
+    const roomData = await db
+      .select({
+        id: RoomTable.id,
+        roomCode: RoomTable.roomCode,
+        imageUrls: RoomTable.imageUrls,
+        floor: RoomTable.floor,
+        gender: RoomTable.gender,
+        buildingName: PropertyTable.name,
+        address: PropertyTable.address,
+        city: PropertyTable.city,
+        state: PropertyTable.state,
+        monthlyRent: BedTable.monthlyRent,
+        bedCount: sql<number>`count(${BedTable.id})`,
+        avgRating: sql<number>`coalesce(avg(${ReviewTable.rating}), 0)`,
+      })
+      .from(RoomTable)
+      .innerJoin(PropertyTable, eq(RoomTable.propertyId, PropertyTable.id))
+      .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
+      .leftJoin(ReviewTable, eq(RoomTable.id, ReviewTable.roomId))
+      .where(eq(RoomTable.id, roomId))
+      .groupBy(RoomTable.id, PropertyTable.id)
+      .execute();
+
+    const reviews = await db
+      .select({
+        rating: ReviewTable.rating,
+        review: ReviewTable.review,
+      })
+      .from(ReviewTable)
+      .where(eq(ReviewTable.roomId, roomId))
+      .limit(3)
+      .execute();
+
+    return { status: "success", data: { ...roomData[0], reviews } };
+  } catch (error) {
+    console.error("Error fetching room data:", error);
+    return { status: "error", data: null };
   }
 };
 
