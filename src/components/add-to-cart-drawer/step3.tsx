@@ -161,7 +161,9 @@ export const AddToCartStep3 = ({
       aadhaarUrl,
     });
     setCreatingGuest(false);
-
+    
+    setGuestId(Number(id));
+    
     if (status === "error" || !id) {
       toast({
         variant: "destructive",
@@ -175,7 +177,6 @@ export const AddToCartStep3 = ({
       title: "Guest created successfully",
     });
     logger("info", "Guest created successfully", { id });
-    setGuestId(Number(id));
 
     handleAddToCart();
   };
