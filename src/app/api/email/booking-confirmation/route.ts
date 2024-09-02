@@ -1,5 +1,3 @@
-// in app/api/email/booking-confirmation/route.ts
-
 import { NextResponse, NextRequest } from "next/server";
 import { transporter } from "@/lib/server-utils";
 import { getBookingDetails } from "@/db/queries";
@@ -8,8 +6,9 @@ import axios from "axios";
 
 export async function POST(request: NextRequest) {
   try {
-    logger("info", "Sending emails for booking confirmation");
-    const { bookingId } = await request.json();
+    const requestData = await request.json();
+    logger("info", "Sending emails for booking confirmation", requestData);
+    const { bookingId } = requestData;
 
     logger("info", `Checking for Booking ID: ${bookingId}`);
     const { data: bookingDetails } = await getBookingDetails(bookingId);
@@ -88,9 +87,9 @@ export async function POST(request: NextRequest) {
         ],
       });
     } catch (error) {
-      logger("error", "Error sending emails", error as Error);
+      logger("error", "Error sending emails to owner", error as Error);
       return NextResponse.json(
-        { message: "COULD NOT SEND MESSAGES" },
+        { message: "COULD NOT SEND MESSAGES TO OWNER" },
         { status: 500 }
       );
     }
@@ -116,7 +115,7 @@ export async function POST(request: NextRequest) {
     `;
 
     try {
-      logger("info", "Sending emails to user");
+      logger("info", "Sending emails to user",{ email: bookingDetails?.userEmail });
       await transporter.sendMail({
         from: "support@aligarhhostel.com",
         to: bookingDetails.userEmail,
@@ -136,7 +135,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       logger("error", "Error sending emails to user", error as Error);
       return NextResponse.json(
-        { message: "COULD NOT SEND MESSAGES" },
+        { message: "COULD NOT SEND MESSAGES TO USER" },
         { status: 500 }
       );
     }
@@ -144,9 +143,9 @@ export async function POST(request: NextRequest) {
     logger("info", "Emails sent successfully");
     return NextResponse.json({ message: "Success: emails were sent" });
   } catch (error) {
-    logger("error", "Error sending emails", error as Error);
+    logger("error", "Error processing request", error as Error);
     return NextResponse.json(
-      { message: "COULD NOT SEND MESSAGES" },
+      { message: "COULD NOT PROCESS REQUEST" },
       { status: 500 }
     );
   }

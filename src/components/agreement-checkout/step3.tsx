@@ -297,7 +297,7 @@ export default function Step3({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ bookingId: result?.data }),
+          body: JSON.stringify({ bookingId: result?.data?.id }),
         })
           .then((response) => {
             if (!response.ok) {
