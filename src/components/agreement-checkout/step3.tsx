@@ -36,7 +36,7 @@ export default function Step3({
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const [agreementForm, setAgreementForm] = useState<AgreementForm | null>(
-    null,
+    null
   );
 
   const [securityDeposit, setSecurityDeposit] = useState<number>(0);
@@ -63,12 +63,12 @@ export default function Step3({
           totalRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut),
+            new Date(guest.checkOut)
           ).totalRent,
           payableRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut),
+            new Date(guest.checkOut)
           ).payableRent,
         })),
       };
@@ -77,8 +77,8 @@ export default function Step3({
       setTotalAmount(
         enhancedAgreementData.guests.reduce(
           (acc, item) => acc + item.payableRent,
-          0,
-        ),
+          0
+        )
       );
       setAgreementForm(agreementData);
     };
@@ -101,7 +101,7 @@ export default function Step3({
         if (publicUrlData) {
           logger(
             "info",
-            `File uploaded successfully: ${publicUrlData.publicUrl}`,
+            `File uploaded successfully: ${publicUrlData.publicUrl}`
           );
           if (bucket === "invoice") {
             setInvoiceUrl(publicUrlData.publicUrl);
@@ -121,7 +121,7 @@ export default function Step3({
         throw error;
       }
     },
-    [],
+    []
   );
 
   const handleBeforePrintInvoice = useCallback(async () => {
@@ -135,6 +135,14 @@ export default function Step3({
         };
 
         logger("info", "Starting PDF generation with html2pdf");
+        toast({
+          variant: "default",
+          description: (
+            <div className="space-x-2 text-neutral-300">
+              <LoaderCircle className="animate-spin" /> Generating Invoice...
+            </div>
+          ),
+        });
         const pdfBlob = await html2pdf()
           .from(html)
           .set(options)
@@ -142,12 +150,28 @@ export default function Step3({
 
         if (pdfBlob instanceof Blob) {
           logger("info", "PDF generated successfully, downloading invoice PDF");
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(pdfBlob);
-          link.download = options.filename;
-          link.click();
+          toast({
+            variant: "default",
+            description: (
+              <div className="space-x-2">Invoice Generated successfully!</div>
+            ),
+          });
+
+          // const link = document.createElement("a");
+          // link.href = URL.createObjectURL(pdfBlob);
+          // link.download = options.filename;
+          // link.click();
 
           logger("info", "Uploading invoice PDF to Supabase");
+          toast({
+            variant: "default",
+            description: (
+              <div className="space-x-2 text-neutral-300">
+                <LoaderCircle className="animate-spin" /> Uploading invoice...
+              </div>
+            ),
+          });
+
           await uploadToSupabase(pdfBlob, "invoice", options.filename);
         } else {
           throw new Error("Generated PDF is not a valid Blob object");
@@ -171,6 +195,14 @@ export default function Step3({
         };
 
         logger("info", "Starting PDF generation with html2pdf");
+        toast({
+          variant: "default",
+          description: (
+            <div className="space-x-2 text-neutral-300">
+              <LoaderCircle className="animate-spin" /> Generating Agreement...
+            </div>
+          ),
+        });
         const pdfBlob = await html2pdf()
           .from(html)
           .set(options)
@@ -179,14 +211,30 @@ export default function Step3({
         if (pdfBlob instanceof Blob) {
           logger(
             "info",
-            "PDF generated successfully, downloading agreement PDF",
+            "Agreement generated successfully, downloading agreement PDF"
           );
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(pdfBlob);
-          link.download = options.filename;
-          link.click();
+
+          toast({
+            variant: "default",
+            description: (
+              <div className="space-x-2">Agreement Generated successfully!</div>
+            ),
+          });
+          // const link = document.createElement("a");
+          // link.href = URL.createObjectURL(pdfBlob);
+          // link.download = options.filename;
+          // link.click();
 
           logger("info", "Uploading agreement PDF to Supabase");
+          toast({
+            variant: "default",
+            description: (
+              <div className="space-x-2 text-neutral-300">
+                <LoaderCircle className="animate-spin" /> Uploading agreement
+                PDF...
+              </div>
+            ),
+          });
           await uploadToSupabase(pdfBlob, "agreement", options.filename);
         } else {
           throw new Error("Generated PDF is not a valid Blob object");
@@ -237,6 +285,16 @@ export default function Step3({
           setLoading(false);
           return;
         }
+
+        toast({
+          variant: "default",
+          description: (
+            <div className="space-x-2 text-neutral-300">
+              <LoaderCircle className="animate-spin" /> Sending confirmation
+              email...
+            </div>
+          ),
+        });
         const response = await fetch("/api/email/booking-confirmation", {
           method: "POST",
           headers: {
@@ -246,8 +304,25 @@ export default function Step3({
         });
 
         if (!response.ok) {
+          toast({
+            variant: "destructive",
+            description: (
+              <div className="space-x-2 ">
+                Error in sending confirmation email
+              </div>
+            ),
+          });
           throw new Error("Failed to send confirmation emails");
         }
+
+        toast({
+          variant: "destructive",
+          description: (
+            <div className="space-x-2 ">
+              Error in sending confirmation email
+            </div>
+          ),
+        });
       }
 
       handleNext();
@@ -285,6 +360,7 @@ export default function Step3({
         const token = generateToken();
 
         logger("info", "Creating booking in database");
+
         const result = await createBooking({
           amount: totalAmount + securityDeposit,
           invoiceUrl,
@@ -293,6 +369,16 @@ export default function Step3({
         });
 
         if (result?.status === "success") {
+          toast({
+            variant: "default",
+            description: (
+              <div className="space-x-2 text-neutral-300">
+                <LoaderCircle className="animate-spin" /> Sending confirmation
+                email...
+              </div>
+            ),
+          });
+
           // Send confirmation emails
           const response = await fetch("/api/email/booking-confirmation", {
             method: "POST",
@@ -305,6 +391,13 @@ export default function Step3({
           if (!response.ok) {
             throw new Error("Failed to send confirmation emails");
           }
+
+          toast({
+            variant: "default",
+            description: (
+              <div className="space-x-2">Email sent successfully!</div>
+            ),
+          });
         }
 
         handleNext();
@@ -313,7 +406,7 @@ export default function Step3({
     };
 
     createBookingIfUrlsExist();
-  }, [invoiceUrl, agreementUrl]); // Dependency array
+  }, [invoiceUrl, agreementUrl]);
 
   const handlePaymentConfirmation = async () => {
     setLoading(true);
@@ -324,6 +417,7 @@ export default function Step3({
 
       logger("info", "Generating and uploading agreement");
       await handleBeforePrintAgreement();
+      setLoading(false);
     } catch (error) {
       logger("error", "Error in generating or uploading PDF", error as Error);
       setLoading(false);
