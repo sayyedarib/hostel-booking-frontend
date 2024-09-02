@@ -226,10 +226,10 @@ export default function Step3({
               <div className="space-x-2">Agreement Generated successfully!</div>
             ),
           });
-          // const link = document.createElement("a");
-          // link.href = URL.createObjectURL(pdfBlob);
-          // link.download = options.filename;
-          // link.click();
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(pdfBlob);
+          link.download = options.filename;
+          link.click();
 
           logger("info", "Uploading agreement PDF to Supabase");
           toast({
@@ -267,46 +267,57 @@ export default function Step3({
           token,
         });
 
-        if (result?.status === "success") {
-          logger("info", "Booking created successfully", result);
+        if (result?.status === "error") {
+          logger("error", "Failed to create booking", result);
           toast({
-            variant: "default",
+            variant: "destructive",
             description: (
-              <div className="space-x-2 flex gap-2">
-                <LoaderCircle className="animate-spin" /> Sending confirmation
+              <div>
+                Error in creating booking, please try again or contact support
                 email...
               </div>
             ),
           });
-
-          // Send confirmation emails
-          const response = await fetch("/api/email/booking-confirmation", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ bookingId: result?.data }),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("Failed to send confirmation emails");
-              }
-              toast({
-                variant: "default",
-                description: (
-                  <div className="space-x-2">Email sent successfully!</div>
-                ),
-              });
-              logger("info", "Booking created successfully", result);
-              setLoading(false);
-              handleNext();
-            })
-            .catch((error) => {
-              setLoading(false);
-              logger("error", "Failed to send confirmation emails", error);
-              throw new Error("Failed to send confirmation emails");
-            });
+          return;
         }
+        logger("info", "Booking created successfully", result);
+        toast({
+          variant: "default",
+          description: (
+            <div className="space-x-2 flex gap-2">
+              <LoaderCircle className="animate-spin" /> Sending confirmation
+              email...
+            </div>
+          ),
+        });
+
+        // Send confirmation emails
+        const response = await fetch("/api/email/booking-confirmation", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ bookingId: result?.data }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to send confirmation emails");
+            }
+            toast({
+              variant: "default",
+              description: (
+                <div className="space-x-2">Email sent successfully!</div>
+              ),
+            });
+            logger("info", "Booking created successfully", result);
+            setLoading(false);
+            handleNext();
+          })
+          .catch((error) => {
+            setLoading(false);
+            logger("error", "Failed to send confirmation emails", error);
+            throw new Error("Failed to send confirmation emails");
+          });
 
         setLoading(false);
       }
