@@ -253,112 +253,6 @@ export default function Step3({
     }
   }, []);
 
-  const handleInvoice = useReactToPrint({
-    content: () => invoiceRef.current,
-    onBeforePrint: handleBeforePrintInvoice,
-    onAfterPrint: async () => {
-      logger("info", "Invoice printed successfully");
-      logger("info", "generating token....");
-      const token = generateToken();
-
-      if (!invoiceUrl || !agreementUrl) {
-        logger("error", "Invoice or agreement URL is missing", {
-          invoiceUrl,
-          agreementUrl,
-        });
-        setLoading(false);
-        return;
-      }
-
-      logger("info", "Creating booking in database");
-      const result = await createBooking({
-        amount: totalAmount + securityDeposit,
-        invoiceUrl,
-        agreementUrl,
-        token,
-      });
-
-      if (result?.status === "success") {
-        // Send confirmation emails
-
-        if (!result?.data?.id) {
-          toast({
-            variant: "destructive",
-            title: "Booking ID is missing in response",
-            description: `${result}`,
-          });
-          logger("error", "Booking ID is missing in response", result);
-          setLoading(false);
-          return;
-        }
-
-        toast({
-          variant: "default",
-          description: (
-            <div className="space-x-2 flex gap-2">
-              <LoaderCircle className="animate-spin" /> Sending confirmation
-              email...
-            </div>
-          ),
-        });
-        const response = await fetch("/api/email/booking-confirmation", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ bookingId: result?.data?.id }),
-        });
-
-        if (!response.ok) {
-          toast({
-            variant: "destructive",
-            description: (
-              <div className="space-x-2 ">
-                Error in sending confirmation email
-              </div>
-            ),
-          });
-          throw new Error("Failed to send confirmation emails");
-        }
-
-        toast({
-          variant: "destructive",
-          description: (
-            <div className="space-x-2 ">
-              Error in sending confirmation email
-            </div>
-          ),
-        });
-      }
-
-      handleNext();
-    },
-  });
-
-  const handlePrintInvoice = async () => {
-    logger("info", "Printing invoice...");
-    try {
-      await handleInvoice();
-    } catch (error) {
-      logger("error", "Error in printing invoice", error as Error);
-    }
-  };
-
-  const handleAgreement = useReactToPrint({
-    content: () => agreementRef.current,
-    onBeforePrint: handleBeforePrintAgreement,
-    onAfterPrint: handlePrintInvoice,
-  });
-
-  const handlePrintAgreement = async () => {
-    logger("info", "Printing invoice...");
-    try {
-      await handleAgreement();
-    } catch (error) {
-      logger("error", "Error in printing invoice", error as Error);
-    }
-  };
-
   useEffect(() => {
     const createBookingIfUrlsExist = async () => {
       if (invoiceUrl && agreementUrl) {
@@ -366,7 +260,6 @@ export default function Step3({
         const token = generateToken();
 
         logger("info", "Creating booking in database");
-
         const result = await createBooking({
           amount: totalAmount + securityDeposit,
           invoiceUrl,
@@ -375,6 +268,7 @@ export default function Step3({
         });
 
         if (result?.status === "success") {
+          logger("info", "Booking created successfully", result);
           toast({
             variant: "default",
             description: (
@@ -392,21 +286,28 @@ export default function Step3({
               "Content-Type": "application/json",
             },
             body: JSON.stringify({ bookingId: result?.data }),
-          });
-
-          if (!response.ok) {
-            throw new Error("Failed to send confirmation emails");
-          }
-
-          toast({
-            variant: "default",
-            description: (
-              <div className="space-x-2">Email sent successfully!</div>
-            ),
-          });
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Failed to send confirmation emails");
+              }
+              toast({
+                variant: "default",
+                description: (
+                  <div className="space-x-2">Email sent successfully!</div>
+                ),
+              });
+              logger("info", "Booking created successfully", result);
+              setLoading(false);
+              handleNext();
+            })
+            .catch((error) => {
+              setLoading(false);
+              logger("error", "Failed to send confirmation emails", error);
+              throw new Error("Failed to send confirmation emails");
+            });
         }
 
-        handleNext();
         setLoading(false);
       }
     };
