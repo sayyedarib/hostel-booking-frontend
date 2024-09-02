@@ -17,15 +17,11 @@ export default function Step4({ handlePrev }: Step4Props) {
 
     if (countdown === 0) {
       clearInterval(timer);
-      router.push("/");
+      // router.push("/");
     }
 
     return () => clearInterval(timer);
   }, [countdown, router]);
-
-  const handleRedirect = () => {
-    router.push("/");
-  };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
