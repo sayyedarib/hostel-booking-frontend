@@ -3,27 +3,33 @@
 import { NextResponse, NextRequest } from "next/server";
 import { transporter } from "@/lib/server-utils";
 import { getBookingDetails } from "@/db/queries";
+import { logger } from "@/lib/utils";
 import axios from "axios";
 
 export async function POST(request: NextRequest) {
   try {
+    logger("info", "Sending emails for booking confirmation");
     const { bookingId } = await request.json();
 
+    logger("info", `Checking for Booking ID: ${bookingId}`);
     const { data: bookingDetails } = await getBookingDetails(bookingId);
 
     if (!bookingDetails) {
+      logger("error", "Booking not found");
       return NextResponse.json(
         { message: "Booking not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
     const confirmationLink = `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://aligarhhostel.com"}/api/email/payment-confirmation?id=${bookingDetails.id}`;
 
-    // Fetch PDF files
+    logger("info", "Fetching agreement PDFs");
     const agreementPdf = await axios.get(bookingDetails.agreementUrl, {
       responseType: "arraybuffer",
     });
+
+    logger("info", "Fetching invoice PDF");
     const invoicePdf = await axios.get(bookingDetails.invoiceUrl, {
       responseType: "arraybuffer",
     });
@@ -37,7 +43,7 @@ export async function POST(request: NextRequest) {
         <td>${new Date(booking.checkIn).toLocaleDateString()}</td>
         <td>${new Date(booking.checkOut).toLocaleDateString()}</td>
       </tr>
-    `,
+    `
       )
       .join("");
 
@@ -62,23 +68,32 @@ export async function POST(request: NextRequest) {
       <p>Best Regards,<br>Your Hostel Team</p>
     `;
 
-    // Send email to owner
-    await transporter.sendMail({
-      from: "support@aligarhhostel.com",
-      to: ["sayyedaribhussain4321@gmail.com", "support@aligarhhostel.com"],
-      subject: `Booking Verification for ${bookingDetails.userName}`,
-      html: mailContent,
-      attachments: [
-        {
-          filename: "agreement.pdf",
-          content: agreementPdf.data,
-        },
-        {
-          filename: "invoice.pdf",
-          content: invoicePdf.data,
-        },
-      ],
-    });
+    try {
+      logger("info", "Sending emails to owner");
+
+      await transporter.sendMail({
+        from: "support@aligarhhostel.com",
+        to: ["sayyedaribhussain4321@gmail.com", "support@aligarhhostel.com"],
+        subject: `Booking Verification for ${bookingDetails.userName}`,
+        html: mailContent,
+        attachments: [
+          {
+            filename: "agreement.pdf",
+            content: agreementPdf.data,
+          },
+          {
+            filename: "invoice.pdf",
+            content: invoicePdf.data,
+          },
+        ],
+      });
+    } catch (error) {
+      logger("error", "Error sending emails", error as Error);
+      return NextResponse.json(
+        { message: "COULD NOT SEND MESSAGES" },
+        { status: 500 }
+      );
+    }
 
     // Send email to user
     const userMailContent = `
@@ -100,29 +115,39 @@ export async function POST(request: NextRequest) {
       <p>Best Regards,<br>Your Hostel Team</p>
     `;
 
-    await transporter.sendMail({
-      from: "support@aligarhhostel.com",
-      to: bookingDetails.userEmail,
-      subject: "Booking Confirmation",
-      html: userMailContent,
-      attachments: [
-        {
-          filename: "agreement.pdf",
-          content: agreementPdf.data,
-        },
-        {
-          filename: "invoice.pdf",
-          content: invoicePdf.data,
-        },
-      ],
-    });
+    try {
+      logger("info", "Sending emails to user");
+      await transporter.sendMail({
+        from: "support@aligarhhostel.com",
+        to: bookingDetails.userEmail,
+        subject: "Booking Confirmation",
+        html: userMailContent,
+        attachments: [
+          {
+            filename: "agreement.pdf",
+            content: agreementPdf.data,
+          },
+          {
+            filename: "invoice.pdf",
+            content: invoicePdf.data,
+          },
+        ],
+      });
+    } catch (error) {
+      logger("error", "Error sending emails to user", error as Error);
+      return NextResponse.json(
+        { message: "COULD NOT SEND MESSAGES" },
+        { status: 500 }
+      );
+    }
 
+    logger("info", "Emails sent successfully");
     return NextResponse.json({ message: "Success: emails were sent" });
   } catch (error) {
-    console.error(error);
+    logger("error", "Error sending emails", error as Error);
     return NextResponse.json(
       { message: "COULD NOT SEND MESSAGES" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
