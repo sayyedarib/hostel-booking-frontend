@@ -70,7 +70,7 @@ export const RoomTable = pgTable("room", {
   imageUrls: text("image_urls")
     .array()
     .notNull()
-    .default(["/img/rooms/Room_5_1.jpeg"]),
+    .default(["/img/fall_back_room.png"]),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
