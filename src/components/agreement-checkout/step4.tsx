@@ -42,9 +42,6 @@ export default function Step4({ handlePrev }: Step4Props) {
           <span className="font-bold">{countdown}</span> seconds.
         </p>
         <p className="text-gray-600 mb-4">Payment will be verified shortly.</p>
-        <Button onClick={handleRedirect} className="mt-4">
-          Redirecting you to homepage in {countdown} seconds
-        </Button>
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
 import React, { forwardRef, useCallback } from "react";
-import Image from "next/image";
 import { toWords } from "number-to-words";
 
 import type { ExtendGuest } from "@/interface";
@@ -63,7 +62,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
               <p>Mobile: 8791476473</p>
               <p>Website: www.aligarhhostel.com</p>
             </div>
-            <Image src="/logo.png" alt="Logo" width={80} height={80} />
+            <img src="/logo.png" className="w-32 h-32" alt="Logo" />
           </div>
           <h2 className="text-3xl font-bold text-center uppercase tracking-wide">
             Invoice
@@ -170,7 +169,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         <div className="h-1 bg-white w-full" />
         <footer className="bg-white h-28">
           <p className="font-bold pb-2">for KHAN GROUP OF PG</p>
-          <div className="h-10 bg-white w-full" />
+          <img src="/signature.png" alt="signature of the property owner" className="h-32 w-40" />
           <div>
             <p>Authorized Signatory</p>
           </div>

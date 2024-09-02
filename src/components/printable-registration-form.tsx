@@ -68,7 +68,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
                 src={formData.applicantPhoto}
                 width={112}
                 height={144}
-                className="border w-28 h-36"
+                className="border w-28 h-36 object-cover"
                 alt="Guest Image"
               />
               {/* <span className="text-center">Applicant</span> */}
@@ -80,7 +80,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
                 src={formData.guardianPhoto}
                 width={112}
                 height={144}
-                className="border w-28 h-36"
+                className="border w-28 h-36 object-cover"
                 alt="Parent Image"
               />
               {/* <span>Guardian</span> */}
@@ -159,7 +159,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
                     height={144}
                     src={guest.photoUrl}
                     alt="Guest Photo"
-                    className="w-28 h-36"
+                    className="w-28 h-36 object-cover"
                   />
                 </div>
                 {/* <div className="flex gap-6">
@@ -241,7 +241,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
           width={208}
           height={128}
           alt="Applicant Signature"
-          className="border w-52 h-32"
+          className="border w-52 h-32 object-cover"
         />
       )}
       {/* </div> */}
@@ -252,7 +252,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
           src={formData.userIdImage}
           width={208}
           height={128}
-          className="border w-52 h-32"
+          className="border w-52 h-32 object-cover"
           alt="Aadhaar Card"
         />
       )}

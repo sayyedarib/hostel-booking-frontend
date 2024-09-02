@@ -138,7 +138,7 @@ export default function Step3({
         toast({
           variant: "default",
           description: (
-            <div className="space-x-2 text-neutral-300">
+            <div className="space-x-2 flex gap-2">
               <LoaderCircle className="animate-spin" /> Generating Invoice...
             </div>
           ),
@@ -157,16 +157,22 @@ export default function Step3({
             ),
           });
 
-          // const link = document.createElement("a");
-          // link.href = URL.createObjectURL(pdfBlob);
-          // link.download = options.filename;
-          // link.click();
+          toast({
+            variant: "default",
+            description: (
+              <div className="space-x-2">Downloading Invoice...</div>
+            ),
+          });
+          const link = document.createElement("a");
+          link.href = URL.createObjectURL(pdfBlob);
+          link.download = options.filename;
+          link.click();
 
           logger("info", "Uploading invoice PDF to Supabase");
           toast({
             variant: "default",
             description: (
-              <div className="space-x-2 text-neutral-300">
+              <div className="space-x-2 flex gap-2">
                 <LoaderCircle className="animate-spin" /> Uploading invoice...
               </div>
             ),
@@ -198,7 +204,7 @@ export default function Step3({
         toast({
           variant: "default",
           description: (
-            <div className="space-x-2 text-neutral-300">
+            <div className="space-x-2 flex gap-2">
               <LoaderCircle className="animate-spin" /> Generating Agreement...
             </div>
           ),
@@ -229,7 +235,7 @@ export default function Step3({
           toast({
             variant: "default",
             description: (
-              <div className="space-x-2 text-neutral-300">
+              <div className="space-x-2 flex gap-2">
                 <LoaderCircle className="animate-spin" /> Uploading agreement
                 PDF...
               </div>
@@ -289,7 +295,7 @@ export default function Step3({
         toast({
           variant: "default",
           description: (
-            <div className="space-x-2 text-neutral-300">
+            <div className="space-x-2 flex gap-2">
               <LoaderCircle className="animate-spin" /> Sending confirmation
               email...
             </div>
@@ -372,7 +378,7 @@ export default function Step3({
           toast({
             variant: "default",
             description: (
-              <div className="space-x-2 text-neutral-300">
+              <div className="space-x-2 flex gap-2">
                 <LoaderCircle className="animate-spin" /> Sending confirmation
                 email...
               </div>
