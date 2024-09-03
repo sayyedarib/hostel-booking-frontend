@@ -785,16 +785,6 @@ export const createBooking = async ({
 
     await db.transaction(async (trx) => {
       try {
-        bookingId = await trx
-          .insert(BookingTable)
-          .values({
-            userId: userId.data,
-            agreementUrl,
-          })
-          .returning({
-            id: BookingTable.id,
-          });
-
         transactionId = await trx
           .insert(TranscationTable)
           .values({
@@ -805,6 +795,17 @@ export const createBooking = async ({
           })
           .returning({
             id: TranscationTable.id,
+          });
+
+        bookingId = await trx
+          .insert(BookingTable)
+          .values({
+            userId: userId.data,
+            agreementUrl,
+            transactionId,
+          })
+          .returning({
+            id: BookingTable.id,
           });
 
         const bedBookings: {
