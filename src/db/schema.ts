@@ -157,6 +157,9 @@ export const BookingTable = pgTable("booking", {
     .notNull()
     .references(() => UserTable.id),
   agreementUrl: text("agreement_url").notNull(),
+  transactionId: integer("transaction_id")
+    .references(() => TranscationTable.id)
+    .notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -178,9 +181,6 @@ export const BedBookingTable = pgTable("bed_booking", {
   guestId: integer("guest_id")
     .notNull()
     .references(() => GuestTable.id),
-  transactionId: integer("transaction_id")
-    .references(() => TranscationTable.id)
-    .notNull(),
   checkIn: date("check_in").notNull(),
   checkOut: date("check_out").notNull(),
   bookingId: integer("booking_id")
