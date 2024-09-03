@@ -802,7 +802,7 @@ export const createBooking = async ({
           .values({
             userId: userId.data,
             agreementUrl,
-            transactionId,
+            transactionId: transactionId[0].id,
           })
           .returning({
             id: BookingTable.id,
