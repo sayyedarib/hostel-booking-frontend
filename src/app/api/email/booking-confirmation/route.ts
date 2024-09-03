@@ -4,6 +4,8 @@ import { getBookingDetails } from "@/db/queries";
 import { logger } from "@/lib/utils";
 import axios from "axios";
 
+export const maxDuration = 55;
+
 export async function POST(request: NextRequest) {
   try {
     const requestData = await request.json();
