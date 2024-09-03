@@ -18,7 +18,7 @@ import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   return (
-    <Card className="w-auto sm:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl">
+    <Card className="w-full md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl">
       <Link href="/rooms">
         <Image
           src={roomData.imageUrls?.[0] || "/img/fall_back_room.png"}
