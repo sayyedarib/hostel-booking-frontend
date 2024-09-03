@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { useUser } from "@clerk/nextjs"; // Import useUser from Clerk
 import { parseAsInteger, useQueryState } from "nuqs";
-
 import type { BedInRoomCard, CartItemShort } from "@/interface";
-
 import { AddToCartStep1 } from "@/components/add-to-cart-drawer/step1";
 import { AddToCartStep2 } from "@/components/add-to-cart-drawer/step2";
 import { AddToCartStep3 } from "@/components/add-to-cart-drawer/step3";
@@ -19,7 +19,8 @@ export default function AddToCartDrawer({
   roomId: number;
   className?: string;
 }) {
-  // user states
+  const router = useRouter(); // Initialize router for navigation
+  const { isSignedIn } = useUser(); // Check if the user is signed in
   const [bedId, setBedId] = useQueryState("bedId", parseAsInteger);
   const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
   const [checkIn, setCheckIn] = useQueryState("checkIn");
@@ -35,7 +36,6 @@ export default function AddToCartDrawer({
   const [isOpen, setIsOpen] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [loading, setLoading] = useState(false);
-
   const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
@@ -63,20 +63,15 @@ export default function AddToCartDrawer({
     fetchBedData();
   }, []);
 
-  const handleNext = () => {
-    setCurrentStep((prev) => prev + 1);
-  };
-
-  const handleBack = () => {
-    setCurrentStep((prev) => prev - 1);
-  };
-
-  const handleBedSelect = (bedId: number) => {
-    setBedId(bedId);
-    handleNext();
-  };
-
+  
   const handleAddToCart = async () => {
+    // Check if the user is authenticated
+    if (!isSignedIn) {
+      // Redirect to the authentication page if not authenticated
+      router.push(`/sign-in?redirect_url=${process.env.NEXT_PUBLIC_FRONTEND_URL}/rooms`);
+      return;
+    }
+
     setLoading(true);
 
     if (!checkIn || !checkOut || !guestId || !bedId) {
@@ -110,7 +105,6 @@ export default function AddToCartDrawer({
         title: "Something went wrong",
         description: "Error in adding to cart, Please try again later",
       });
-
       return;
     }
 
