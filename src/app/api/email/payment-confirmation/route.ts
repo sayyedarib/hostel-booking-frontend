@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .execute();
 
     logger("info", "Payment confirmed");
-    return NextResponse.redirect("/payment-confirmed");
+    return NextResponse.redirect(new URL('/payment-confirmed', request.url))
   } catch (error) {
     logger("error", "Failed to confirm payment", error as Error);
     return NextResponse.json(
