@@ -6,7 +6,6 @@ import { TranscationTable } from "@/db/schema";
 
 export async function GET(request: NextRequest) {
   try {
-
     try {
       return new NextResponse(
         `

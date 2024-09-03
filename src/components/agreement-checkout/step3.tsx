@@ -36,7 +36,7 @@ export default function Step3({
   const invoiceRef = useRef<HTMLDivElement>(null);
 
   const [agreementForm, setAgreementForm] = useState<AgreementForm | null>(
-    null
+    null,
   );
 
   const [securityDeposit, setSecurityDeposit] = useState<number>(0);
@@ -63,12 +63,12 @@ export default function Step3({
           totalRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut)
+            new Date(guest.checkOut),
           ).totalRent,
           payableRent: calculateRent(
             guest.monthlyRent,
             new Date(guest.checkIn),
-            new Date(guest.checkOut)
+            new Date(guest.checkOut),
           ).payableRent,
         })),
       };
@@ -77,8 +77,8 @@ export default function Step3({
       setTotalAmount(
         enhancedAgreementData.guests.reduce(
           (acc, item) => acc + item.payableRent,
-          0
-        )
+          0,
+        ),
       );
       setAgreementForm(agreementData);
     };
@@ -101,7 +101,7 @@ export default function Step3({
         if (publicUrlData) {
           logger(
             "info",
-            `File uploaded successfully: ${publicUrlData.publicUrl}`
+            `File uploaded successfully: ${publicUrlData.publicUrl}`,
           );
           if (bucket === "invoice") {
             setInvoiceUrl(publicUrlData.publicUrl);
@@ -121,7 +121,7 @@ export default function Step3({
         throw error;
       }
     },
-    []
+    [],
   );
 
   const handleBeforePrintInvoice = useCallback(async () => {
@@ -217,7 +217,7 @@ export default function Step3({
         if (pdfBlob instanceof Blob) {
           logger(
             "info",
-            "Agreement generated successfully, downloading agreement PDF"
+            "Agreement generated successfully, downloading agreement PDF",
           );
 
           toast({
@@ -260,15 +260,15 @@ export default function Step3({
         const token = generateToken();
 
         logger("info", "Creating booking in database");
-        const result = await createBooking({
+        const { status, data } = await createBooking({
           amount: totalAmount + securityDeposit,
           invoiceUrl,
           agreementUrl,
           token,
         });
 
-        if (result?.status === "error") {
-          logger("error", "Failed to create booking", result);
+        if (status === "error") {
+          logger("error", "Failed to create booking", { data: data });
           toast({
             variant: "destructive",
             description: (
@@ -299,12 +299,12 @@ export default function Step3({
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ bookingId: result?.data?.id }),
+          body: JSON.stringify({ bookingId: data?.bookingId, token }),
         }).catch((error) => {
           logger(
             "error",
             "Error in sending confirmation email",
-            error as Error
+            error as Error,
           );
 
           return;
@@ -317,7 +317,7 @@ export default function Step3({
           ),
         });
 
-        logger("info", "Booking created successfully", result);
+        logger("info", "Booking created successfully", { data: data });
         setLoading(false);
         handleNext();
 

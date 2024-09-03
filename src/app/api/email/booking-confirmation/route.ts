@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
   try {
     const requestData = await request.json();
     logger("info", "Sending emails for booking confirmation", requestData);
-    const { bookingId } = requestData;
+    const { bookingId, token } = requestData;
 
     logger("info", `Checking for Booking ID: ${bookingId}`);
     const { data: bookingDetails } = await getBookingDetails(Number(bookingId));
@@ -19,11 +19,11 @@ export async function POST(request: NextRequest) {
       logger("error", "Booking not found");
       return NextResponse.json(
         { message: "Booking not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    const confirmationLink = `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://aligarhhostel.com"}/api/email/payment-confirmation?id=${bookingDetails.id}`;
+    const confirmationLink = `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://aligarhhostel.com"}/api/email/payment-confirmation?id=${bookingDetails.id}&token=${token}`;
 
     logger("info", "Fetching agreement PDFs");
     const agreementPdf = await axios.get(bookingDetails.agreementUrl, {
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         <td>${new Date(booking.checkIn).toLocaleDateString()}</td>
         <td>${new Date(booking.checkOut).toLocaleDateString()}</td>
       </tr>
-    `
+    `,
       )
       .join("");
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       logger("error", "Error sending emails to owner", error as Error);
       return NextResponse.json(
         { message: "COULD NOT SEND MESSAGES TO OWNER" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -117,7 +117,9 @@ export async function POST(request: NextRequest) {
     `;
 
     try {
-      logger("info", "Sending emails to user",{ email: bookingDetails?.userEmail });
+      logger("info", "Sending emails to user", {
+        email: bookingDetails?.userEmail,
+      });
       await transporter.sendMail({
         from: "support@aligarhhostel.com",
         to: bookingDetails.userEmail,
@@ -138,7 +140,7 @@ export async function POST(request: NextRequest) {
       logger("error", "Error sending emails to user", error as Error);
       return NextResponse.json(
         { message: "COULD NOT SEND MESSAGES TO USER" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -148,7 +150,7 @@ export async function POST(request: NextRequest) {
     logger("error", "Error processing request", error as Error);
     return NextResponse.json(
       { message: "COULD NOT PROCESS REQUEST" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

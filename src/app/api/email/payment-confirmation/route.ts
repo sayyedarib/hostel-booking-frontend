@@ -8,13 +8,14 @@ import { logger } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   logger("info", "Confirming payment");
-  const id = request.nextUrl.searchParams.get("id");
+  const id = request.nextUrl.searchParams.get("id"); // id = bookingId
+  const token = request.nextUrl.searchParams.get("token");
 
-  if (!id) {
-    logger("error", "Invalid confirmation ID");
+  if (!id || !token) {
+    logger("error", "Booking ID or token not provided", { id, token });
     return NextResponse.json(
-      { message: "Invalid confirmation ID" },
-      { status: 400 }
+      { message: "Booking ID or token not provided" },
+      { status: 400 },
     );
   }
 
@@ -26,13 +27,19 @@ export async function GET(request: NextRequest) {
       .where(eq(BedBookingTable.bookingId, parseInt(id)))
       .execute();
 
+    await db
+      .update(TranscationTable)
+      .set({ verified: true })
+      .where(eq(TranscationTable.token, token))
+      .execute();
+
     logger("info", "Payment confirmed");
     return NextResponse.redirect(new URL("/payment-confirmed", request.url));
   } catch (error) {
     logger("error", "Failed to confirm payment", error as Error);
     return NextResponse.json(
       { message: "Failed to confirm payment" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

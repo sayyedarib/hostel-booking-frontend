@@ -298,7 +298,7 @@ export const getBedData = async (roomId: number) => {
     logger("info", "Fetching bed info", { roomId });
     const currentDate = new Date();
     const fifteenDaysLater = new Date(
-      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000
+      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000,
     );
 
     const bedInfo = await db
@@ -467,7 +467,7 @@ export const addToCart = async (
   guestId: number,
   bedId: number,
   checkIn: string,
-  checkOut: string
+  checkOut: string,
 ) => {
   try {
     const userId = await getUserId();
@@ -780,7 +780,8 @@ export const createBooking = async ({
       .from(CartTable)
       .where(eq(CartTable.userId, userId.data));
 
-    let bookingId: { id: number }[] = [{id: 0}];
+    let bookingId: { id: number }[] = [{ id: 0 }];
+    let transactionId: { id: number }[] = [{ id: 0 }];
 
     await db.transaction(async (trx) => {
       try {
@@ -821,12 +822,17 @@ export const createBooking = async ({
           .where(eq(securityDepositTable.userId, userId.data))
           .execute();
 
-        await trx.insert(TranscationTable).values({
-          userId: userId.data,
-          amount,
-          token,
-          invoiceUrl,
-        });
+        transactionId = await trx
+          .insert(TranscationTable)
+          .values({
+            userId: userId.data,
+            amount,
+            token,
+            invoiceUrl,
+          })
+          .returning({
+            id: TranscationTable.id,
+          });
 
         await trx
           .delete(CartTable)
@@ -837,7 +843,7 @@ export const createBooking = async ({
       } catch (error) {
         console.error(
           `[ERROR] ${new Date().toISOString()} - Error in transaction:`,
-          error
+          error,
         );
         throw error;
       }
@@ -852,10 +858,19 @@ export const createBooking = async ({
       };
     }
 
+    if (transactionId[0].id == 0) {
+      logger("error", "Error in creating transaction");
+      return {
+        status: "error",
+        message: "Error in creating transaction",
+        data: null,
+      };
+    }
+
     return {
       status: "success",
       message: "Booking created successfully",
-      data: { id: bookingId[0].id },
+      data: { bookingId: bookingId[0].id },
     };
   } catch (error) {
     logger("error", "Error in creating booking: ", error as Error);
@@ -885,7 +900,7 @@ export const getBookingDetails = async (bookingId: number) => {
       .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
       .innerJoin(
         TranscationTable,
-        eq(BookingTable.userId, TranscationTable.userId)
+        eq(BookingTable.userId, TranscationTable.userId),
       )
       .where(eq(BookingTable.id, bookingId))
       .limit(1);

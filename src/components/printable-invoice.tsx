@@ -169,7 +169,11 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         <div className="h-1 bg-white w-full" />
         <footer className="bg-white h-28">
           <p className="font-bold pb-2">for KHAN GROUP OF PG</p>
-          <img src="/signature.png" alt="signature of the property owner" className="h-36 w-40 object-cover" />
+          <img
+            src="/signature.png"
+            alt="signature of the property owner"
+            className="h-36 w-40 object-cover"
+          />
           <div>
             <p>Authorized Signatory</p>
           </div>

@@ -8,7 +8,7 @@ interface Step4Props {
 
 export default function Step4({ handlePrev }: Step4Props) {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(3);
+  const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -17,7 +17,7 @@ export default function Step4({ handlePrev }: Step4Props) {
 
     if (countdown === 0) {
       clearInterval(timer);
-      // router.push("/");
+      router.push("/");
     }
 
     return () => clearInterval(timer);
@@ -37,7 +37,7 @@ export default function Step4({ handlePrev }: Step4Props) {
           You will be redirected in{" "}
           <span className="font-bold">{countdown}</span> seconds.
         </p>
-        <p className="text-gray-600 mb-4">Payment will be verified shortly.</p>
+        <p className="text-gray-400 mb-4">(Payment will be verified shortly)</p>
       </div>
     </div>
   );
