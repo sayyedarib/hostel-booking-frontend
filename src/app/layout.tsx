@@ -25,8 +25,9 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <head />
+        <head>
+          <link rel="icon" href="/favicon.ico" sizes="any" />
+        </head>
         <body className={cn(inter.className, "relative")}>
           <ThemeProvider
             attribute="class"
