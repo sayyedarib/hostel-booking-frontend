@@ -2,7 +2,7 @@
 
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/db";
-import { BedBookingTable } from "@/db/schema";
+import { BedBookingTable, TranscationTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { logger } from "@/lib/utils";
 
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .execute();
 
     logger("info", "Payment confirmed");
-    return NextResponse.redirect(new URL('/payment-confirmed', request.url))
+    return NextResponse.redirect(new URL("/payment-confirmed", request.url));
   } catch (error) {
     logger("error", "Failed to confirm payment", error as Error);
     return NextResponse.json(

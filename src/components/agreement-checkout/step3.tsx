@@ -280,6 +280,7 @@ export default function Step3({
           });
           return;
         }
+
         logger("info", "Booking created successfully", result);
         toast({
           variant: "default",
@@ -292,32 +293,35 @@ export default function Step3({
         });
 
         // Send confirmation emails
-        const response = await fetch("/api/email/booking-confirmation", {
+        logger("info", "Sending confirmation email to owner for booking id", {
+          bookingId: result?.data?.id,
+        });
+        await fetch("/api/email/booking-confirmation", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ bookingId: result?.data?.id }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Failed to send confirmation emails");
-            }
-            toast({
-              variant: "default",
-              description: (
-                <div className="space-x-2">Email sent successfully!</div>
-              ),
-            });
-            logger("info", "Booking created successfully", result);
-            setLoading(false);
-            handleNext();
-          })
-          .catch((error) => {
-            setLoading(false);
-            logger("error", "Failed to send confirmation emails", error);
-            throw new Error("Failed to send confirmation emails");
-          });
+        }).catch((error) => {
+          logger(
+            "error",
+            "Error in sending confirmation email",
+            error as Error
+          );
+
+          return;
+        });
+
+        toast({
+          variant: "default",
+          description: (
+            <div className="space-x-2">Email sent successfully!</div>
+          ),
+        });
+
+        logger("info", "Booking created successfully", result);
+        setLoading(false);
+        handleNext();
 
         setLoading(false);
       }
