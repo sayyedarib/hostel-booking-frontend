@@ -32,6 +32,7 @@ export default function Rooms() {
       }
 
       if (status === "success") {
+        setFetching(false);
         //TODO: if there are no rooms, then show a message in center of the screen that no rooms found
         setRooms(data);
       }
@@ -60,7 +61,7 @@ export default function Rooms() {
       )}
       <Button
         onClick={() => router.push("/cart")}
-        className="md:hidden fixed bottom-0 left-0 right-0 bg-black"
+        className="md:hidden fixed bottom-0 left-0 right-0 bg-black rounded-none"
       >
         Go to Cart
       </Button>

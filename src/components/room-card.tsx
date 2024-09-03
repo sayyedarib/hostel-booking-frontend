@@ -18,34 +18,31 @@ import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   return (
-    <Card className="w-full md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl">
+    <Card className="w-full p-2 md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl space-y-3">
       <Link href="/rooms">
         <Image
           src={roomData.imageUrls?.[0] || "/img/fall_back_room.png"}
           height="1000"
           width="1000"
-          className="h-64 w-full object-cover rounded-t-xl"
+          className="h-64 w-full object-cover rounded-xl"
           alt="thumbnail"
         />
       </Link>
-      <CardContent className="w-full">
-        <CardHeader className="flex">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-semibold">
-              {roomData.buildingName}
-            </CardTitle>
-            <div className="flex items-center space-x-2 text-yellow-500">
-              <Star fill="currentColor" size={16} />
-              <span>4.{Math.floor(Math.random() * 10)}</span>
-            </div>
-          </div>
-          <CardDescription className="text-sm text-gray-600">
-            Room: {roomData.roomCode}
-          </CardDescription>
-        </CardHeader>
-        {/* TODO: why roomData.id is string here, it should be number always no need to convert */}
-        <AddToCartDrawer roomId={Number(roomData.id)} />
-      </CardContent>
+
+      <div className="flex items-center justify-between">
+        <CardTitle className="text-lg font-semibold">
+          {roomData.buildingName}
+        </CardTitle>
+        <div className="flex items-center space-x-2 text-yellow-500">
+          <Star fill="currentColor" size={16} />
+          <span>4.{Math.floor(Math.random() * 10)}</span>
+        </div>
+      </div>
+      <CardDescription className="text-sm text-gray-600">
+        Room: {roomData.roomCode}
+      </CardDescription>
+      {/* TODO: why roomData.id is string here, it should be number always no need to convert */}
+      <AddToCartDrawer roomId={Number(roomData.id)} />
     </Card>
   );
 }

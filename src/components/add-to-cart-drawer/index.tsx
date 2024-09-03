@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
-import { useUser } from "@clerk/nextjs"; // Import useUser from Clerk
 import { parseAsInteger, useQueryState } from "nuqs";
+import { useAuth } from '@clerk/nextjs'
+import { useRouter } from "next/navigation";
+
 import type { BedInRoomCard, CartItemShort } from "@/interface";
+
 import { AddToCartStep1 } from "@/components/add-to-cart-drawer/step1";
 import { AddToCartStep2 } from "@/components/add-to-cart-drawer/step2";
 import { AddToCartStep3 } from "@/components/add-to-cart-drawer/step3";
@@ -19,8 +21,9 @@ export default function AddToCartDrawer({
   roomId: number;
   className?: string;
 }) {
-  const router = useRouter(); // Initialize router for navigation
-  const { isSignedIn } = useUser(); // Check if the user is signed in
+  const { userId } = useAuth();
+  const router = useRouter();
+  // user states
   const [bedId, setBedId] = useQueryState("bedId", parseAsInteger);
   const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
   const [checkIn, setCheckIn] = useQueryState("checkIn");
@@ -36,6 +39,7 @@ export default function AddToCartDrawer({
   const [isOpen, setIsOpen] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [loading, setLoading] = useState(false);
+
   const [currentStep, setCurrentStep] = useState(1);
 
   useEffect(() => {
@@ -63,15 +67,20 @@ export default function AddToCartDrawer({
     fetchBedData();
   }, []);
 
-  
-  const handleAddToCart = async () => {
-    // Check if the user is authenticated
-    if (!isSignedIn) {
-      // Redirect to the authentication page if not authenticated
-      router.push(`/sign-in?redirect_url=${process.env.NEXT_PUBLIC_FRONTEND_URL}/rooms`);
-      return;
-    }
+  const handleNext = () => {
+    setCurrentStep((prev) => prev + 1);
+  };
 
+  const handleBack = () => {
+    setCurrentStep((prev) => prev - 1);
+  };
+
+  const handleBedSelect = (bedId: number) => {
+    setBedId(bedId);
+    handleNext();
+  };
+
+  const handleAddToCart = async () => {
     setLoading(true);
 
     if (!checkIn || !checkOut || !guestId || !bedId) {
@@ -105,6 +114,7 @@ export default function AddToCartDrawer({
         title: "Something went wrong",
         description: "Error in adding to cart, Please try again later",
       });
+
       return;
     }
 
@@ -129,6 +139,14 @@ export default function AddToCartDrawer({
     setIsOpen(false);
   };
 
+  const handleOpenDrawer = () => {
+    if (!userId) {
+      router.push("/sign-in?redirect_url=/rooms");
+    } else {
+      setIsOpen(true);
+    }
+  };
+
   return (
     <Drawer open={isOpen} onOpenChange={setIsOpen}>
       <DrawerTrigger asChild>
@@ -137,7 +155,7 @@ export default function AddToCartDrawer({
             className,
             "w-full py-2 bg-primary text-white text-center font-semibold hover:bg-primary-dark transition-colors",
           )}
-          onClick={() => setIsOpen(true)}
+          onClick={handleOpenDrawer}
         >
           Add Bed to Cart
         </Button>
