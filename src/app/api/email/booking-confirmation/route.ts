@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const { bookingId } = requestData;
 
     logger("info", `Checking for Booking ID: ${bookingId}`);
-    const { data: bookingDetails } = await getBookingDetails(bookingId);
+    const { data: bookingDetails } = await getBookingDetails(Number(bookingId));
 
     if (!bookingDetails) {
       logger("error", "Booking not found");

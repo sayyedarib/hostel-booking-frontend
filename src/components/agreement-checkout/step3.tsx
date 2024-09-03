@@ -281,7 +281,7 @@ export default function Step3({
           return;
         }
 
-        logger("info", "Booking created successfully", result);
+        logger("info", "Booking created successfully");
         toast({
           variant: "default",
           description: (
@@ -293,9 +293,7 @@ export default function Step3({
         });
 
         // Send confirmation emails
-        logger("info", "Sending confirmation email to owner for booking id", {
-          bookingId: result?.data?.id,
-        });
+        logger("info", "Sending confirmation email to owner for booking id");
         await fetch("/api/email/booking-confirmation", {
           method: "POST",
           headers: {
