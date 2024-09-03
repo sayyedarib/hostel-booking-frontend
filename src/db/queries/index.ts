@@ -298,7 +298,7 @@ export const getBedData = async (roomId: number) => {
     logger("info", "Fetching bed info", { roomId });
     const currentDate = new Date();
     const fifteenDaysLater = new Date(
-      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000,
+      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000
     );
 
     const bedInfo = await db
@@ -467,7 +467,7 @@ export const addToCart = async (
   guestId: number,
   bedId: number,
   checkIn: string,
-  checkOut: string,
+  checkOut: string
 ) => {
   try {
     const userId = await getUserId();
@@ -795,12 +795,25 @@ export const createBooking = async ({
             id: BookingTable.id,
           });
 
+        transactionId = await trx
+          .insert(TranscationTable)
+          .values({
+            userId: userId.data,
+            amount,
+            token,
+            invoiceUrl,
+          })
+          .returning({
+            id: TranscationTable.id,
+          });
+
         const bedBookings: {
           bedId: number;
           guestId: number;
           checkIn: string;
           checkOut: string;
           bookingId: number;
+          transactionId: number;
           status: "booked" | "checked_in" | "checked_out" | "cancelled";
         }[] = cartItems.map((item) => ({
           bedId: item.bedId,
@@ -808,6 +821,7 @@ export const createBooking = async ({
           checkIn: item.checkIn,
           checkOut: item.checkOut,
           bookingId: bookingId[0].id,
+          transactionId: transactionId[0].id,
           status: "booked",
         }));
 
@@ -822,18 +836,6 @@ export const createBooking = async ({
           .where(eq(securityDepositTable.userId, userId.data))
           .execute();
 
-        transactionId = await trx
-          .insert(TranscationTable)
-          .values({
-            userId: userId.data,
-            amount,
-            token,
-            invoiceUrl,
-          })
-          .returning({
-            id: TranscationTable.id,
-          });
-
         await trx
           .delete(CartTable)
           .where(eq(CartTable.userId, userId.data))
@@ -843,7 +845,7 @@ export const createBooking = async ({
       } catch (error) {
         console.error(
           `[ERROR] ${new Date().toISOString()} - Error in transaction:`,
-          error,
+          error
         );
         throw error;
       }
@@ -900,7 +902,7 @@ export const getBookingDetails = async (bookingId: number) => {
       .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
       .innerJoin(
         TranscationTable,
-        eq(BookingTable.userId, TranscationTable.userId),
+        eq(BookingTable.userId, TranscationTable.userId)
       )
       .where(eq(BookingTable.id, bookingId))
       .limit(1);
