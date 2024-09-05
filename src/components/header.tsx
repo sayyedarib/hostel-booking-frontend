@@ -33,91 +33,82 @@ export default function Header({
   }, []);
 
   return (
-    <>
-      <div
-        className={cn(
-          className,
-          "flex justify-between w-full md:w-[584px] sticky rounded-full bg-[#EDE8F5] md:left-1/2 top-2 md:top-8 z-10 md:-translate-x-1/2 items-center pl-6 pr-4 py-2 backdrop-blur-3xl shadow-md",
-        )}
-      >
-        <Link href="/" className="font-extrabold text-2xl text-[#3D5280]">
-          Khan PG
-        </Link>
-
-        <div className="hidden md:flex gap-3 items-center">
-          <ul className="flex gap-4">
-            <li>
-              <Link href="/rooms">Rooms</Link>
-            </li>
-            <li>
-              <Link href="/about">About</Link>
-            </li>
-            <li>
-              <Link href="/contact">Contact</Link>
-            </li>
-            <li>
+    <nav className={cn(className, "bg-white shadow-md")}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center justify-between flex-1 ml-6">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={toggleMenu}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
+            >
+              <span className="sr-only">Open main menu</span>
+              {isMenuOpen ? (
+                <X className="block h-6 w-6" aria-hidden="true" />
+              ) : (
+                <Menu className="block h-6 w-6" aria-hidden="true" />
+              )}
+            </button>
+          </div>
+            <div className="flex items-center flex-col">
+              <Link href="/">
+                <span className="ml-2 text-2xl font-bold text-gray-800">Khan PG</span>
+              </Link>
+              <span className="ml-2 text-xs text-gray-500">The Aligarh Hostel</span>
+            </div>
+            <div className="flex items-center space-x-4">
               <SignedIn>
-                <Link href="/cart" className="relative">
+                <Link href="/cart" className="relative text-gray-600 hover:text-gray-900">
                   <ShoppingCart />
-                  <span className="absolute -right-2 -top-1 bg-primary h-4 w-4 p-1 rounded-full text-sm text-white flex items-center justify-center font-extrabold">
+                  <span className="absolute -right-2 -top-1 bg-orange-500 h-4 w-4 rounded-full text-xs text-white flex items-center justify-center font-bold">
                     {cartItemsCount}
                   </span>
                 </Link>
               </SignedIn>
-            </li>
-          </ul>
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
-        </div>
-        <button onClick={toggleMenu} className="md:hidden">
-          {isMenuOpen ? <X /> : <Menu />}
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden sticky top-14 left-2 right-2 bg-neutral-100/50 backdrop-blur-3xl rounded-3xl rounded-t z-20 shadow-md">
-          <ul className="flex flex-col items-center py-4">
-            <li className="py-2">
-              <Link href="/rooms" onClick={toggleMenu}>
-                Rooms
-              </Link>
-            </li>
-            <li className="py-2">
-              <Link href="/about" onClick={toggleMenu}>
-                About
-              </Link>
-            </li>
-            <li className="py-2">
-              <Link href="/contact" onClick={toggleMenu}>
-                Contact
-              </Link>
-            </li>
-            <li>
-              <SignedIn>
-                <Link href="/cart" className="relative">
-                  <ShoppingCart />
-                  <span className="absolute -right-2 -top-1 bg-primary h-4 w-4 p-1 rounded-full text-sm text-white flex items-center justify-center font-extrabold">
-                    {cartItemsCount}
-                  </span>
-                </Link>
-              </SignedIn>
-            </li>
-            <li className="py-2">
               <SignedOut>
-                <SignInButton />
+                <SignInButton mode="modal">
+                  <button className="text-gray-600 hover:text-gray-900 font-medium">
+                    Sign In
+                  </button>
+                </SignInButton>
               </SignedOut>
               <SignedIn>
-                <UserButton />
+                <UserButton afterSignOutUrl="/" />
               </SignedIn>
-            </li>
-          </ul>
+              <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded">
+                BOOK NOW!
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {/* Menu */}
+      {isMenuOpen && (
+        <div>
+          <div className="px-2 pt-2 pb-3 space-y-1 h-screen"> 
+            {/* can be add background yellow if want */}
+            <ul className="space-y-1">
+              <li>
+                <Link href="/rooms" className="text-black hover:text-white hover:bg-black block py-2 rounded-full px-9 w-2/5 min-w-fit text-base font-medium" onClick={toggleMenu}>
+                  Rooms
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="text-black hover:text-white hover:bg-black block py-2 rounded-full px-9 w-2/5 min-w-fit text-base font-medium" onClick={toggleMenu}>
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-black hover:text-white hover:bg-black block py-2 rounded-full px-9 w-2/5 min-w-fit text-base font-medium" onClick={toggleMenu}>
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       )}
-    </>
+    </nav>
   );
 }
