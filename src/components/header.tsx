@@ -47,13 +47,14 @@ export default function Header({
         className={cn(
           className,
           "flex justify-between items-center p-4 bg-[#FFD600] lg:px-36",
+          isMenuOpen ? "fixed top-0 left-0 right-0 z-50" : ""
         )}
       >
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
             onClick={toggleMenu}
-            className="p-2 border-2 border-black rounded-full h-10 w-10 lg:h-14 lg:w-14"
+            className="p-2 border-2 border-black rounded-full h-10 w-10 lg:h-14 lg:w-14 hover:bg-transparent"
           >
             <Menu strokeWidth={2} size={40} />
           </Button>
@@ -69,12 +70,17 @@ export default function Header({
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden fixed top-0 left-0 right-0 bottom-0 bg-[#FFD600] z-20">
+        <div
+          className={cn(
+            "fixed top-0 left-0 right-0 bottom-0 bg-[#FFD600] z-40 flex flex-col justify-center items-center",
+            isMenuOpen ? "block" : "hidden"
+          )}
+        >
           <div className="flex justify-between items-center p-4">
             <Button
               variant="ghost"
               onClick={toggleMenu}
-              className="text-black p-2"
+              className="text-black p-2 hover:bg-transparent"
             >
               <CircleX strokeWidth={1} size={48} />
             </Button>
@@ -127,22 +133,40 @@ export default function Header({
             </li>
             <li className="py-2 w-full">
               <Link
-                href="/events"
+                href="/about"
+                onClick={toggleMenu}
+                className="flex items-center justify-between"
+              >
+                about Aligarh&apos;s
+                <MoveRight size={24} />
+              </Link>
+            </li>
+            <li className="py-2 w-full">
+              <Link
+                href="/contact"
                 onClick={toggleMenu}
                 className="flex items-center justify-between"
               >
                 events
               </Link>
             </li>
+            {/* signin */}
             <li className="py-2 w-full">
+              <SignedOut>
               <Link
-                href="/about"
-                onClick={toggleMenu}
+                href="/sign-in?redirect_url=https://aligarhhostel.com/rooms"
                 className="flex items-center justify-between"
               >
-                about Wombat&apos;s
-                <MoveRight size={24} />
+                sign in
               </Link>
+              </SignedOut>
+            </li>
+
+            {/* signout */}
+            <li className="py-2 w-full">
+              <SignedIn>
+                <UserButton />
+              </SignedIn>
             </li>
           </ul>
         </div>
