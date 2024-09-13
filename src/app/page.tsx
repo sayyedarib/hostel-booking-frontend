@@ -29,7 +29,7 @@ export default function Home() {
   const router = useRouter();
 
   const carouselItems = [
-    { src: "/bg.webp", alt: "Events at Wombat's", overlayText: "events" },
+    { src: "/bg.webp", alt: "Events at Wombat&apos;s", overlayText: "events" },
     {
       src: "/bg.webp",
       alt: "Rooms and Facilities",
@@ -48,7 +48,7 @@ export default function Home() {
       <section className="flex flex-col items-center justify-center py-8 px-4 bg-white text-[#212529]">
         <div className="max-w-4xl text-center space-y-20">
           <h2 className="text-5xl lg:text-9xl font-bold mb-6">
-            Aligarh's <br />
+            Aligarh&apos;s <br />
             City Hostels
           </h2>
           <p className="text-lg mb-8">
@@ -57,7 +57,7 @@ export default function Home() {
             <span className="font-semibold">guest kitchens</span>, we have{" "}
             <span className="font-semibold">study environment</span>...{" "}
             <span className="font-bold">but above all: we have the vibe</span>.
-            Wombat's City Hostels are the right place to{" "}
+            Wombat&apos;s City Hostels are the right place to{" "}
             <span className="font-semibold">
               meet people from around the world
             </span>
@@ -86,12 +86,12 @@ export default function Home() {
                     <div className="bg-white rounded-lg overflow-hidden shadow-lg">
                       <img
                         src={location.image}
-                        alt={`Wombat's City Hostel ${location.name}`}
+                        alt={`Wombat&apos;s City Hostel ${location.name}`}
                         className="w-full h-64 object-cover"
                       />
                       <div className="p-4">
                         <h3 className="text-2xl font-bold mb-2 capitalize">{location.name}</h3>
-                        <p className="text-gray-600">Wombat's City Hostel {location.name}</p>
+                        <p className="text-gray-600">Wombat&apos;s City Hostel {location.name}</p>
                       </div>
                     </div>
                   </div>
@@ -103,7 +103,7 @@ export default function Home() {
                 <button
                   key={index}
                   className={`w-3 h-3 rounded-full mx-1 focus:outline-none ${
-                    index === activeIndex ? 'bg-blue-500' : 'bg-gray-300'
+                    index === activeIndex ? &apos;bg-blue-500&apos; : &apos;bg-gray-300&apos;
                   }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
@@ -116,7 +116,7 @@ export default function Home() {
       <section className="flex flex-col lg:flex-row py-16 px-4 bg-black text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-5xl font-extrabold mb-8 lg:text-8xl relative">
-            why Aligarh's <br className="hidden lg:block" /> City
+            why Aligarh&apos;s <br className="hidden lg:block" /> City
             <span className="inline-block align-middle ml-2 absolute -top-8 right-0">
               <Image
                 className="h-20 w-20 lg:h-52 lg:w-52"
@@ -129,9 +129,9 @@ export default function Home() {
             Hostels?
           </h2>
           <p className="text-lg mb-8 max-w-3xl">
-            It's about more than just a bed. Wombat's is your city host,
-            offering lovingly put-together breakfast variations, a WomBAR in
-            each hostel with a great vibe and fantastic offerings, as well as
+            It&apos;s about more than just a bed. Wombat&apos;s is your city
+            host, offering lovingly put-together breakfast variations, a WomBAR
+            in each hostel with a great vibe and fantastic offerings, as well as
             events on a regular basis, including our WomBEATS concert series
             with free admission.
           </p>

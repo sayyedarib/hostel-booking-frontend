@@ -57,7 +57,7 @@ export default function Header({
           >
             <Menu strokeWidth={2} size={40} />
           </Button>
-          {/* <Image src="/logo.png" alt="Wombat's logo" width={50} height={40} /> */}
+          {/* <Image src="/logo.png" alt="Wombat&apos;s logo" width={50} height={40} /> */}
           <h1 className="text-xl md:text-2xl lg:text-4xl font-extrabold">
             Khan Group of PG
           </h1>
@@ -140,7 +140,7 @@ export default function Header({
                 onClick={toggleMenu}
                 className="flex items-center justify-between"
               >
-                about Wombat's
+                about Wombat&apos;s
                 <MoveRight size={24} />
               </Link>
             </li>
