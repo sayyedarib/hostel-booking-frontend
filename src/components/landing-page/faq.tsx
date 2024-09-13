@@ -42,7 +42,7 @@ export default function FAQ() {
             Where do I get the best rates (here!), what is check-in time (2 pm),
             are bed sheets included (yes!), do you have safe luggage storage
             (yes!), when is the reception open (always!)...? Have a deep dive
-            into Wombat's basics in our FAQ section. Of course, we are always
+            into Wombat&apos;s basics in our FAQ section. Of course, we are always
             happy to assist personally if you have more specific requests!
           </p>
         </div>
