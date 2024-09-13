@@ -140,6 +140,10 @@ export default function Home() {
           <Carousel items={carouselItems} />
         </div>
       </section>
+      
+      <div className="my-8 mx-10">
+        <FAQ />
+      </div>
 
       <div className="w-full flex flex-wrap items-center justify-between px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 bg-neutral-100 backdrop-blur-3xl shadow-md">
         <Footer />

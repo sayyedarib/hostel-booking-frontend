@@ -9,13 +9,13 @@ import {
 
 export default function FAQ() {
   return (
-    <div className="mx-auto px-4 py-16 relative z-0">
-      <div className="mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 w-full">
+    <div className="mx-auto px-20 py-16 relative z-0">
+      <div className="mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
         <div className="order-2 lg:order-1">
           <Accordion type="single" collapsible>
             {faqData.map((faq, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="text-xl font-bold">
+                <AccordionTrigger className="text-md lg:text-xl font-bold">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent>
@@ -35,7 +35,7 @@ export default function FAQ() {
             height={500}
             className="absolute top-0 right-8 object-cover -z-10 h-28 w-28 md:h-36 md:w-36 lg:h-60 lg:w-60"
           />
-          <h2 className="text-4xl md:text-6xl lg:text-8xl font-extrabold mb-12">
+          <h2 className="text-4xl text-[#212529] md:text-6xl lg:text-8xl font-extrabold mb-12">
             frequently <br /> asked <br /> questions
           </h2>
           <p>

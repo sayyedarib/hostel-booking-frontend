@@ -30,7 +30,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
       securityDeposit,
       className,
     },
-    ref,
+    ref
   ) => {
     const calculateSubtotal = useCallback(() => {
       return items.reduce(
@@ -39,9 +39,9 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
           calculateRent(
             item.monthlyRent,
             new Date(item.checkIn),
-            new Date(item.checkOut),
+            new Date(item.checkOut)
           ).payableRent,
-        0,
+        0
       );
     }, [items]);
 
@@ -53,7 +53,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         ref={ref}
         className={cn(
           className,
-          "max-w-4xl mx-auto text-base leading-relaxed font-serif shadow-md bg-white",
+          "max-w-4xl mx-auto text-base leading-relaxed font-serif shadow-md bg-white"
         )}
       >
         <header className=" bg-white">
@@ -61,9 +61,19 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
             <div>
               <h1 className="text-2xl font-bold">KHAN GROUP OF PG</h1>
               <p>Mobile: 8791476473</p>
+              <p>Campus Of View Appartment,</p>
+              <p>Beside Sultan Jahan Coaching, Shadshad Market, Aligarh</p>
+            </div>
+            <div>
+              <Image
+                src="/logo.png"
+                className="w-32 h-32 object-cover"
+                alt="Khand Group of PG Logo"
+                width={128}
+                height={128}
+              />
               <p>Website: www.aligarhhostel.com</p>
             </div>
-            <img src="/logo.png" className="w-32 h-32" alt="Logo" />
           </div>
           <h2 className="text-3xl font-bold text-center uppercase tracking-wide">
             Invoice
@@ -125,7 +135,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
                       calculateRent(
                         item.monthlyRent,
                         new Date(item.checkIn),
-                        new Date(item.checkOut),
+                        new Date(item.checkOut)
                       ).payableRent
                     }
                   </td>
@@ -192,7 +202,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         </footer>
       </div>
     );
-  },
+  }
 );
 
 PrintableInvoice.displayName = "PrintableInvoice";
