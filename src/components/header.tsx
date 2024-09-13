@@ -59,7 +59,7 @@ export default function Header({
           </Button>
           {/* <Image src="/logo.png" alt="Wombat&apos;s logo" width={50} height={40} /> */}
           <h1 className="text-lg md:text-2xl lg:text-4xl font-extrabold">
-            Khan Group of PG
+            <Link href="/">Khan Group of PG</Link>
           </h1>
         </div>
         <Button className="font-bold px-3 py-4 lg:text-2xl lg:px-12 lg:py-8 rounded-full bg-black text-[#FFD600]">
