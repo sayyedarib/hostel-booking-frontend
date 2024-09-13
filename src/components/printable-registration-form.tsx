@@ -267,7 +267,7 @@ const PrintableForm: React.ForwardRefRenderFunction<
       <p className="font-semibold uppercase text-lg bg-white">
         Check-out time: 11AM
       </p>
-      <p className="mt-4 bg-white">
+      <p className="mt-4 bg-white mb-2">
         Campus View Apartment, Shamshad Market Aligarh, 202001. Mobile:
         8791476473
       </p>

@@ -1,5 +1,6 @@
 import React, { forwardRef, useCallback } from "react";
 import { toWords } from "number-to-words";
+import Image from "next/image";
 
 import type { ExtendGuest } from "@/interface";
 
@@ -167,20 +168,27 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         <div className="h-1 bg-white w-full" />
         <Separator />
         <div className="h-1 bg-white w-full" />
-        <footer className="bg-white h-28">
-          <p className="font-bold pb-2">for KHAN GROUP OF PG</p>
-          <img
-            src="/signature.png"
-            alt="signature of the property owner"
-            className="h-36 w-40 object-cover"
-          />
+        <footer className="bg-white h-52 flex flex-col justify-between">
           <div>
-            <p>Authorized Signatory</p>
+            <p className="font-bold text-lg mb-2">For KHAN GROUP OF PG</p>
+            <Image
+              src="/signature.png"
+              alt="Authorized Signature"
+              className="h-20 w-48 object-contain mb-2"
+              width={192}
+              height={80}
+            />
+            <p className="text-sm font-semibold">Authorized Signatory</p>
           </div>
-          <p className="text-sm text-center text-gray-600 pb-2">
-            This is a computer generated document and requires no signature |
-            ORIGINAL FOR RECIPIENT
-          </p>
+          <div className="border-t pt-2">
+            <p className="text-xs text-center text-gray-600">
+              This is a computer-generated document. No physical signature is
+              required.
+            </p>
+            <p className="text-xs text-center text-gray-600 font-semibold mb-2">
+              ORIGINAL FOR RECIPIENT
+            </p>
+          </div>
         </footer>
       </div>
     );

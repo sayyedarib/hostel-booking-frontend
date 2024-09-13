@@ -6,7 +6,6 @@ import { Analytics } from "@vercel/analytics/react";
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import Header from "@/components/header";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -28,14 +27,13 @@ export default function RootLayout({
         <head>
           <link rel="icon" href="/favicon.ico" sizes="any" />
         </head>
-        <body className={cn(inter.className, "relative")}>
+        <body className={inter.className}>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
-            enableSystem
+            enableSystem={false}
             disableTransitionOnChange
           >
-            <Header className="fixed top-0 left-0 right-0 z-50" />
             {children}
             <Toaster />
             <SpeedInsights />

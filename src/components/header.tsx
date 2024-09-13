@@ -3,12 +3,21 @@
 import { useState, useEffect } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import Link from "next/link";
-import { Menu, X, ShoppingCart } from "lucide-react";
+import Image from "next/image";
+import {
+  Menu,
+  X,
+  ShoppingCart,
+  ArrowRight,
+  CircleX,
+  MoveRight,
+} from "lucide-react";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 import { getCartItemsCount } from "@/db/queries";
 
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 export default function Header({
   className,
@@ -37,83 +46,103 @@ export default function Header({
       <div
         className={cn(
           className,
-          "flex justify-between w-full md:w-[584px] sticky rounded-full bg-[#EDE8F5] md:left-1/2 top-2 md:top-8 z-10 md:-translate-x-1/2 items-center pl-6 pr-4 py-2 backdrop-blur-3xl shadow-md",
+          "flex justify-between items-center p-4 bg-[#FFD600] lg:px-36",
         )}
       >
-        <Link href="/" className="font-extrabold text-2xl text-[#3D5280]">
-          Khan PG
-        </Link>
-
-        <div className="hidden md:flex gap-3 items-center">
-          <ul className="flex gap-4">
-            <li>
-              <Link href="/rooms">Rooms</Link>
-            </li>
-            <li>
-              <Link href="/about">About</Link>
-            </li>
-            <li>
-              <Link href="/contact">Contact</Link>
-            </li>
-            <li>
-              <SignedIn>
-                <Link href="/cart" className="relative">
-                  <ShoppingCart />
-                  <span className="absolute -right-2 -top-1 bg-primary h-4 w-4 p-1 rounded-full text-sm text-white flex items-center justify-center font-extrabold">
-                    {cartItemsCount}
-                  </span>
-                </Link>
-              </SignedIn>
-            </li>
-          </ul>
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
+        <div className="flex items-center gap-3">
+          <Button
+            variant="ghost"
+            onClick={toggleMenu}
+            className="p-2 border-2 border-black rounded-full h-10 w-10 lg:h-14 lg:w-14"
+          >
+            <Menu strokeWidth={2} size={40} />
+          </Button>
+          {/* <Image src="/logo.png" alt="Wombat's logo" width={50} height={40} /> */}
+          <h1 className="text-xl md:text-2xl lg:text-4xl font-extrabold">
+            Khan Group of PG
+          </h1>
         </div>
-        <button onClick={toggleMenu} className="md:hidden">
-          {isMenuOpen ? <X /> : <Menu />}
-        </button>
+        <Button className="font-bold px-3 py-4 lg:text-2xl lg:px-12 lg:py-8 rounded-full bg-black text-[#FFD600]">
+          BOOK NOW!
+        </Button>
       </div>
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden sticky top-14 left-2 right-2 bg-neutral-100/50 backdrop-blur-3xl rounded-3xl rounded-t z-20 shadow-md">
-          <ul className="flex flex-col items-center py-4">
-            <li className="py-2">
-              <Link href="/rooms" onClick={toggleMenu}>
-                Rooms
+        <div className="md:hidden fixed top-0 left-0 right-0 bottom-0 bg-[#FFD600] z-20">
+          <div className="flex justify-between items-center p-4">
+            <Button
+              variant="ghost"
+              onClick={toggleMenu}
+              className="text-black p-2"
+            >
+              <CircleX strokeWidth={1} size={48} />
+            </Button>
+            <Image src="/logo.png" alt="Wombat's logo" width={50} height={40} />
+            <Button
+              variant="outline"
+              className="px-4 py-5 rounded-full bg-transparent border-white text-white border-2 font-extrabold"
+            >
+              BOOK NOW!
+            </Button>
+          </div>
+          <ul className="flex flex-col items-start py-4 px-8 text-2xl space-y-2 font-extrabold text-black">
+            <li className="py-2 w-full">
+              <Link
+                href="/booking"
+                onClick={toggleMenu}
+                className="flex items-center justify-between"
+              >
+                booking
+                <MoveRight size={24} />
               </Link>
             </li>
-            <li className="py-2">
-              <Link href="/about" onClick={toggleMenu}>
-                About
+            <li className="py-2 w-full">
+              <Link
+                href="/locations"
+                onClick={toggleMenu}
+                className="flex items-center justify-between"
+              >
+                locations
+                <MoveRight size={24} />
               </Link>
             </li>
-            <li className="py-2">
-              <Link href="/contact" onClick={toggleMenu}>
-                Contact
+            <li className="py-2 w-full">
+              <Link
+                href="/rooms-and-facilities"
+                onClick={toggleMenu}
+                className="flex items-center justify-between"
+              >
+                rooms & facilities
               </Link>
             </li>
-            <li>
-              <SignedIn>
-                <Link href="/cart" className="relative">
-                  <ShoppingCart />
-                  <span className="absolute -right-2 -top-1 bg-primary h-4 w-4 p-1 rounded-full text-sm text-white flex items-center justify-center font-extrabold">
-                    {cartItemsCount}
-                  </span>
-                </Link>
-              </SignedIn>
+            <li className="py-2 w-full">
+              <Link
+                href="/food-and-drinks"
+                onClick={toggleMenu}
+                className="flex items-center justify-between"
+              >
+                food & drinks
+              </Link>
             </li>
-            <li className="py-2">
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
+            <li className="py-2 w-full">
+              <Link
+                href="/events"
+                onClick={toggleMenu}
+                className="flex items-center justify-between"
+              >
+                events
+              </Link>
+            </li>
+            <li className="py-2 w-full">
+              <Link
+                href="/about"
+                onClick={toggleMenu}
+                className="flex items-center justify-between"
+              >
+                about Wombat's
+                <MoveRight size={24} />
+              </Link>
             </li>
           </ul>
         </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { useAuth } from '@clerk/nextjs'
+import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
 import type { BedInRoomCard, CartItemShort } from "@/interface";

@@ -1,5 +1,5 @@
 "use server";
-import { eq, and, count, sql, inArray } from "drizzle-orm";
+import { eq, and, count, sql, inArray, gte, lte, or } from "drizzle-orm";
 
 import type { OccupiedDateRange } from "@/interface";
 
@@ -298,7 +298,7 @@ export const getBedData = async (roomId: number) => {
     logger("info", "Fetching bed info", { roomId });
     const currentDate = new Date();
     const fifteenDaysLater = new Date(
-      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000
+      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000,
     );
 
     const bedInfo = await db
@@ -467,7 +467,7 @@ export const addToCart = async (
   guestId: number,
   bedId: number,
   checkIn: string,
-  checkOut: string
+  checkOut: string,
 ) => {
   try {
     const userId = await getUserId();
@@ -617,6 +617,35 @@ export const getRoomData = async (roomId: number) => {
   }
 };
 
+export const getAdminRoomData = async () => {
+  try {
+    const rooms = await db
+      .select({
+        id: RoomTable.id,
+        roomCode: RoomTable.roomCode,
+        floor: RoomTable.floor,
+        gender: RoomTable.gender,
+        beds: sql`
+          array_agg(json_build_object(
+            'id', ${BedTable.id},
+            'bedCode', ${BedTable.bedCode},
+            'type', ${BedTable.type},
+            'monthlyRent', ${BedTable.monthlyRent},
+            'dailyRent', ${BedTable.dailyRent}
+          )) FILTER (WHERE ${BedTable.id} IS NOT NULL)
+        `,
+      })
+      .from(RoomTable)
+      .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
+      .groupBy(RoomTable.id);
+
+    return { status: "success", data: rooms };
+  } catch (error) {
+    logger("error", "Error fetching room data", { error });
+    return { status: "error", data: null };
+  }
+};
+
 export const removeFromCart = async (cartId: number) => {
   try {
     const userId = await getUserId();
@@ -750,6 +779,131 @@ export const getAgreementFormData = async () => {
   }
 };
 
+export const getAnalyticsData = async () => {
+  try {
+    const totalRevenue = await db
+      .select({
+        total: sql<number>`SUM(${TranscationTable.amount})`,
+      })
+      .from(TranscationTable);
+
+    const totalBookings = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(BookingTable);
+
+    const totalUsers = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(UserTable);
+
+    const totalGuests = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(GuestTable);
+
+    return {
+      totalRevenue: totalRevenue[0].total,
+      totalBookings: totalBookings[0].count,
+      totalUsers: totalUsers[0].count,
+      totalGuests: totalGuests[0].count,
+    };
+  } catch (error) {
+    logger("error", "Error fetching analytics data", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getGuests = async () => {
+  try {
+    logger("info", "Fetching guests");
+    const guests = await db
+      .select({
+        id: GuestTable.id,
+        name: GuestTable.name,
+        roomCode: RoomTable.roomCode,
+        bedCode: BedTable.bedCode,
+        checkIn: BedBookingTable.checkIn,
+        checkOut: BedBookingTable.checkOut,
+      })
+      .from(GuestTable)
+      .innerJoin(BedBookingTable, eq(GuestTable.id, BedBookingTable.guestId))
+      .innerJoin(BedTable, eq(BedBookingTable.bedId, BedTable.id))
+      .innerJoin(RoomTable, eq(BedTable.roomId, RoomTable.id));
+    logger("info", "Fetched guests successfully");
+    return { status: "success", data: guests };
+  } catch (error) {
+    logger("error", "Error fetching guests", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const deleteGuest = async (guestId: number) => {
+  try {
+    logger("info", "Deleting guest", { guestId });
+    await db.delete(GuestTable).where(eq(GuestTable.id, guestId)).execute();
+    logger("info", "Guest deleted successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error in deleting guest", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getAvailableRooms = async () => {
+  try {
+    const rooms = await db.select().from(RoomTable);
+    return { status: "success", data: rooms };
+  } catch (error) {
+    return { status: "error", data: null };
+  }
+};
+
+export const getAvailableBeds = async (roomId: number) => {
+  try {
+    const beds = await db
+      .select()
+      .from(BedTable)
+      .where(eq(BedTable.roomId, roomId));
+    return { status: "success", data: beds };
+  } catch (error) {
+    return { status: "error", data: null };
+  }
+};
+
+export const checkOccupiedRange = async (
+  bedId: number,
+  checkIn: Date,
+  checkOut: Date,
+) => {
+  try {
+    const occupiedRanges = await db
+      .select()
+      .from(BedBookingTable)
+      .where(
+        and(
+          eq(BedBookingTable.bedId, bedId),
+          or(
+            and(
+              gte(BedBookingTable.checkIn, checkIn.toISOString()),
+              lte(BedBookingTable.checkIn, checkOut.toISOString()),
+            ),
+            and(
+              gte(BedBookingTable.checkOut, checkIn.toISOString()),
+              lte(BedBookingTable.checkOut, checkOut.toISOString()),
+            ),
+          ),
+        ),
+      );
+    return occupiedRanges.length > 0;
+  } catch (error) {
+    return true;
+  }
+};
+
 export const createBooking = async ({
   amount,
   invoiceUrl,
@@ -846,7 +1000,7 @@ export const createBooking = async ({
       } catch (error) {
         console.error(
           `[ERROR] ${new Date().toISOString()} - Error in transaction:`,
-          error
+          error,
         );
         throw error;
       }
@@ -903,7 +1057,7 @@ export const getBookingDetails = async (bookingId: number) => {
       .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
       .innerJoin(
         TranscationTable,
-        eq(BookingTable.userId, TranscationTable.userId)
+        eq(BookingTable.userId, TranscationTable.userId),
       )
       .where(eq(BookingTable.id, bookingId))
       .limit(1);
