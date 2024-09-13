@@ -58,12 +58,12 @@ export default function Header({
             <Menu strokeWidth={2} size={40} />
           </Button>
           {/* <Image src="/logo.png" alt="Wombat&apos;s logo" width={50} height={40} /> */}
-          <h1 className="text-xl md:text-2xl lg:text-4xl font-extrabold">
+          <h1 className="text-lg md:text-2xl lg:text-4xl font-extrabold">
             Khan Group of PG
           </h1>
         </div>
         <Button className="font-bold px-3 py-4 lg:text-2xl lg:px-12 lg:py-8 rounded-full bg-black text-[#FFD600]">
-          BOOK NOW!
+          <Link href="/rooms">BOOK NOW!</Link>
         </Button>
       </div>
 
@@ -89,7 +89,7 @@ export default function Header({
           <ul className="flex flex-col items-start py-4 px-8 text-2xl space-y-2 font-extrabold text-black">
             <li className="py-2 w-full">
               <Link
-                href="/booking"
+                href="/rooms"
                 onClick={toggleMenu}
                 className="flex items-center justify-between"
               >

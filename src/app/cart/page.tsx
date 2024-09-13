@@ -114,7 +114,7 @@ export default function CartPage() {
                     <Image
                       width={1500}
                       height={1500}
-                      src={item?.roomImage?.[0] ?? ""}
+                      src={item?.roomImage?.[0] ?? "/bg.webp"}
                       alt="room image"
                       className="hidden md:block w-64 h-48 object-cover rounded-lg mr-4"
                     />

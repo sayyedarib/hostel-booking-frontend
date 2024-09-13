@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import type { RoomCard } from "@/interface";
 
+import Header from "@/components/header";
 import { getAllRoomCards } from "@/db/queries";
 import { RoomCardComponent } from "@/components/room-card";
 import { Button } from "@/components/ui/button";
@@ -43,28 +44,32 @@ export default function Rooms() {
   }, []);
 
   return (
-    <div className="flex justify-center items-center min-h-[80vh] max-w-screen">
-      {fetching ? (
-        <Image
-          src="/Loading.gif"
-          width={100}
-          height={100}
-          alt="loading"
-          unoptimized={true}
-        />
-      ) : (
-        <div className="my-12 md:my-20 relative flex flex-wrap gap-10 items-center justify-center -z-1">
-          {rooms.map((room) => (
-            <RoomCardComponent key={room.roomCode} roomData={room} />
-          ))}
-        </div>
-      )}
-      <Button
-        onClick={() => router.push("/cart")}
-        className="md:hidden fixed bottom-0 left-0 right-0 bg-black rounded-none"
-      >
-        Go to Cart
-      </Button>
-    </div>
+    <>
+      <Header className="fixed top-0 left-0 right-0 z-9999" />
+
+      <div className="flex justify-center items-center min-h-[80vh] max-w-screen mt-20 relative -z-1">
+        {fetching ? (
+          <Image
+            src="/Loading.gif"
+            width={100}
+            height={100}
+            alt="loading"
+            unoptimized={true}
+          />
+        ) : (
+          <div className="my-12 md:my-20 relative flex flex-wrap gap-10 items-center justify-center -z-1">
+            {rooms.map((room) => (
+              <RoomCardComponent key={room.roomCode} roomData={room} />
+            ))}
+          </div>
+        )}
+        <Button
+          onClick={() => router.push("/cart")}
+          className="md:hidden fixed bottom-0 left-0 right-0 rounded-none"
+        >
+          Go to Cart
+        </Button>
+      </div>
+    </>
   );
 }

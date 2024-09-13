@@ -41,7 +41,7 @@ export default function Home() {
     <>
       <Header className="fixed top-0 left-0 right-0 z-9999" />
 
-      <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center">
+      <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center mt-20">
         <HeroSection />
       </section>
 
@@ -141,46 +141,12 @@ export default function Home() {
         </div>
       </section>
 
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8 }}
-        className="max-w-full bg-[#EDE8F5]/50 min-h-[70vh]"
-      >
-        <Facilities />
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8 }}
-        className="max-w-full min-h-[70vh]"
-      >
-        <BedTypes />
-      </motion.div>
-
-      <FAQ />
-
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8 }}
-        className="max-w-full"
-      >
-        <Testimonials />
-      </motion.div>
-
-      <motion.footer
-        initial={{ opacity: 0, y: 50 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.8 }}
-        className="w-full flex flex-wrap items-center justify-between px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 bg-neutral-100 backdrop-blur-3xl shadow-md"
-      >
+      <div className="w-full flex flex-wrap items-center justify-between px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 bg-neutral-100 backdrop-blur-3xl shadow-md">
         <Footer />
-      </motion.footer>
+      </div>
       <Button
         onClick={() => router.push("/rooms")}
-        className="fixed bg-black w-full rounded-none bottom-0 md:hidden"
+        className="fixed w-full rounded-none bottom-0 md:hidden"
       >
         Book Now
       </Button>

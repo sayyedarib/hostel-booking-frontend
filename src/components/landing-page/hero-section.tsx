@@ -1,48 +1,22 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
-import { CardStack } from "../ui/card-stack";
-
-const acheievers = [
-  {
-    name: "Aarib",
-    rank: "2",
-    src: "/acheivers/11.png",
-  },
-  {
-    name: "Aarib",
-    rank: "2",
-    src: "/acheivers/sumair.png",
-  },
-  {
-    name: "Aarib",
-    rank: "2",
-    src: "/acheivers/11.png",
-  },
-];
 
 export default function HeroSection() {
-  const router = useRouter();
-
   return (
-    <div className="space-y-4 flex flex-col items-center">
-      {/* <CardStack items={acheievers} /> */}
-      <h1 className="text-2xl sm:text-4xl md:text-6xl text-[#3D5280]">
-        Experience Premium Hostel Living, <br className="hidden sm:block" />{" "}
-        Designed for Your Children&apos;s Success.
+    <div className="flex flex-col items-center justify-center text-center">
+      <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6">
+        Experience Premium Hostel Living <br /> Designed for Your Children's
+        Success
       </h1>
-      <p className="text-sm md:text-xl lg:text-3xl text-neutral-500">
-        Your children is our responsibility. <br className="hidden sm:block" />{" "}
-        We provide home away from home.
+      <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-8">
+        Your children are our responsibility. We provide a home away from home.
       </p>
-      <Button
-        onClick={() => router.push("/rooms")}
-        className="bg-primary rounded-full"
-      >
-        Book Now
+      <Button className="bg-primary text-white font-semibold py-3 px-6 rounded-full">
+        <Link href="/rooms">Book Now</Link>
       </Button>
     </div>
   );
