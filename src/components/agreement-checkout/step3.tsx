@@ -425,9 +425,17 @@ export default function Step3({
             invoiceDate={new Date()}
             customerName={agreementForm?.name}
             customerPhone={agreementForm?.phone}
-            customerAddress={`${agreementForm?.address}, ${agreementForm?.city}, ${agreementForm?.state}, ${agreementForm?.pin}`}
+            customerAddress={{
+              address: agreementForm?.address ?? "",
+              city: agreementForm?.city ?? "",
+              pin: agreementForm?.pin ?? "",
+              state: agreementForm?.state ?? "",
+            }}
             items={agreementForm.guests}
             securityDeposit={securityDeposit}
+            discount={0}
+            fine={0}
+            roomCode={agreementForm.guests[0]?.roomCode}
           />
         </div>
       )}

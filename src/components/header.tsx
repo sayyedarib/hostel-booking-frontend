@@ -47,7 +47,7 @@ export default function Header({
         className={cn(
           className,
           "flex justify-between items-center p-4 bg-[#FFD600] lg:px-36",
-          isMenuOpen ? "fixed top-0 left-0 right-0 z-50" : ""
+          isMenuOpen ? "fixed top-0 left-0 right-0 z-50" : "",
         )}
       >
         <div className="flex items-center gap-3">
@@ -73,7 +73,7 @@ export default function Header({
         <div
           className={cn(
             "fixed top-0 left-0 right-0 bottom-0 bg-[#FFD600] z-40 flex flex-col justify-center items-center",
-            isMenuOpen ? "block" : "hidden"
+            isMenuOpen ? "block" : "hidden",
           )}
         >
           <div className="flex justify-between items-center p-4">
@@ -153,12 +153,12 @@ export default function Header({
             {/* signin */}
             <li className="py-2 w-full">
               <SignedOut>
-              <Link
-                href="/sign-in?redirect_url=https://aligarhhostel.com/rooms"
-                className="flex items-center justify-between"
-              >
-                sign in
-              </Link>
+                <Link
+                  href="/sign-in?redirect_url=https://aligarhhostel.com/rooms"
+                  className="flex items-center justify-between"
+                >
+                  sign in
+                </Link>
               </SignedOut>
             </li>
 

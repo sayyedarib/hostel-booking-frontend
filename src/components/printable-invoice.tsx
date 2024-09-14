@@ -12,9 +12,17 @@ interface InvoiceProps {
   invoiceDate: Date;
   customerName: string;
   customerPhone: string;
-  customerAddress: string;
+  customerAddress: {
+    address: string;
+    city: string;
+    pin: string;
+    state: string;
+  };
   items: ExtendGuest[];
   securityDeposit: number;
+  discount: number;
+  fine: number;
+  roomCode: string;
   className?: string;
 }
 
@@ -28,9 +36,12 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
       customerAddress,
       items,
       securityDeposit,
+      discount,
+      fine,
+      roomCode,
       className,
     },
-    ref
+    ref,
   ) => {
     const calculateSubtotal = useCallback(() => {
       return items.reduce(
@@ -39,9 +50,9 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
           calculateRent(
             item.monthlyRent,
             new Date(item.checkIn),
-            new Date(item.checkOut)
+            new Date(item.checkOut),
           ).payableRent,
-        0
+        0,
       );
     }, [items]);
 
@@ -53,56 +64,79 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         ref={ref}
         className={cn(
           className,
-          "max-w-4xl mx-auto text-base leading-relaxed font-serif shadow-md bg-white"
+          "max-w-4xl mx-auto text-base leading-relaxed font-serif shadow-md bg-white",
         )}
       >
         <header className=" bg-white">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl font-bold">KHAN GROUP OF PG</h1>
-              <p>Mobile: 8791476473</p>
-              <p>Campus Of View Appartment,</p>
-              <p>Beside Sultan Jahan Coaching, Shadshad Market, Aligarh</p>
+              <h1 className="text-2xl font-bold mb-2">KHAN GROUP OF PG</h1>
+              <p className="mb-1 bg-white">Mobile: 8791476473</p>
+              <p className="mb-2 bg-white">
+                Campus View Appartment, <br /> Beside Sultan Jahan Coaching,
+                Shamshad Market, <br /> Aligarh 202001, <br /> Uttar Pradesh,
+                India
+              </p>
             </div>
-            <div>
+            <div className="flex flex-col items-center bg-white">
               <Image
                 src="/logo.png"
-                className="w-32 h-32 object-cover"
-                alt="Khand Group of PG Logo"
-                width={128}
-                height={128}
+                className="w-28 h-28 object-contain"
+                alt="Khan Group of PG Logo"
+                width={112}
+                height={112}
               />
-              <p>Website: www.aligarhhostel.com</p>
+              <p className="text-sm mb-1">www.aligarhhostel.com</p>
             </div>
           </div>
-          <h2 className="text-3xl font-bold text-center uppercase tracking-wide">
+          <div className="h-1 bg-white w-full" />
+          <h2 className="text-3xl font-bold text-center uppercase tracking-wide mb-4 bg-white">
             Invoice
           </h2>
-          <p className="text-center text-gray-600 h-14">
-            ORIGINAL FOR RECIPIENT
-          </p>
+          <div className="flex justify-between bg-white">
+            <p className="mb-2">
+              <strong>Invoice #:</strong> {invoiceNumber}
+            </p>
+            <p className="mb-2">
+              <strong>Invoice Date:</strong> {formatDate(invoiceDate)}
+            </p>
+          </div>
         </header>
 
         <div className="h-1 bg-white w-full" />
         <Separator />
         <div className="h-3 bg-white w-full" />
-        <section className=" bg-white h-32">
-          <div className="flex justify-between">
-            <div>
-              <p>
-                <strong>Invoice #:</strong> {invoiceNumber}
-              </p>
-              <p>
-                <strong>Invoice Date:</strong> {formatDate(invoiceDate)}
-              </p>
-            </div>
+        <section className=" bg-white">
+          <div className="">
             <div>
               <p>
                 <strong>Bill To:</strong>
               </p>
               <p>{customerName}</p>
               <p>Ph: {customerPhone}</p>
-              <p>{customerAddress}</p>
+              <div className="flex gap-4 justify-between">
+                <div className="mb-2">
+                  <p>
+                    <strong>Permanent Address:</strong>
+                  </p>
+                  <p>
+                    {customerAddress.address},<br />
+                    {customerAddress.city}, {customerAddress.pin} <br />
+                    {customerAddress.state}
+                  </p>
+                </div>
+                <div className="mb-2">
+                  <p>
+                    <strong>Correspondence Address:</strong>
+                    <br />
+                    Campus Of View Appartment,
+                    <br /> Beside Sultan Jahan Coaching,
+                    <br />
+                    Shamshad Market, Aligarh 202001, <br />
+                    Uttar Pradesh, India
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -135,7 +169,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
                       calculateRent(
                         item.monthlyRent,
                         new Date(item.checkIn),
-                        new Date(item.checkOut)
+                        new Date(item.checkOut),
                       ).payableRent
                     }
                   </td>
@@ -146,6 +180,12 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
                 <td className="border p-2 text-right">₹1000</td>
                 <td className="border p-2 text-right">1</td>
                 <td className="border p-2 text-right">{securityDeposit}</td>
+              </tr>
+              <tr>
+                <td className="border p-2">Additional Charges</td>
+                <td className="border p-2 text-right">₹{fine}</td>
+                <td className="border p-2 text-right">1</td>
+                <td className="border p-2 text-right">₹{fine}</td>
               </tr>
             </tbody>
           </table>
@@ -202,7 +242,7 @@ const PrintableInvoice = forwardRef<HTMLDivElement, InvoiceProps>(
         </footer>
       </div>
     );
-  }
+  },
 );
 
 PrintableInvoice.displayName = "PrintableInvoice";
