@@ -15,7 +15,7 @@ const AccordionItem = React.forwardRef<
   <AccordionPrimitive.Item
     ref={ref}
     className={cn(
-      "border-2 border-black px-8 lg:py-3 my-3 lg:px-14 rounded-full hover:bg-[#FFD600]",
+      "border-2 border-black px-8 py-2 lg:py-3 my-3 lg:px-14 rounded-full hover:bg-[#FFD600]",
       className,
     )}
     {...props}
@@ -37,7 +37,7 @@ const AccordionTrigger = React.forwardRef<
       {...props}
     >
       <span>{children}</span>
-      <Plus size={48} className="shrink-0 transition-transform duration-200 h-8 w-8 md:h-12 md:w-12 lg:h-16 lg:w-16" />
+      <Plus size={48} className="shrink-0 transition-transform duration-200 h-6 w-6 md:h-12 md:w-12 lg:h-16 lg:w-16" />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));

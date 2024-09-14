@@ -141,7 +141,7 @@ export default function Home() {
         </div>
       </section>
       
-      <div className="my-8 mx-10">
+      <div className="my-8 mx-4 md:mx-10">
         <FAQ />
       </div>
 
