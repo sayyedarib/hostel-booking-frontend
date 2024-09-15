@@ -151,13 +151,24 @@ export default function Home() {
         <div className="mt-2 pt-2 border-gray-700">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-4 md:mb-0">
-              <Image src="/logo.png" alt="Khan Group of PG Logo" width={100} height={50} />
+              <Image
+                src="/logo.png"
+                alt="Khan Group of PG Logo"
+                width={100}
+                height={50}
+              />
             </div>
             <div className="text-sm">
-              <Link href="/privacy-policy" className="mr-4 hover:underline">Privacy Policy</Link>
-              <Link href="/terms-of-service" className="hover:underline">Terms of Service</Link>
+              <Link href="/privacy-policy" className="mr-4 hover:underline">
+                Privacy Policy
+              </Link>
+              <Link href="/terms-of-service" className="hover:underline">
+                Terms of Service
+              </Link>
             </div>
-            <p className="text-sm mt-4 md:mt-0">&copy; 2024 Khan Group of PG. All rights reserved.</p>
+            <p className="text-sm mt-4 md:mt-0">
+              &copy; 2024 Khan Group of PG. All rights reserved.
+            </p>
           </div>
         </div>
       </div>
