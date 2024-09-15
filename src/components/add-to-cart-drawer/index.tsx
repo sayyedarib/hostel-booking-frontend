@@ -68,7 +68,12 @@ export default function AddToCartDrawer({
       if (!checkIn || !checkOut || !guestId || !bedId) {
         throw new Error("Missing required fields");
       }
-      const { status, data } = await addToCart(guestId, bedId, checkIn, checkOut);
+      const { status, data } = await addToCart(
+        guestId,
+        bedId,
+        checkIn,
+        checkOut,
+      );
       if (status === "error" || !data) {
         throw new Error("Error in adding to cart");
       }
@@ -125,7 +130,10 @@ export default function AddToCartDrawer({
         </Button>
       </DrawerTrigger>
       <DrawerContent className="min-h-[60vh]">
-        <Progress value={((currentStep - 1) / 3) * 100} className="w-full mb-4 mt-2" />
+        <Progress
+          value={((currentStep - 1) / 3) * 100}
+          className="w-full mb-4 mt-2"
+        />
         {currentStep === 1 && (
           <AddToCartStep1
             cartData={cartData || []}
@@ -149,9 +157,7 @@ export default function AddToCartDrawer({
             loading={addToCartMutation.isPending}
           />
         )}
-        {currentStep === 4 && (
-          <AddToCartStep4 />
-        )}
+        {currentStep === 4 && <AddToCartStep4 />}
       </DrawerContent>
     </Drawer>
   );

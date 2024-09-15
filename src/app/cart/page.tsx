@@ -91,7 +91,7 @@ export default function CartPage() {
 
   return (
     <>
-    <Header className="sticky top-0 z-50"/>
+      <Header className="sticky top-0 z-50" />
       {fetching ? (
         <div className="min-h-[80vh] min-w-screen flex justify-center items-center">
           <Image
@@ -104,9 +104,14 @@ export default function CartPage() {
         </div>
       ) : cartItems.length === 0 ? (
         <div className="min-h-[80vh] min-w-screen flex flex-col justify-center items-center">
-          <Lottie animationData={emptyCartAnimation} style={{ width: 300, height: 300 }} />
+          <Lottie
+            animationData={emptyCartAnimation}
+            style={{ width: 300, height: 300 }}
+          />
           <h2 className="text-2xl font-semibold mt-4">Your cart is empty</h2>
-          <p className="text-gray-500 mt-2">Add some items to your cart to get started!</p>
+          <p className="text-gray-500 mt-2">
+            Add some items to your cart to get started!
+          </p>
           <Button onClick={() => router.push("/rooms")} className="mt-6">
             Continue Booking
           </Button>

@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
 
       await transporter.sendMail({
         from: "support@aligarhhostel.com",
-        to: ["sayyedaribhussain4321@gmail.com", "support@aligarhhostel.com"],
+        to: ["sayyedaribhussain4321@gmail.com"],
         subject: `Booking Verification for ${bookingDetails.userName}`,
         html: mailContent,
         attachments: [

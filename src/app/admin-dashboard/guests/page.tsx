@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { EllipsisVertical } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 
 import { getGuests, deleteGuest } from "@/db/queries";
 import {
@@ -32,24 +33,36 @@ interface Guest {
 }
 
 export default function Guests() {
-  const [guests, setGuests] = useState<Guest[]>([]);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    async function fetchGuests() {
+  const {
+    data: guests = [],
+    isLoading,
+    isError,
+  } = useQuery<Guest[]>({
+    queryKey: ["guests"],
+    queryFn: async () => {
       const response = await getGuests();
       if (response.status === "success" && response.data !== null) {
-        setGuests(response.data);
+        return response.data;
       }
-    }
-    fetchGuests();
-  }, []);
+      throw new Error("Failed to fetch guests");
+    },
+  });
 
-  const handleDelete = async (guestId: number) => {
-    const response = await deleteGuest(guestId);
-    if (response.status === "success") {
-      setGuests(guests.filter((guest) => guest.id !== guestId));
-    }
+  const deleteMutation = useMutation({
+    mutationFn: deleteGuest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["guests"] });
+    },
+  });
+
+  const handleDelete = (guestId: number) => {
+    deleteMutation.mutate(guestId);
   };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching guests</div>;
 
   return (
     <div className="p-4">
@@ -58,6 +71,7 @@ export default function Guests() {
           <TableHeader>
             <TableRow>
               <TableHead>Guest Name</TableHead>
+              {/* TODO: Add phone number */}
               <TableHead>Room Code</TableHead>
               <TableHead>Bed Code</TableHead>
               <TableHead>Check-In</TableHead>
@@ -68,7 +82,11 @@ export default function Guests() {
           <TableBody>
             {guests.map((guest) => (
               <TableRow key={guest.id}>
-                <TableCell>{guest.name}</TableCell>
+                <TableCell>
+                  <Link href={`/admin-dashboard/guests/${guest.id}`}>
+                    {guest.name}
+                  </Link>
+                </TableCell>
                 <TableCell>{guest.roomCode}</TableCell>
                 <TableCell>{guest.bedCode}</TableCell>
                 <TableCell>
@@ -85,7 +103,9 @@ export default function Guests() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Link href={`/admin-dashboard/${guest.id}`}>Edit</Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleDelete(guest.id)}>
                         Delete
                       </DropdownMenuItem>

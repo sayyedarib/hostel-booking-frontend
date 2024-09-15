@@ -57,34 +57,34 @@ export default function AdminDashboardLayout({
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
           >
             <Package2 className="h-6 w-6" />
-            <span className="sr-only">Acme Inc</span>
+            <span className="sr-only">Aligarh Hostel</span>
           </Link>
           <Link
-            href="#"
+            href="/admin-dashboard"
             className="text-foreground transition-colors hover:text-foreground"
           >
             Dashboard
           </Link>
           <Link
-            href="#"
+            href="/admin-dashboard/bookings"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Orders
+            Bookings
           </Link>
           <Link
-            href="#"
+            href="/admin-dashboard/users"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Products
+            Users
           </Link>
           <Link
-            href="#"
+            href="/admin-dashboard/guests"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Customers
+            Guests
           </Link>
           <Link
-            href="#"
+            href="/admin-dashboard/analytics"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Analytics

@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/table";
 import { getAnalyticsData } from "@/db/queries";
 import { BarChartComponent } from "@/components/ui/chart/bar-chart";
+import { useQuery } from "@tanstack/react-query";
 
 interface Analytics {
   totalRevenue: number;
@@ -46,29 +47,30 @@ const description =
   "An application shell with a header and main content area. The header has a navbar, a search input and and a user nav dropdown. The user nav is toggled by a button with an avatar image.";
 
 export default function AdminDashboard() {
-  const [analytics, setAnalytics] = useState<Analytics>({
-    totalRevenue: 0,
-    totalBookings: 0,
-    totalUsers: 0,
-    totalGuests: 0,
-  });
-
-  useEffect(() => {
-    async function fetchAnalytics() {
+  const {
+    data: analytics,
+    isLoading,
+    error,
+  } = useQuery<Analytics>({
+    queryKey: ["analytics"],
+    queryFn: async () => {
       const response: AnalyticsResponse = await getAnalyticsData();
       if (response.status === "success" && response.data !== undefined) {
-        setAnalytics(
+        return (
           response.data || {
             totalRevenue: 0,
             totalBookings: 0,
             totalUsers: 0,
             totalGuests: 0,
-          },
+          }
         );
       }
-    }
-    fetchAnalytics();
-  }, []);
+      throw new Error("Failed to fetch analytics data");
+    },
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>An error occurred: {error.message}</div>;
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
@@ -79,7 +81,7 @@ export default function AdminDashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{analytics.totalRevenue}</div>
+            <div className="text-2xl font-bold">₹{analytics?.totalRevenue}</div>
           </CardContent>
         </Card>
         <Card>
@@ -90,7 +92,7 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalBookings}</div>
+            <div className="text-2xl font-bold">{analytics?.totalBookings}</div>
           </CardContent>
         </Card>
         <Card>
@@ -99,7 +101,7 @@ export default function AdminDashboard() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalUsers}</div>
+            <div className="text-2xl font-bold">{analytics?.totalUsers}</div>
           </CardContent>
         </Card>
         <Card>
@@ -108,7 +110,7 @@ export default function AdminDashboard() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalGuests}</div>
+            <div className="text-2xl font-bold">{analytics?.totalGuests}</div>
           </CardContent>
         </Card>
       </div>

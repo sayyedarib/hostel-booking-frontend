@@ -13,12 +13,18 @@ export const AddToCartStep4 = () => {
 
   return (
     <div className="flex flex-col items-center justify-center h-full">
-      <Lottie animationData={successAnimation} loop={false} className="w-64 h-64" />
+      <Lottie
+        animationData={successAnimation}
+        loop={false}
+        className="w-64 h-64"
+      />
       <div className="flex items-center mb-4">
         <CheckCircle2 className="text-green-500 mr-2" size={24} />
         <h2 className="text-2xl font-bold">Guest added to cart!</h2>
       </div>
-      <p className="text-gray-500 mb-6">Your guest has been successfully added to the cart.</p>
+      <p className="text-gray-500 mb-6">
+        Your guest has been successfully added to the cart.
+      </p>
       <Button
         onClick={handleGoToCart}
         className="bg-primary text-white flex items-center justify-center"

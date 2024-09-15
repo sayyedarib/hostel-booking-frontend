@@ -782,6 +782,80 @@ export const getAgreementFormData = async () => {
   }
 };
 
+export const getUserTransactions = async (userId: number) => {
+  try {
+    const transactions = await db
+      .select({
+        id: TranscationTable.id,
+        amount: TranscationTable.amount,
+        createdAt: TranscationTable.createdAt,
+        verified: TranscationTable.verified,
+      })
+      .from(TranscationTable)
+      .where(eq(TranscationTable.userId, userId));
+
+    logger("info", "Fetched user transactions", { transactions });
+    return { status: "success", data: transactions };
+  } catch (error) {
+    logger("error", "Error fetching user transactions", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getGuestBookings = async (guestId: number) => {
+  try {
+    const bookings = await db
+      .select({
+        id: BedBookingTable.id,
+        roomCode: RoomTable.roomCode,
+        bedCode: BedTable.bedCode,
+        checkIn: BedBookingTable.checkIn,
+        checkOut: BedBookingTable.checkOut,
+        status: BedBookingTable.status,
+      })
+      .from(BedBookingTable)
+      .innerJoin(BookingTable, eq(BedBookingTable.bookingId, BookingTable.id))
+      .innerJoin(BedTable, eq(BedBookingTable.bedId, BedTable.id))
+      .innerJoin(RoomTable, eq(BedTable.roomId, RoomTable.id))
+      .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
+      .innerJoin(GuestTable, eq(UserTable.id, GuestTable.userId))
+      .where(eq(GuestTable.id, guestId));
+
+    logger("info", "Fetched user bookings", { bookings });
+    return { status: "success", data: bookings };
+  } catch (error) {
+    logger("error", "Error fetching user bookings", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getGuest = async (guestId: number) => {
+  try {
+    const guest = await db
+      .select({
+        id: GuestTable.id,
+        name: GuestTable.name,
+        email: GuestTable.email,
+        phone: GuestTable.phone,
+        photoUrl: GuestTable.photoUrl,
+        aadhaarUrl: GuestTable.aadhaarUrl,
+        purpose: GuestTable.purpose,
+        dob: GuestTable.dob,
+        userId: UserTable.id,
+        userName: UserTable.name,
+      })
+      .from(GuestTable)
+      .innerJoin(UserTable, eq(GuestTable.userId, UserTable.id))
+      .where(eq(GuestTable.id, guestId));
+
+    logger("info", "Fetched guest", { guest });
+    return { status: "success", data: guest };
+  } catch (error) {
+    logger("error", "Error fetching guest", { error });
+    return { status: "error", data: null };
+  }
+};
+
 export const getAnalyticsData = async () => {
   try {
     const totalRevenue = await db
