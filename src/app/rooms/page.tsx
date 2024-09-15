@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import type { RoomCard } from "@/interface";
+import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
+import Link from "next/link";
 
 import Header from "@/components/header";
 import { getAllRoomCards } from "@/db/queries";
@@ -13,43 +13,34 @@ import { logger } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 
 export default function Rooms() {
-  const router = useRouter();
-
-  const [rooms, setRooms] = useState<RoomCard[]>([]);
-  const [fetching, setFetching] = useState(true);
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchRooms = async () => {
+  const {
+    isLoading,
+    error,
+    data: rooms,
+  } = useQuery({
+    queryKey: ["rooms"],
+    queryFn: async () => {
       const { status, data } = await getAllRoomCards();
-
       if (status === "error" || !data) {
         toast({
           title: "Something went wrong",
           description: "Failed to fetch rooms, Please try again later",
         });
-        setFetching(false);
         logger("error", "Failed to fetch rooms");
-        return;
+        throw new Error("Failed to fetch rooms");
       }
-
-      if (status === "success") {
-        setFetching(false);
-        //TODO: if there are no rooms, then show a message in center of the screen that no rooms found
-        setRooms(data);
-      }
-      setFetching(false);
-    };
-
-    fetchRooms();
-  }, []);
+      return data;
+    },
+  });
 
   return (
     <>
-      <Header className="fixed top-0 left-0 right-0 z-9999" />
+      <Header className="fixed top-0 left-0 right-0 z-10" />
 
       <div className="flex justify-center items-center min-h-[80vh] max-w-screen mt-20 relative -z-1">
-        {fetching ? (
+        {isLoading ? (
           <Image
             src="/Loading.gif"
             width={100}
@@ -57,18 +48,19 @@ export default function Rooms() {
             alt="loading"
             unoptimized={true}
           />
+        ) : error ? (
+          <div>Error: {error.message}</div>
+        ) : rooms?.length === 0 ? (
+          <div>No rooms found</div>
         ) : (
           <div className="my-12 md:my-20 relative flex flex-wrap gap-10 items-center justify-center -z-1">
-            {rooms.map((room) => (
+            {rooms?.map((room) => (
               <RoomCardComponent key={room.roomCode} roomData={room} />
             ))}
           </div>
         )}
-        <Button
-          onClick={() => router.push("/cart")}
-          className="md:hidden fixed bottom-0 left-0 right-0 rounded-none"
-        >
-          Go to Cart
+        <Button className="md:hidden fixed bottom-0 left-0 right-0 rounded-none">
+          <Link href="/cart">Go to Cart</Link>
         </Button>
       </div>
     </>
