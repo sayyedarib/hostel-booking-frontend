@@ -125,7 +125,7 @@ export default function AddToCartDrawer({
         </Button>
       </DrawerTrigger>
       <DrawerContent className="min-h-[60vh]">
-        <Progress value={((currentStep - 1) / 4) * 100} className="w-full mb-4 mt-2" />
+        <Progress value={((currentStep - 1) / 3) * 100} className="w-full mb-4 mt-2" />
         {currentStep === 1 && (
           <AddToCartStep1
             cartData={cartData || []}

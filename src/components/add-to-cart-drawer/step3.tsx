@@ -311,7 +311,7 @@ export const AddToCartStep3 = ({
           <Button
             type="submit"
             onClick={handleSubmit}
-            className="w-full h-12 bg-blue-600 text-white rounded-lg"
+            className="w-full h-12 bg-yellow-500 text-white rounded-lg"
             disabled={
               loading ||
               !name ||
