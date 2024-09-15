@@ -3,12 +3,9 @@ import { Playfair_Display } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
-import {
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
 
 import "./globals.css";
+import { ReactQueryProvider } from "@/components/react-query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -37,10 +34,12 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
-            {children}
-            <Toaster />
-            <SpeedInsights />
-            <Analytics />
+            <ReactQueryProvider>
+              {children}
+              <Toaster />
+              <SpeedInsights />
+              <Analytics />
+            </ReactQueryProvider>
           </ThemeProvider>
         </body>
       </html>

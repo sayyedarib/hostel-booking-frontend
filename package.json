@@ -70,6 +70,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.56.1",
+    "@tanstack/react-query-devtools": "^5.56.2",
     "@types/node": "^20",
     "@types/number-to-words": "^1.2.3",
     "@types/react": "^18",
