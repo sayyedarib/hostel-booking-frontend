@@ -4,12 +4,7 @@ import { useState, useEffect } from "react";
 import { useQueryState, parseAsInteger } from "nuqs";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  Menu,
-  X,
-  CircleX,
-  MoveRight,
-} from "lucide-react";
+import { Menu, X, CircleX, MoveRight } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 import { getCartItemsCount } from "@/db/queries";
