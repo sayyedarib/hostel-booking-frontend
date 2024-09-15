@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import HeroSection from "@/components/landing-page/hero-section";
@@ -145,8 +146,20 @@ export default function Home() {
         <FAQ />
       </div>
 
-      <div className="w-full flex flex-wrap items-center justify-between px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 bg-neutral-100 backdrop-blur-3xl shadow-md">
+      <div className="w-full flex flex-col items-center justify-cetner px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 bg-neutral-100 backdrop-blur-3xl shadow-md">
         <Footer />
+        <div className="mt-2 pt-2 border-gray-700">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <Image src="/logo.png" alt="Khan Group of PG Logo" width={100} height={50} />
+            </div>
+            <div className="text-sm">
+              <Link href="/privacy-policy" className="mr-4 hover:underline">Privacy Policy</Link>
+              <Link href="/terms-of-service" className="hover:underline">Terms of Service</Link>
+            </div>
+            <p className="text-sm mt-4 md:mt-0">&copy; 2024 Khan Group of PG. All rights reserved.</p>
+          </div>
+        </div>
       </div>
       <Button
         onClick={() => router.push("/rooms")}
