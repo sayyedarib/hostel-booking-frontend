@@ -6,10 +6,7 @@ import { Analytics } from "@vercel/analytics/react";
 import {
   QueryClient,
   QueryClientProvider,
-  useQuery,
 } from "@tanstack/react-query";
-
-const queryClient = new QueryClient();
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -40,12 +37,10 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
-            <QueryClientProvider client={queryClient}>
-              {children}
-              <Toaster />
-              <SpeedInsights />
-              <Analytics />
-            </QueryClientProvider>
+            {children}
+            <Toaster />
+            <SpeedInsights />
+            <Analytics />
           </ThemeProvider>
         </body>
       </html>
