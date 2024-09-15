@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { IndianRupee, Trash2 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
+import Lottie from "lottie-react";
 
+import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
 import {
   getCartItems,
@@ -17,6 +19,7 @@ import { CartItem } from "@/interface";
 import { Separator } from "@/components/ui/separator";
 import { differenceInDays } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
+import emptyCartAnimation from "../../../public/empty_cart.json";
 
 export default function CartPage() {
   const router = useRouter();
@@ -88,6 +91,7 @@ export default function CartPage() {
 
   return (
     <>
+    <Header className="sticky top-0 z-50"/>
       {fetching ? (
         <div className="min-h-[80vh] min-w-screen flex justify-center items-center">
           <Image
@@ -97,6 +101,15 @@ export default function CartPage() {
             alt="loading"
             unoptimized={true}
           />
+        </div>
+      ) : cartItems.length === 0 ? (
+        <div className="min-h-[80vh] min-w-screen flex flex-col justify-center items-center">
+          <Lottie animationData={emptyCartAnimation} style={{ width: 300, height: 300 }} />
+          <h2 className="text-2xl font-semibold mt-4">Your cart is empty</h2>
+          <p className="text-gray-500 mt-2">Add some items to your cart to get started!</p>
+          <Button onClick={() => router.push("/rooms")} className="mt-6">
+            Continue Booking
+          </Button>
         </div>
       ) : (
         <div className="container mx-auto p-4 sm:p-6">
