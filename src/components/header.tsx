@@ -7,12 +7,10 @@ import Image from "next/image";
 import {
   Menu,
   X,
-  ShoppingCart,
-  ArrowRight,
   CircleX,
   MoveRight,
 } from "lucide-react";
-import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 import { getCartItemsCount } from "@/db/queries";
 

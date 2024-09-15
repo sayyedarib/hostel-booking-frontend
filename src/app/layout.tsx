@@ -13,7 +13,6 @@ const queryClient = new QueryClient();
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 
 const inter = Playfair_Display({ subsets: ["latin"] });

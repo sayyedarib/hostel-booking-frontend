@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+
 import { useInView } from "react-intersection-observer";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -7,20 +7,11 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import HeroSection from "@/components/landing-page/hero-section";
-import Testimonials from "@/components/landing-page/testimonials";
 import Header from "@/components/header";
 import Footer from "@/components/landing-page/footer";
 import Carousel from "@/components/ui/carousel-2";
-import Quotes from "@/components/quotes";
 import FAQ from "@/components/landing-page/faq";
-import Facilities from "@/components/landing-page/facilities";
-import BedTypes from "@/components/landing-page/bed-types";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+
 export default function Home() {
   const [ref, inView] = useInView({
     triggerOnce: true,
