@@ -3,6 +3,13 @@ import { Playfair_Display } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -34,10 +41,12 @@ export default function RootLayout({
             enableSystem={false}
             disableTransitionOnChange
           >
-            {children}
-            <Toaster />
+            <QueryClientProvider client={queryClient}>
+              {children}
+              <Toaster />
             <SpeedInsights />
-            <Analytics />
+              <Analytics />
+            </QueryClientProvider>
           </ThemeProvider>
         </body>
       </html>
