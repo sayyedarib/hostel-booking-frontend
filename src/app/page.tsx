@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <>
-      <Header className="fixed top-0 left-0 right-0 z-9999" />
+      <Header className="fixed top-0 left-0 right-0 z-10" />
 
       <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center mt-20">
         <HeroSection />
