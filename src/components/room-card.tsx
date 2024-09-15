@@ -17,17 +17,16 @@ import { RoomCard } from "@/interface";
 import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
+
   return (
     <Card className="w-full p-2 md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl space-y-3">
-      <Link href="/rooms">
-        <Image
-          src={roomData.imageUrls?.[0] || "/img/fall_back_room.png"}
-          height="1000"
-          width="1000"
-          className="h-64 w-full object-cover rounded-xl"
-          alt="thumbnail"
-        />
-      </Link>
+      <Image
+        src={roomData.imageUrls?.[0] || "/img/fall_back_room.png"}
+        height="1000"
+        width="1000"
+        className="h-64 w-full object-cover rounded-xl"
+        alt="thumbnail"
+      />
 
       <div className="flex items-center justify-between">
         <CardTitle className="text-lg font-semibold">
@@ -39,9 +38,8 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
         </div>
       </div>
       <CardDescription className="text-sm text-gray-600">
-        Room: {roomData.roomCode}
+        Room: {roomData.roomCode} | Max Persons: {roomData.bedCount}
       </CardDescription>
-      {/* TODO: why roomData.id is string here, it should be number always no need to convert */}
       <AddToCartDrawer roomId={Number(roomData.id)} />
     </Card>
   );

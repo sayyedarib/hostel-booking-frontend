@@ -19,6 +19,7 @@ export interface RoomCard {
   roomCode: string;
   imageUrls: string[] | null;
   gender: string;
+  bedCount: number;
 }
 
 export interface CartItemShort {

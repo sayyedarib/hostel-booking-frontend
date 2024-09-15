@@ -282,9 +282,12 @@ export const getAllRoomCards = async () => {
         roomCode: RoomTable.roomCode,
         imageUrls: RoomTable.imageUrls,
         gender: RoomTable.gender,
+        bedCount: sql<number>`COUNT(${BedTable.id})::int`,
       })
       .from(RoomTable)
-      .innerJoin(PropertyTable, eq(RoomTable.propertyId, PropertyTable.id));
+      .innerJoin(PropertyTable, eq(RoomTable.propertyId, PropertyTable.id))
+      .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
+      .groupBy(RoomTable.id, PropertyTable.name);
     logger("info", "Fetched all room cards");
     return { status: "success", data: rooms };
   } catch (error) {
