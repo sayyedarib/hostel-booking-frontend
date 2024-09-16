@@ -630,15 +630,7 @@ export const getAdminRoomData = async () => {
         roomCode: RoomTable.roomCode,
         floor: RoomTable.floor,
         gender: RoomTable.gender,
-        beds: sql`
-          array_agg(json_build_object(
-            'id', ${BedTable.id},
-            'bedCode', ${BedTable.bedCode},
-            'type', ${BedTable.type},
-            'monthlyRent', ${BedTable.monthlyRent},
-            'dailyRent', ${BedTable.dailyRent}
-          )) FILTER (WHERE ${BedTable.id} IS NOT NULL)
-        `,
+        bedCount: sql<number>`count(${BedTable.id})`,
       })
       .from(RoomTable)
       .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
@@ -1471,5 +1463,244 @@ export const updateUserImageUrl = async ({
   } catch (error) {
     logger("error", "Error updating user image URL", { error });
     return { status: "error", data: null };
+  }
+};
+
+export const getRoomById = async (roomId: number) => {
+  try {
+    logger("info", "Fetching room by ID", { roomId });
+    const room = await db
+      .select({
+        id: RoomTable.id,
+        roomCode: RoomTable.roomCode,
+        floor: RoomTable.floor,
+        gender: RoomTable.gender,
+        imageUrls: RoomTable.imageUrls,
+        beds: {
+          id: BedTable.id,
+          bedCode: BedTable.bedCode,
+          type: BedTable.type,
+          monthlyRent: BedTable.monthlyRent,
+        },
+        property: {
+          id: PropertyTable.id,
+          name: PropertyTable.name,
+          address: PropertyTable.address,
+        },
+      })
+      .from(RoomTable)
+      .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
+      .innerJoin(PropertyTable, eq(RoomTable.propertyId, PropertyTable.id))
+      .where(eq(RoomTable.id, roomId));
+
+    const roomWithBeds = {
+      ...room[0],
+      beds: room.map((r) => r.beds).filter((bed) => bed?.id !== null),
+    };
+
+    logger("info", "Room fetched successfully", { roomWithBeds });
+    return { status: "success", data: [roomWithBeds] };
+  } catch (error) {
+    logger("error", "Error fetching room by ID", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const addBedToRoom = async (
+  roomId: number,
+  bedCode: string,
+  type: string,
+  monthlyRent: number,
+  dailyRent: number,
+) => {
+  try {
+    logger("info", "Adding bed to room", {
+      roomId,
+      bedCode,
+      type,
+      monthlyRent,
+      dailyRent,
+    });
+
+    const newBed = await db
+      .insert(BedTable)
+      .values({
+        roomId,
+        bedCode,
+        type,
+        monthlyRent,
+        dailyRent,
+      })
+      .returning();
+
+    logger("info", "Bed added successfully", { newBed });
+    return { status: "success", data: newBed[0] };
+  } catch (error) {
+    logger("error", "Error adding bed to room", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateRoomDetails = async (
+  roomId: number,
+  roomCode: string,
+  floor: number,
+  gender: string,
+) => {
+  try {
+    logger("info", "Updating room details", {
+      roomId,
+      roomCode,
+      floor,
+      gender,
+    });
+
+    const updatedRoom = await db
+      .update(RoomTable)
+      .set({
+        roomCode,
+        floor,
+        gender,
+      })
+      .where(eq(RoomTable.id, roomId))
+      .returning();
+
+    if (updatedRoom.length === 0) {
+      logger("warn", "Room not found for update", { roomId });
+      return { status: "error", data: null, message: "Room not found" };
+    }
+
+    logger("info", "Room details updated successfully", { updatedRoom });
+    return { status: "success", data: updatedRoom[0] };
+  } catch (error) {
+    logger("error", "Error updating room details", { error, roomId });
+    return {
+      status: "error",
+      data: null,
+      message: "Failed to update room details",
+    };
+  }
+};
+
+export const updateBedDetails = async (
+  bedId: number,
+  bedCode: string,
+  type: string,
+  monthlyRent: number,
+) => {
+  try {
+    logger("info", "Updating bed details", {
+      bedId,
+      bedCode,
+      type,
+      monthlyRent,
+    });
+
+    const updatedBed = await db
+      .update(BedTable)
+      .set({
+        bedCode,
+        type,
+        monthlyRent,
+      })
+      .where(eq(BedTable.id, bedId))
+      .returning();
+
+    if (updatedBed.length === 0) {
+      logger("warn", "Bed not found for update", { bedId });
+      return { status: "error", data: null, message: "Bed not found" };
+    }
+
+    logger("info", "Bed details updated successfully", { updatedBed });
+    return { status: "success", data: updatedBed[0] };
+  } catch (error) {
+    logger("error", "Error updating bed details", { error, bedId });
+    return {
+      status: "error",
+      data: null,
+      message: "Failed to update bed details",
+    };
+  }
+};
+
+export const addRoomImage = async (roomId: number, imageUrl: string) => {
+  try {
+    logger("info", "Adding image to room", { roomId, imageUrl });
+
+    const insertedImage = await db
+      .update(RoomTable)
+      .set({
+        imageUrls: sql`${RoomTable.imageUrls} || ARRAY[${imageUrl}]::text[]`,
+      })
+      .returning();
+
+    if (insertedImage.length === 0) {
+      logger("warn", "Failed to add image to room", { roomId });
+      return { status: "error", data: null, message: "Failed to add image" };
+    }
+
+    logger("info", "Image added successfully", { insertedImage });
+    return { status: "success", data: insertedImage[0] };
+  } catch (error) {
+    logger("error", "Error adding image to room", { error, roomId });
+    return {
+      status: "error",
+      data: null,
+      message: "Failed to add image to room",
+    };
+  }
+};
+
+export const deleteImage = async (roomId: number, imageUrl: string) => {
+  try {
+    logger("info", "Deleting image from room", { roomId, imageUrl });
+    const updatedRoom = await db
+      .update(RoomTable)
+      .set({
+        imageUrls: sql`array_remove(${RoomTable.imageUrls}, ${imageUrl}::text)`,
+      })
+      .where(eq(RoomTable.id, roomId))
+      .returning();
+
+    if (updatedRoom.length === 0) {
+      logger("warn", "Failed to delete image from room", { roomId });
+      return { status: "error", data: null, message: "Failed to delete image" };
+    }
+
+    logger("info", "Image deleted successfully", { updatedRoom });
+    return { status: "success", data: updatedRoom[0] };
+  } catch (error) {
+    logger("error", "Error deleting image from room", {
+      error: error as Error,
+      roomId,
+    });
+    return {
+      status: "error",
+      data: null,
+      message: "Failed to delete image from room",
+    };
+  }
+};
+
+export const createRoom = async (roomCode: string, floor: number, gender: string, propertyId: number) => {
+  try {
+    logger("info", "Creating room", { roomCode, floor, gender, propertyId });
+
+    const newRoom = await db.insert(RoomTable).values({
+      roomCode,
+      floor,
+      gender,
+      propertyId,
+    }).returning();
+
+    logger("info", "Room created successfully", { newRoom });
+    return { status: "success", data: newRoom[0] };
+  } catch (error) {
+    logger("error", "Error creating room", { error, roomCode, floor, gender, propertyId });
+    return {
+      status: "error",
+      data: null,
+      message: "Failed to create room",
+    };
   }
 };

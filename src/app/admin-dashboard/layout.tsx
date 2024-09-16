@@ -66,10 +66,10 @@ export default function AdminDashboardLayout({
             Dashboard
           </Link>
           <Link
-            href="/admin-dashboard/bookings"
+            href="/admin-dashboard/rooms"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
-            Bookings
+            Rooms
           </Link>
           <Link
             href="/admin-dashboard/users"

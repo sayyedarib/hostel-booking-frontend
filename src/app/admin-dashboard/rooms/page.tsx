@@ -1,7 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { getAdminRoomData } from "@/db/queries";
+import Link from "next/link";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+
+import { getAdminRoomData, createRoom } from "@/db/queries";
 import {
   Table,
   TableBody,
@@ -12,81 +15,70 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-interface Bed {
-  id: number;
-  bedCode: string;
-  type: string;
-  monthlyRent: number;
-  dailyRent: number;
-}
+import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import AddRoomDialogue from "@/components/add-room-dialogue";
 
 interface Room {
   id: number;
   roomCode: string;
   floor: number;
   gender: string;
-  beds: Bed[];
+  bedCount: number;
 }
 
 export default function Rooms() {
-  const [rooms, setRooms] = useState<Room[]>([]);
+  const [formData, setFormData] = useState({
+    roomCode: "",
+    floor: 0,
+    gender: "male",
+  });
 
-  useEffect(() => {
-    async function fetchRooms() {
+  const { data: rooms, isLoading, error } = useQuery({
+    queryKey: ["adminRoomData"],
+    queryFn: async () => {
       const response = await getAdminRoomData();
       if (response.status === "success" && response.data !== null) {
-        setRooms(response.data as Room[]);
+        return response.data;
       }
-    }
-    fetchRooms();
-  }, []);
+      throw new Error("Failed to fetch admin room data");
+    },
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>An error occurred: {error.message}</div>;
 
   return (
     <div className="p-4">
-      <div className="hidden md:block">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Room Code</TableHead>
-              <TableHead>Floor</TableHead>
-              <TableHead>Gender</TableHead>
-              <TableHead>Bed Codes</TableHead>
-              <TableHead>Bed Types</TableHead>
+      <div className="mb-4">
+        <AddRoomDialogue />
+      </div>
+
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Room Code</TableHead>
+            <TableHead>Floor</TableHead>
+            <TableHead>Gender</TableHead>
+            <TableHead>Number of Beds</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {rooms?.map((room: Room) => (
+            <TableRow key={room.id}>
+              <TableCell>
+                <Link href={`/admin-dashboard/rooms/${room.id}`}>
+                  {room.roomCode}
+                </Link>
+              </TableCell>
+              <TableCell>{room.floor}</TableCell>
+              <TableCell>{room.gender}</TableCell>
+              <TableCell>{room.bedCount}</TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rooms.map((room) => (
-              <TableRow key={room.id}>
-                <TableCell>{room.roomCode}</TableCell>
-                <TableCell>{room.floor}</TableCell>
-                <TableCell>{room.gender}</TableCell>
-                <TableCell>
-                  {room.beds.map((bed) => bed.bedCode).join(", ")}
-                </TableCell>
-                <TableCell>
-                  {room.beds.map((bed) => bed.type).join(", ")}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-      <div className="block md:hidden">
-        {rooms.map((room) => (
-          <Card key={room.id} className="mb-4">
-            <CardHeader>
-              <CardTitle>{room.roomCode}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p>Floor: {room.floor}</p>
-              <p>Gender: {room.gender}</p>
-              <p>Bed Codes: {room.beds.map((bed) => bed.bedCode).join(", ")}</p>
-              <p>Bed Types: {room.beds.map((bed) => bed.type).join(", ")}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
