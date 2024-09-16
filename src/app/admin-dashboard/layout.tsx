@@ -144,7 +144,7 @@ export default function AdminDashboardLayout({
             </nav>
           </SheetContent>
         </Sheet>
-        <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
+        <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4 md:hidden">
           <h2>
             <Link href="/">Khan Group of PG</Link>
           </h2>
