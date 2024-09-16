@@ -1030,10 +1030,13 @@ export const getAnalyticsData = async () => {
       .from(GuestTable);
 
     return {
-      totalRevenue: totalRevenue[0].total,
-      totalBookings: totalBookings[0].count,
-      totalUsers: totalUsers[0].count,
-      totalGuests: totalGuests[0].count,
+      status: "success",
+      data: {
+        totalRevenue: totalRevenue[0].total,
+        totalBookings: totalBookings[0].count,
+        totalUsers: totalUsers[0].count,
+        totalGuests: totalGuests[0].count,
+      },
     };
   } catch (error) {
     logger("error", "Error fetching analytics data", { error });
@@ -1682,25 +1685,92 @@ export const deleteImage = async (roomId: number, imageUrl: string) => {
   }
 };
 
-export const createRoom = async (roomCode: string, floor: number, gender: string, propertyId: number) => {
+export const createRoom = async (
+  roomCode: string,
+  floor: number,
+  gender: string,
+  propertyId: number,
+) => {
   try {
     logger("info", "Creating room", { roomCode, floor, gender, propertyId });
 
-    const newRoom = await db.insert(RoomTable).values({
-      roomCode,
-      floor,
-      gender,
-      propertyId,
-    }).returning();
+    const newRoom = await db
+      .insert(RoomTable)
+      .values({
+        roomCode,
+        floor,
+        gender,
+        propertyId,
+      })
+      .returning();
 
     logger("info", "Room created successfully", { newRoom });
     return { status: "success", data: newRoom[0] };
   } catch (error) {
-    logger("error", "Error creating room", { error, roomCode, floor, gender, propertyId });
+    logger("error", "Error creating room", {
+      error,
+      roomCode,
+      floor,
+      gender,
+      propertyId,
+    });
     return {
       status: "error",
       data: null,
       message: "Failed to create room",
     };
+  }
+};
+
+export const getRevenueAndBookingsData = async (
+  startDate: Date,
+  endDate: Date,
+) => {
+  try {
+    logger("info", "Fetching revenue and bookings data", {
+      startDate,
+      endDate,
+    });
+    const revenueAndBookings = await db
+      .select({
+        month: sql<string>`to_char(${TranscationTable.createdAt}, 'Month')`,
+        revenue: sql<number>`sum(${TranscationTable.amount})`,
+        bookings: count(BookingTable.id),
+      })
+      .from(TranscationTable)
+      .innerJoin(
+        BookingTable,
+        eq(TranscationTable.id, BookingTable.transactionId),
+      )
+      .innerJoin(
+        BedBookingTable,
+        and(
+          eq(BookingTable.id, BedBookingTable.bookingId),
+          inArray(BedBookingTable.status, ["checked_in", "checked_out"]),
+        ),
+      )
+      .where(
+        and(
+          gte(TranscationTable.createdAt, startDate),
+          lte(TranscationTable.createdAt, endDate),
+        ),
+      )
+      .groupBy(sql<string>`to_char(${TranscationTable.createdAt}, 'Month')`)
+      .orderBy(sql<string>`to_char(${TranscationTable.createdAt}, 'Month')`);
+
+    const formattedData = revenueAndBookings.map((item) => ({
+      month: item.month,
+      revenue: item.revenue,
+      bookings: Number(item.bookings),
+    }));
+
+    logger("info", "Revenue and bookings data fetched successfully", {
+      formattedData,
+    });
+
+    return { status: "success", data: formattedData };
+  } catch (error) {
+    console.error("Error fetching revenue and bookings data:", error);
+    return { status: "error", data: null };
   }
 };

@@ -163,12 +163,6 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <Button
-        onClick={() => router.push("/rooms")}
-        className="fixed w-full rounded-none bottom-0 md:hidden"
-      >
-        Book Now
-      </Button>
     </>
   );
 }

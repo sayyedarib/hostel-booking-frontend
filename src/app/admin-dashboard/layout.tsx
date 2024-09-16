@@ -1,10 +1,9 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   Activity,
   ArrowUpRight,
   CircleUser,
-  CreditCard,
-  DollarSign,
   Menu,
   Package2,
   Search,
@@ -53,10 +52,15 @@ export default function AdminDashboardLayout({
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
-            href="#"
+            href="/"
             className="flex items-center gap-2 text-lg font-semibold md:text-base"
           >
-            <Package2 className="h-6 w-6" />
+            <Image
+              src="/logo.png"
+              alt="Aligarh Hostel"
+              width={32}
+              height={32}
+            />
             <span className="sr-only">Aligarh Hostel</span>
           </Link>
           <Link
@@ -108,31 +112,31 @@ export default function AdminDashboardLayout({
                 className="flex items-center gap-2 text-lg font-semibold"
               >
                 <Package2 className="h-6 w-6" />
-                <span className="sr-only">Acme Inc</span>
+                <span className="sr-only">Aligarh Hostel</span>
               </Link>
-              <Link href="#" className="hover:text-foreground">
+              <Link href="/admin-dashboard" className="hover:text-foreground">
                 Dashboard
               </Link>
               <Link
-                href="#"
+                href="/admin-dashboard/rooms"
                 className="text-muted-foreground hover:text-foreground"
               >
-                Orders
+                Rooms
               </Link>
               <Link
-                href="#"
+                href="/admin-dashboard/users"
                 className="text-muted-foreground hover:text-foreground"
               >
-                Products
+                Users
               </Link>
               <Link
-                href="#"
+                href="/admin-dashboard/guests"
                 className="text-muted-foreground hover:text-foreground"
               >
-                Customers
+                Guests
               </Link>
               <Link
-                href="#"
+                href="/admin-dashboard/analytics"
                 className="text-muted-foreground hover:text-foreground"
               >
                 Analytics
@@ -141,32 +145,9 @@ export default function AdminDashboardLayout({
           </SheetContent>
         </Sheet>
         <div className="flex w-full items-center gap-4 md:ml-auto md:gap-2 lg:gap-4">
-          <form className="ml-auto flex-1 sm:flex-initial">
-            <div className="relative">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Search products..."
-                className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px]"
-              />
-            </div>
-          </form>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="secondary" size="icon" className="rounded-full">
-                <CircleUser className="h-5 w-5" />
-                <span className="sr-only">Toggle user menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Support</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <h2>
+            <Link href="/">Khan Group of PG</Link>
+          </h2>
         </div>
       </header>
       {children}

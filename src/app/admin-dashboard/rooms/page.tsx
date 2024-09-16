@@ -15,7 +15,12 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AddRoomDialogue from "@/components/add-room-dialogue";
@@ -35,7 +40,11 @@ export default function Rooms() {
     gender: "male",
   });
 
-  const { data: rooms, isLoading, error } = useQuery({
+  const {
+    data: rooms,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["adminRoomData"],
     queryFn: async () => {
       const response = await getAdminRoomData();

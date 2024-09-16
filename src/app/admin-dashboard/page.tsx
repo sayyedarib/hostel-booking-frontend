@@ -9,6 +9,7 @@ import {
   DollarSign,
   Users,
 } from "lucide-react";
+import { format, subMonths } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,8 +28,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { getAnalyticsData } from "@/db/queries";
+import { getAnalyticsData, getRevenueAndBookingsData } from "@/db/queries";
 import { BarChartComponent } from "@/components/ui/chart/bar-chart";
+import { AreaChartComponent } from "@/components/ui/chart/area-chart";
+import { PieChartComponent } from "@/components/ui/chart/pie-chart";
+import { LineChartComponent } from "@/components/ui/chart/line-chart";
 import { useQuery } from "@tanstack/react-query";
 
 interface Analytics {
@@ -47,14 +51,20 @@ const description =
   "An application shell with a header and main content area. The header has a navbar, a search input and and a user nav dropdown. The user nav is toggled by a button with an avatar image.";
 
 export default function AdminDashboard() {
+  const [dateRange, setDateRange] = useState({
+    startDate: subMonths(new Date(), 6),
+    endDate: new Date(),
+  });
+
   const {
     data: analytics,
-    isLoading,
-    error,
+    isLoading: analyticsLoading,
+    error: analyticsError,
   } = useQuery<Analytics>({
     queryKey: ["analytics"],
     queryFn: async () => {
       const response: AnalyticsResponse = await getAnalyticsData();
+      console.log(response);
       if (response.status === "success" && response.data !== undefined) {
         return (
           response.data || {
@@ -69,8 +79,39 @@ export default function AdminDashboard() {
     },
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>An error occurred: {error.message}</div>;
+  const {
+    data: revenueAndBookingsData,
+    isLoading: revenueAndBookingsLoading,
+    error: revenueAndBookingsError,
+  } = useQuery({
+    queryKey: ["revenueAndBookings", dateRange.startDate, dateRange.endDate],
+    queryFn: async () => {
+      const response: {
+        status: string;
+        data: { month: string; revenue: number; bookings: number }[] | null;
+      } = await getRevenueAndBookingsData(
+        new Date("2024-09-01"),
+        new Date("2024-09-30"),
+      );
+      console.log(response);
+      if (response.status === "success" && response.data !== null) {
+        return response.data;
+      }
+      throw new Error("Failed to fetch revenue and bookings data");
+    },
+  });
+
+  if (analyticsLoading || revenueAndBookingsLoading)
+    return <div>Loading...</div>;
+  if (analyticsError)
+    return <div>An error occurred: {analyticsError.message}</div>;
+  if (revenueAndBookingsError)
+    return <div>An error occurred: {revenueAndBookingsError.message}</div>;
+
+  const formattedDateRange = `${format(
+    dateRange.startDate,
+    "MMMM yyyy",
+  )} - ${format(dateRange.endDate, "MMMM yyyy")}`;
 
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
@@ -118,90 +159,16 @@ export default function AdminDashboard() {
         <Card className="xl:col-span-2">
           <CardHeader className="flex flex-row items-center">
             <div className="grid gap-2">
-              <CardTitle>Transactions</CardTitle>
-              <CardDescription>
-                Recent transactions from your store.
-              </CardDescription>
+              <CardTitle>Revenue and Bookings</CardTitle>
+              <CardDescription>{formattedDateRange}</CardDescription>
             </div>
-            <Button asChild size="sm" className="ml-auto gap-1">
-              <Link href="#">
-                View All
-                <ArrowUpRight className="h-4 w-4" />
-              </Link>
-            </Button>
           </CardHeader>
           <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Customer</TableHead>
-                  <TableHead className="hidden xl:table-column">Type</TableHead>
-                  <TableHead className="hidden xl:table-column">
-                    Status
-                  </TableHead>
-                  <TableHead className="hidden xl:table-column">Date</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <div className="font-medium">Liam Johnson</div>
-                    <div className="hidden text-sm text-muted-foreground md:inline">
-                      liam@example.com
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden xl:table-column">Sale</TableCell>
-                  <TableCell className="hidden xl:table-column">
-                    <Badge className="text-xs" variant="outline">
-                      Approved
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="hidden md:table-cell lg:hidden xl:table-column">
-                    2023-06-23
-                  </TableCell>
-                  <TableCell className="text-right">$250.00</TableCell>
-                </TableRow>
-                {/* Add more rows as needed */}
-              </TableBody>
-            </Table>
+            <BarChartComponent />
+            <LineChartComponent />
+            <PieChartComponent />
+            <AreaChartComponent />
           </CardContent>
-        </Card>
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Sales</CardTitle>
-          </CardHeader>
-          <CardContent className="grid gap-8">
-            <div className="flex items-center gap-4">
-              <Avatar className="hidden h-9 w-9 sm:flex">
-                <AvatarImage src="/avatars/01.png" alt="Avatar" />
-                <AvatarFallback>OM</AvatarFallback>
-              </Avatar>
-              <div className="grid gap-1">
-                <p className="text-sm font-medium leading-none">
-                  Olivia Martin
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  olivia.martin@email.com
-                </p>
-              </div>
-              <div className="ml-auto font-medium">+$1,999.00</div>
-            </div>
-            {/* Add more recent sales as needed */}
-          </CardContent>
-        </Card>
-      </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <CardHeader className="flex flex-row items-center">
-            <div className="grid gap-2">
-              <CardTitle>Revenue Chart</CardTitle>
-              <CardDescription>
-                Monthly revenue for the current year.
-              </CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent></CardContent>
         </Card>
       </div>
     </main>

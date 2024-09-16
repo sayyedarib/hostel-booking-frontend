@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogTitle, DialogTrigger, DialogFooter, DialogHeader } from "./ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogHeader,
+} from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -18,8 +25,18 @@ export default function AddRoomDialogue() {
 
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: (formData: { roomCode: string; floor: number; gender: string; propertyId: number }) => 
-      createRoom(formData.roomCode, formData.floor, formData.gender, formData.propertyId),
+    mutationFn: (formData: {
+      roomCode: string;
+      floor: number;
+      gender: string;
+      propertyId: number;
+    }) =>
+      createRoom(
+        formData.roomCode,
+        formData.floor,
+        formData.gender,
+        formData.propertyId,
+      ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["adminRoomData"] });
       setIsDialogOpen(false);
