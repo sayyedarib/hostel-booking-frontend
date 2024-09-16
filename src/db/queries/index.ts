@@ -26,6 +26,8 @@ import {
   CreateAddress,
 } from "@/interface";
 
+import { createClient } from "@/lib/supabase/server";
+
 import { auth } from "@clerk/nextjs/server";
 
 const getClerkId = () => {
@@ -856,6 +858,159 @@ export const getGuest = async (guestId: number) => {
   }
 };
 
+export const getUsersData = async () => {
+  try {
+    const users = await db
+      .select({
+        id: UserTable.id,
+        name: UserTable.name,
+        email: UserTable.email,
+        phone: UserTable.phone,
+        // Add more columns as needed
+      })
+      .from(UserTable);
+
+    return { status: "success", data: users };
+  } catch (error) {
+    logger("error", "Error fetching user data", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getUserDataById = async (userId: number) => {
+  try {
+    const user = await db
+      .select({
+        id: UserTable.id,
+        name: UserTable.name,
+        email: UserTable.email,
+        phone: UserTable.phone,
+        applicantPhoto: UserTable.imageUrl,
+        dob: UserTable.dob,
+        userIdImage: UserTable.idUrl,
+        guardianIdImage: UserTable.guardianIdUrl,
+        guardianName: UserTable.guardianName,
+        guardianPhone: UserTable.guardianPhone,
+        guardianPhoto: UserTable.guardianPhoto,
+        signature: UserTable.signature,
+        address: AddressBookTable.address,
+        pin: AddressBookTable.pin,
+        city: AddressBookTable.city,
+        state: AddressBookTable.state,
+      })
+      .from(UserTable)
+      .leftJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
+      .where(eq(UserTable.id, userId));
+
+    logger("info", "Fetched user data", { user });
+    return { status: "success", data: user };
+  } catch (error) {
+    logger("error", "Error fetching user data", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateUserPersonalDetails = async (
+  data: FormData,
+  userId: number,
+) => {
+  try {
+    logger("info", "User data", {
+      user: data.get("name") as string,
+      email: data.get("email") as string,
+      phone: data.get("phone") as string,
+      dob: data.get("dob") as string,
+    });
+
+    await db.transaction(async (trx) => {
+      try {
+        logger("info", "Updating user personal data", { userId });
+        await trx
+          .update(UserTable)
+          .set({
+            name: data.get("name") as string,
+            email: data.get("email") as string,
+            phone: data.get("phone") as string,
+            dob:
+              data.has("dob") && data.get("dob") !== ""
+                ? new Date(data.get("dob") as string).toISOString()
+                : null,
+          })
+          .where(eq(UserTable.id, userId));
+      } catch (error) {
+        logger("error", "Error updating user personal data", { error });
+        throw error;
+      }
+
+      logger("info", "Fetching user address id");
+      const user = await trx
+        .select({
+          addressId: UserTable.addressId,
+        })
+        .from(UserTable)
+        .where(eq(UserTable.id, userId))
+        .limit(1);
+
+      logger("info", "User address id found", {
+        addressId: user[0]?.addressId,
+      });
+
+      if (user[0]?.addressId) {
+        try {
+          logger("info", "Updating user address data", {
+            addressId: user[0]?.addressId,
+          });
+          await trx
+            .update(AddressBookTable)
+            .set({
+              address: data.get("address") as string,
+              city: data.get("city") as string,
+              state: data.get("state") as string,
+              pin: data.get("pin") as string,
+            })
+            .where(eq(AddressBookTable.id, user[0].addressId))
+            .execute();
+          logger("info", "User address data updated");
+        } catch (error) {
+          logger("error", "Error updating user address data", { error });
+          throw error;
+        }
+      } else {
+        try {
+          logger("info", "Creating user new address");
+          const newAddressId = await trx
+            .insert(AddressBookTable)
+            .values({
+              address: data.get("address") as string,
+              city: data.get("city") as string,
+              state: data.get("state") as string,
+              pin: data.get("pin") as string,
+            })
+            .returning({ id: AddressBookTable.id });
+
+          logger("info", "User new address created", {
+            newAddressId: newAddressId[0].id,
+          });
+
+          await trx
+            .update(UserTable)
+            .set({ addressId: newAddressId[0].id })
+            .where(eq(UserTable.id, userId));
+          logger("info", "User new address updated");
+        } catch (error) {
+          logger("error", "Error creating user new address", { error });
+          throw error;
+        }
+      }
+    });
+
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error updating user data", { error });
+    return { status: "error" };
+  }
+};
+
 export const getAnalyticsData = async () => {
   try {
     const totalRevenue = await db
@@ -1164,6 +1319,157 @@ export const getBookingDetails = async (bookingId: number) => {
     };
   } catch (error) {
     logger("error", "Error fetching booking details", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateUserData = async (
+  userId: number,
+  field: string,
+  value: string,
+) => {
+  try {
+    logger("info", "Updating user data", { userId, field, value });
+    await db.transaction(async (trx) => {
+      await trx
+        .update(UserTable)
+        .set({ [field]: value })
+        .where(eq(UserTable.id, userId));
+    });
+  } catch (error) {
+    logger("error", "Error updating user data", { error });
+  }
+};
+
+export const updateUserSignatureByUserId = async (
+  userId: number,
+  signatureUrl: string,
+) => {
+  try {
+    logger("info", "Updating user signature", { userId, signatureUrl });
+    const result = await db
+      .update(UserTable)
+      .set({ signature: signatureUrl })
+      .where(eq(UserTable.id, userId))
+      .returning();
+
+    if (result.length === 0) {
+      logger("error", "User not found", { userId });
+      return { status: "error", data: null };
+    }
+
+    logger("info", "User signature updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error updating user signature", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateGuardianIdImage = async (
+  userId: number,
+  guardianIdImageUrl: string,
+) => {
+  try {
+    logger("info", "Updating guardian ID image", {
+      userId,
+      guardianIdImageUrl,
+    });
+    const result = await db
+      .update(UserTable)
+      .set({ guardianIdUrl: guardianIdImageUrl })
+      .where(eq(UserTable.id, userId))
+      .returning();
+
+    if (result.length === 0) {
+      logger("error", "User not found", { userId });
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Guardian ID image updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error updating guardian ID image", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateUserIdImage = async (
+  userId: number,
+  userIdImageUrl: string,
+) => {
+  try {
+    logger("info", "Updating user ID image", { userId, userIdImageUrl });
+    const result = await db
+      .update(UserTable)
+      .set({ idUrl: userIdImageUrl })
+      .where(eq(UserTable.id, userId))
+      .returning();
+
+    if (result.length === 0) {
+      logger("error", "User not found", { userId });
+      return { status: "error", data: null };
+    }
+
+    logger("info", "User ID image updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error updating user ID image", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateGuardianPhoto = async (
+  userId: number,
+  guardianPhotoUrl: string,
+) => {
+  try {
+    logger("info", "Updating guardian photo", { userId, guardianPhotoUrl });
+    const result = await db
+      .update(UserTable)
+      .set({ guardianPhoto: guardianPhotoUrl })
+      .where(eq(UserTable.id, userId))
+      .returning();
+
+    if (result.length === 0) {
+      logger("error", "User not found", { userId });
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Guardian photo updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error updating guardian photo", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const updateUserImageUrl = async ({
+  userId,
+  imageUrl,
+}: {
+  userId: number;
+  imageUrl: string;
+}) => {
+  try {
+    logger("info", "Updating user image URL", { userId, imageUrl });
+
+    logger("info", "Updating user image URL", { imageUrl });
+    const result = await db
+      .update(UserTable)
+      .set({ imageUrl })
+      .where(eq(UserTable.id, userId))
+      .returning();
+
+    if (result.length === 0) {
+      logger("error", "User not found", { userId });
+      return { status: "error", data: null };
+    }
+
+    logger("info", "User image URL updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error updating user image URL", { error });
     return { status: "error", data: null };
   }
 };
