@@ -173,7 +173,7 @@ export default function UserProfilePage({
                         name="dob"
                         className="mt-1"
                         type="date"
-                        defaultValue={user.data[0].dob ?? ""}
+                        defaultValue={user.data[0].dob ? new Date(user.data[0].dob).toISOString().split('T')[0] : ""}
                       />
                     </div>
                     <div>
