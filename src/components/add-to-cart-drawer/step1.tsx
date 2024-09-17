@@ -1,3 +1,5 @@
+import { Loader2 } from "lucide-react";
+
 import type { BedInRoomCard, CartItemShort } from "@/interface";
 
 import { DrawerClose, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
@@ -9,13 +11,23 @@ export const AddToCartStep1 = ({
   handleBedSelect,
   handleNext,
   handleBack,
+  isBedDataLoading,
 }: {
   cartData: CartItemShort[];
   bedData: BedInRoomCard[];
   handleBedSelect: (bedId: number) => void;
   handleNext: () => void;
   handleBack: () => void;
+  isBedDataLoading: boolean;
 }) => {
+  if (isBedDataLoading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <Loader2 className="w-4 h-4 animate-spin" />
+      </div>
+    );
+  }
+
   const getStatus = (bedId: number) => {
     const bedInfo = bedData.find((bed) => bed.id === bedId);
 
@@ -58,7 +70,6 @@ export const AddToCartStep1 = ({
           <DrawerTitle className="text-2xl font-semibold">
             Select Your Bed
           </DrawerTitle>
-          <DrawerClose />
         </DrawerHeader>
         <div className="mt-4">
           <div className="flex justify-around mb-4">

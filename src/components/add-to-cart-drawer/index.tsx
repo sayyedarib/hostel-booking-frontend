@@ -1,10 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-import type { BedInRoomCard, CartItemShort } from "@/interface";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  keepPreviousData,
+} from "@tanstack/react-query";
 
 import { AddToCartStep1 } from "@/components/add-to-cart-drawer/step1";
 import { AddToCartStep2 } from "@/components/add-to-cart-drawer/step2";
@@ -12,7 +15,7 @@ import { AddToCartStep3 } from "@/components/add-to-cart-drawer/step3";
 import { AddToCartStep4 } from "@/components/add-to-cart-drawer/step4";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { getBedData, addToCart, getBedsInCart } from "@/db/queries";
+import { getBedData, addToCart, getCartBedsOfRoom } from "@/db/queries";
 import { logger, cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { Progress } from "@/components/ui/progress";
@@ -24,24 +27,20 @@ export default function AddToCartDrawer({
   roomId: number;
   className?: string;
 }) {
+  console.log("roomId", roomId);
   const { userId } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
   // user states
+  const [isOpen, setIsOpen] = useState(false);
   const [bedId, setBedId] = useQueryState("bedId", parseAsInteger);
-  const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
   const [checkIn, setCheckIn] = useQueryState("checkIn");
   const [checkOut, setCheckOut] = useQueryState("checkOut");
   const { toast } = useToast();
-  const [cartItemsCount, setCartItemsCount] = useQueryState(
-    "cartItemsCount",
-    parseAsInteger.withDefault(0),
-  );
 
-  const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
-  const { data: bedData, isLoading: isBedDataLoading } = useQuery({
+  const { data: bedDataRoomId, isFetching: isBedDataLoading } = useQuery({
     queryKey: ["bedData", roomId],
     queryFn: async () => {
       const { status, data } = await getBedData(roomId);
@@ -50,52 +49,57 @@ export default function AddToCartDrawer({
       }
       return data;
     },
+    enabled: isOpen && !!roomId,
+    placeholderData: keepPreviousData,
   });
 
   const { data: cartData, isLoading: isCartDataLoading } = useQuery({
     queryKey: ["cartData", roomId],
     queryFn: async () => {
-      const { status, data } = await getBedsInCart(roomId);
+      const { status, data } = await getCartBedsOfRoom(roomId);
       if (status === "error" || !data) {
         throw new Error("Error in fetching cart data");
       }
       return data;
     },
+    enabled: isOpen && !!roomId,
+    placeholderData: keepPreviousData,
   });
 
   const addToCartMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (guestId: number) => {
       if (!checkIn || !checkOut || !guestId || !bedId) {
+        logger("info", "Missing required fields", {
+          checkIn,
+          checkOut,
+          guestId,
+          bedId,
+        });
+        toast({
+          variant: "destructive",
+          title: "Missing required fields",
+          description: "Please fill all the fields",
+        });
         throw new Error("Missing required fields");
       }
-      const { status, data } = await addToCart(
-        guestId,
-        bedId,
-        checkIn,
-        checkOut,
-      );
-      if (status === "error" || !data) {
-        throw new Error("Error in adding to cart");
+      const { status } = await addToCart(guestId, bedId, checkIn, checkOut);
+      if (status === "error") {
+        toast({
+          variant: "destructive",
+          title: "Something went wrong",
+          description: "Error in adding to cart, Please try again later",
+        });
       }
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cartData"] });
-      setCartItemsCount((prev) => prev + 1);
-      logger("info", "Added to cart", { guestId, bedId, checkIn, checkOut });
+      queryClient.invalidateQueries({ queryKey: ["cartItemsCount"] });
+      logger("info", "Added to cart", { bedId, checkIn, checkOut });
       setCurrentStep(4);
       setTimeout(() => {
         setIsOpen(false);
         setCurrentStep(1);
       }, 3000);
-    },
-    onError: (error) => {
-      logger("error", "Error in adding to cart", { error });
-      toast({
-        variant: "destructive",
-        title: "Something went wrong",
-        description: "Error in adding to cart, Please try again later",
-      });
     },
   });
 
@@ -106,7 +110,9 @@ export default function AddToCartDrawer({
     handleNext();
   };
 
-  const handleAddToCart = () => addToCartMutation.mutate();
+  const handleAddToCart = (guestId: number) => {
+    addToCartMutation.mutate(guestId);
+  };
 
   const handleOpenDrawer = () => {
     if (!userId) {
@@ -117,12 +123,12 @@ export default function AddToCartDrawer({
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer open={isOpen} onOpenChange={setIsOpen} key={roomId}>
       <DrawerTrigger asChild>
         <Button
           className={cn(
             className,
-            "w-full py-2 bg-primary text-white text-center font-semibold hover:bg-primary-dark transition-colors",
+            "w-full py-2 bg-primary text-center font-semibold hover:bg-primary-dark transition-colors",
           )}
           onClick={handleOpenDrawer}
         >
@@ -132,20 +138,21 @@ export default function AddToCartDrawer({
       <DrawerContent className="min-h-[60vh]">
         <Progress
           value={((currentStep - 1) / 3) * 100}
-          className="w-full mb-4 mt-2"
+          className="w-full mt-1 mb-2"
         />
         {currentStep === 1 && (
           <AddToCartStep1
             cartData={cartData || []}
-            bedData={bedData || []}
+            bedData={bedDataRoomId || []}
             handleBedSelect={handleBedSelect}
             handleNext={handleNext}
             handleBack={handleBack}
+            isBedDataLoading={isBedDataLoading || isCartDataLoading}
           />
         )}
-        {currentStep === 2 && bedData && bedId && (
+        {currentStep === 2 && bedDataRoomId && bedId && (
           <AddToCartStep2
-            bedData={bedData.find((bed) => Number(bed.id) === bedId)!}
+            bedData={bedDataRoomId.find((bed) => Number(bed.id) === bedId)!}
             handleNext={handleNext}
             handleBack={handleBack}
           />
@@ -154,6 +161,7 @@ export default function AddToCartDrawer({
           <AddToCartStep3
             handleAddToCart={handleAddToCart}
             handleBack={handleBack}
+            handleNext={handleNext}
             loading={addToCartMutation.isPending}
           />
         )}

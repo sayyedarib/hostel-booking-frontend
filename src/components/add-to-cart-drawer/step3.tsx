@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
-import { LoaderCircle, MoveLeft } from "lucide-react";
+import { LoaderCircle, MoveLeft, Upload } from "lucide-react";
+import Image from "next/image";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
-import { createGuest } from "@/db/queries";
+import { createGuest, getGuests, getUserData } from "@/db/queries";
 import {
   DrawerHeader,
   DrawerTitle,
@@ -12,178 +14,232 @@ import {
   DrawerFooter,
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
-import { logger } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 
 export const AddToCartStep3 = ({
   handleBack,
+  handleNext,
   handleAddToCart,
   loading = false,
 }: {
   handleBack: () => void;
-  handleAddToCart: () => void;
+  handleNext: () => void;
+  handleAddToCart: (guestId: number) => void;
   loading: boolean;
 }) => {
   const supabase = createClient();
+  const queryClient = useQueryClient();
 
-  const [name, setName] = useQueryState("name");
-  const [email, setEmail] = useQueryState("email");
-  const [phone, setPhone] = useQueryState("phone");
-  const [dob, setDob] = useQueryState("dob");
-  const [photoUrl, setPhotoUrl] = useQueryState("photoUrl");
-  const [aadhaarUrl, setAadhaarUrl] = useQueryState("aadhaarUrl");
-  const [guestId, setGuestId] = useQueryState("guestId", parseAsInteger);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [dob, setDob] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [aadhaarUrl, setAadhaarUrl] = useState("");
 
   const [purpose, setPurpose] = useState<string>("");
   const [uploading, setUploading] = useState<boolean>(false);
-  const [creatingGuest, setCreatingGuest] = useState<boolean>(false);
+  const [bookingForSomeoneElse, setBookingForSomeoneElse] = useState(false);
+  const [selectedExistingGuest, setSelectedExistingGuest] = useState<
+    string | null
+  >(null);
   const { toast } = useToast();
 
+  const guestImageInputRef = useRef<HTMLInputElement>(null);
+  const aadhaarImageInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: userData, isError: userDataFetchingError } = useQuery({
+    queryKey: ["userData"],
+    queryFn: async () => {
+      const { data, status } = await getUserData();
+
+      if (status === "error") {
+        toast({
+          variant: "destructive",
+          title: "Error fetching user data",
+          description: "Please try again",
+        });
+
+        return null;
+      }
+
+      return data;
+    },
+  });
+
   useEffect(() => {
-    if (guestId !== null) {
-      handleAddToCart();
+    if (userData) {
+      setName(userData.name || "");
+      setEmail(userData.email || "");
+      setPhone(userData.phone || "");
+      setDob(userData.dob || "");
+      setPhotoUrl(userData.applicantPhoto || "");
+      setAadhaarUrl(userData.userIdImage || "");
     }
-  }, [guestId]);
+  }, [userData]);
+
+  const { data: existingGuests, isError: guestDataFetchingError } = useQuery({
+    queryKey: ["existingGuests"],
+    queryFn: async () => {
+      const { data, status } = await getGuests();
+
+      if (status === "error") {
+        toast({
+          variant: "destructive",
+          title: "Error fetching guest data",
+          description: "Please try again",
+        });
+
+        return null;
+      }
+
+      return data;
+    },
+  });
+
+  useEffect(() => {
+    if (selectedExistingGuest && existingGuests) {
+      const guest = existingGuests.find(
+        (g) => g.id.toString() === selectedExistingGuest,
+      );
+      if (guest) {
+        setName(guest.name);
+        setEmail(guest.email);
+        setPhone(guest.phone);
+        setDob(guest.dob);
+        setPurpose(guest.purpose);
+        setPhotoUrl(guest.photoUrl);
+        setAadhaarUrl(guest.aadhaarUrl);
+      }
+    }
+  }, [selectedExistingGuest, existingGuests]);
 
   const handleGuestImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const file = e.target.files?.[0];
-
-    if (!file) {
+    if (!e.target.files || e.target.files.length === 0) {
+      console.error("No file selected");
       return;
     }
 
+    const file = e.target.files[0];
     setUploading(true);
-    const fileName = `${name}_${Date.now()}`;
-    toast({
-      description: (
-        <div className="flex items-center">
-          <LoaderCircle className="animate-spin mr-2" /> Uploading guest image
-        </div>
-      ),
-    });
-    logger("info", "Uploading guest image", { fileName });
-    const { data, error } = await supabase.storage
-      .from("guest_image")
-      .upload(fileName, file);
 
-    const { data: publicUrlData } = supabase.storage
-      .from("guest_image")
-      .getPublicUrl(fileName);
+    try {
+      const { data, error } = await supabase.storage
+        .from("guest-images")
+        .upload(`${Date.now()}-${file.name}`, file);
 
-    setUploading(false);
-    if (error) {
-      logger("error", "Error in uploading guest image", { error });
-      return;
-    } else {
-      setPhotoUrl(publicUrlData.publicUrl);
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        const { data: urlData } = supabase.storage
+          .from("guest-images")
+          .getPublicUrl(data.path);
+        setPhotoUrl(urlData.publicUrl);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      toast({
+        variant: "destructive",
+        title: "Error uploading file",
+        description: "Please try again",
+      });
+    } finally {
+      setUploading(false);
     }
   };
 
   const handleAadhaarUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const file = e.target.files?.[0];
-
-    if (!file) {
+    if (!e.target.files || e.target.files.length === 0) {
+      console.error("No file selected");
       return;
     }
 
-    const fileName = `${name}_${Date.now()}`;
-    toast({
-      description: (
-        <div className="flex items-center">
-          <LoaderCircle className="animate-spin mr-2" /> Uploading aadhaar image
-        </div>
-      ),
-    });
-    logger("info", "Uploading aadhaar image", { fileName });
-
+    const file = e.target.files[0];
     setUploading(true);
-    const { data, error } = await supabase.storage
-      .from("guest_aadhaar")
-      .upload(fileName, file);
 
-    const { data: publicUrlData } = supabase.storage
-      .from("guest_aadhaar")
-      .getPublicUrl(fileName);
+    try {
+      const { data, error } = await supabase.storage
+        .from("aadhaar-images")
+        .upload(`${Date.now()}-${file.name}`, file);
 
-    setUploading(false);
-    if (error) {
+      if (error) {
+        throw error;
+      }
+
+      if (data) {
+        const { data: urlData } = supabase.storage
+          .from("aadhaar-images")
+          .getPublicUrl(data.path);
+        setAadhaarUrl(urlData.publicUrl);
+      }
+    } catch (error) {
+      console.error("Error uploading file:", error);
       toast({
         variant: "destructive",
-        title: "Error in uploading aadhaar image",
+        title: "Error uploading file",
+        description: "Please try again",
       });
-      logger("error", "Error in uploading aadhaar image", { error });
-      return;
-    } else {
-      setAadhaarUrl(publicUrlData.publicUrl);
+    } finally {
+      setUploading(false);
     }
   };
 
-  const handleSubmit = async () => {
-    if (!name || !email || !phone || !dob || !aadhaarUrl || !photoUrl) {
-      console.log(
-        "All fields are required",
-        name,
-        email,
-        phone,
-        dob,
-        aadhaarUrl,
-        photoUrl,
-      );
-      logger("error", "All fields are required");
+  const createGuestMutation = useMutation({
+    mutationFn: createGuest,
+    onSuccess: (data) => {
+      if (data.status === "error") {
+        toast({
+          variant: "destructive",
+          title: "Error creating guest",
+          description: "Please try again",
+        });
+
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["existingGuests"] });
+      handleAddToCart(data?.data!);
+    },
+    onError: (error) => {
+      console.error("Error creating guest:", error);
       toast({
         variant: "destructive",
-        title: "All fields are required",
+        title: "Error creating guest",
+        description: "Please try again",
       });
-      return;
-    }
+    },
+  });
 
-    toast({
-      description: (
-        <div className="flex items-center">
-          <LoaderCircle className="animate-spin mr-2" /> Creating guest
-        </div>
-      ),
-    });
-    logger("info", "Creating guest", { name, phone, email });
-    setCreatingGuest(true);
-    const { status, data: id } = await createGuest({
+  const handleSubmit = async () => {
+    createGuestMutation.mutate({
       name,
-      phone,
       email,
-      dob,
+      phone,
+      dob: dob ?? "",
       purpose,
       photoUrl,
       aadhaarUrl,
     });
-    setCreatingGuest(false);
-
-    setGuestId(Number(id));
-
-    if (status === "error" || !id) {
-      toast({
-        variant: "destructive",
-        title: "Error in creating guest",
-      });
-      logger("error", "Error in creating guest", { name, phone, email });
-      return;
-    }
-
-    toast({
-      title: "Guest created successfully",
-    });
-    logger("info", "Guest created successfully", { id });
-
-    handleAddToCart();
   };
 
   return (
     <>
-      <div className="mx-auto w-full md:w-1/2 lg:w-1/3 p-6 bg-white shadow-lg rounded-lg">
+      <div className="mx-auto w-full md:w-1/2 lg:w-1/3 p-3 bg-white shadow-lg rounded-lg">
         <DrawerHeader>
           <DrawerTitle className="flex items-center text-2xl font-semibold">
             <MoveLeft onClick={handleBack} className="mr-2 cursor-pointer" />
@@ -192,6 +248,43 @@ export const AddToCartStep3 = ({
           <DrawerClose />
         </DrawerHeader>
         <div className="grid grid-cols-1 gap-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="bookingForSomeoneElse"
+              checked={bookingForSomeoneElse}
+              onCheckedChange={(checked) =>
+                setBookingForSomeoneElse(checked as boolean)
+              }
+            />
+            <label
+              htmlFor="bookingForSomeoneElse"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Booking for someone else
+            </label>
+          </div>
+
+          {bookingForSomeoneElse && (
+            <div>
+              <Label htmlFor="existingGuest">Select Existing Guest</Label>
+              <Select
+                onValueChange={setSelectedExistingGuest}
+                value={selectedExistingGuest || undefined}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a guest" />
+                </SelectTrigger>
+                <SelectContent>
+                  {existingGuests?.map((guest) => (
+                    <SelectItem key={guest.id} value={guest.id.toString()}>
+                      {guest.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div>
             <Label
               htmlFor="name"
@@ -203,8 +296,8 @@ export const AddToCartStep3 = ({
               id="name"
               type="text"
               placeholder="John Doe"
-              className="h-12 rounded-lg p-4 w-full border border-gray-300"
-              value={name ?? ""}
+              className="rounded-lg p-2 w-full border border-gray-300"
+              value={name}
               onChange={(e) => setName(e.target.value)}
               required
             />
@@ -220,42 +313,44 @@ export const AddToCartStep3 = ({
               id="email"
               type="email"
               placeholder="john.doe@example.com"
-              className="h-12 rounded-lg p-4 w-full border border-gray-300"
-              value={email ?? ""}
+              className="rounded-lg p-2 w-full border border-gray-300"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
-          <div>
-            <Label
-              htmlFor="phone"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Phone
-            </Label>
-            <Input
-              id="phone"
-              type="tel"
-              placeholder="+91 864567890"
-              className="h-12 rounded-lg p-4 w-full border border-gray-300"
-              value={phone ?? ""}
-              onChange={(e) => setPhone(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor="dob"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Date of Birth
-            </Label>
-            <Input
-              id="dob"
-              type="date"
-              value={dob ?? ""}
-              onChange={(e) => setDob(e.target.value)}
-            />
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label
+                htmlFor="phone"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Phone
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+91 864567890"
+                className="rounded-lg p-2 w-full border border-gray-300"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="dob"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Date of Birth
+              </Label>
+              <Input
+                id="dob"
+                type="date"
+                value={dob ? new Date(dob).toISOString().split("T")[0] : ""}
+                onChange={(e) => setDob(e.target.value)}
+              />
+            </div>
           </div>
           <div>
             <Label
@@ -267,51 +362,95 @@ export const AddToCartStep3 = ({
             <Input
               id="purpose"
               type="text"
-              placeholder="Meeting"
-              className="h-12 rounded-lg p-4 w-full border border-gray-300"
+              placeholder="e.g. Preparing for Competitive exam"
+              className="rounded-lg p-2 w-full border border-gray-300"
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
               required
             />
           </div>
-          <div>
-            <Label
-              htmlFor="guestImage"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Guest Image
-            </Label>
-            <Input
-              id="guestImage"
-              type="file"
-              className="h-12 rounded-lg p-4 w-full border border-gray-300"
-              onChange={handleGuestImageUpload}
-              disabled={uploading}
-              required
-            />
-          </div>
-          <div>
-            <Label
-              htmlFor="aadhaarImage"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Aadhaar Image
-            </Label>
-            <Input
-              id="aadhaarImage"
-              type="file"
-              className="h-12 rounded-lg p-4 w-full border border-gray-300"
-              onChange={handleAadhaarUpload}
-              disabled={uploading}
-              required
-            />
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-1">
+              <Label
+                htmlFor="guestImage"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Photo
+              </Label>
+              {photoUrl ? (
+                <div className="mt-2">
+                  <Image
+                    width={100}
+                    height={300}
+                    src={photoUrl}
+                    alt="Guest"
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                </div>
+              ) : (
+                <div
+                  className="mt-2 border-2 border-dashed border-gray-300 rounded-lg h-40 p-4 text-center flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => guestImageInputRef.current?.click()}
+                >
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <p className="mt-1 text-sm text-gray-600">
+                    Upload passport size photo
+                  </p>
+                </div>
+              )}
+              <Input
+                id="guestImage"
+                type="file"
+                className="hidden"
+                onChange={handleGuestImageUpload}
+                disabled={uploading}
+                required
+                ref={guestImageInputRef}
+              />
+            </div>
+            <div className="col-span-2">
+              <Label
+                htmlFor="aadhaarImage"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Valid ID proof
+              </Label>
+              {aadhaarUrl ? (
+                <div className="mt-2">
+                  <Image
+                    width={200}
+                    height={300}
+                    src={aadhaarUrl}
+                    alt="Aadhaar"
+                    className="w-full h-40 object-cover rounded-lg"
+                  />
+                </div>
+              ) : (
+                <div
+                  className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-4 h-40 flex flex-col items-center justify-center cursor-pointer"
+                  onClick={() => aadhaarImageInputRef.current?.click()}
+                >
+                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                  <p className="mt-1 text-sm text-gray-600">Upload ID proof</p>
+                </div>
+              )}
+              <Input
+                id="aadhaarImage"
+                type="file"
+                className="hidden"
+                onChange={handleAadhaarUpload}
+                disabled={uploading}
+                required
+                ref={aadhaarImageInputRef}
+              />
+            </div>
           </div>
         </div>
         <DrawerFooter className="mt-4">
           <Button
             type="submit"
             onClick={handleSubmit}
-            className="w-full h-12 bg-yellow-500 text-white rounded-lg"
+            className="w-full bg-yellow-500 text-white rounded-lg"
             disabled={
               loading ||
               !name ||
@@ -319,10 +458,11 @@ export const AddToCartStep3 = ({
               !phone ||
               !dob ||
               !aadhaarUrl ||
-              !photoUrl
+              !photoUrl ||
+              createGuestMutation.isPending
             }
           >
-            {loading || creatingGuest ? (
+            {loading || createGuestMutation.isPending ? (
               <LoaderCircle className="animate-spin" />
             ) : (
               "Add to Cart"

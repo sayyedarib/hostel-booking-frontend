@@ -23,10 +23,7 @@ export interface RoomCard {
 }
 
 export interface CartItemShort {
-  guestId: number;
   bedId: number;
-  checkIn: Date;
-  checkOut: Date;
 }
 
 export interface CartItem {

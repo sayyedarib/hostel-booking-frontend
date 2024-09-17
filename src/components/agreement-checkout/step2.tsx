@@ -96,7 +96,7 @@ export default function Step2({
       const signatureDataUrl = signatureRef.current.toDataURL();
       const signatureBlob = base64ToBlob(signatureDataUrl);
 
-      const filename = `signatures/${Date.now()}.png`;
+      const filename = `${Date.now()}.png`;
       const { data, error } = await supabase.storage
         .from("signature")
         .upload(filename, signatureBlob);

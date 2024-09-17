@@ -16,7 +16,7 @@ import {
   ReviewTable,
   RoomTable,
   securityDepositTable,
-  TranscationTable,
+  TransactionTable,
   UserTable,
 } from "@/db/schema";
 import {
@@ -341,9 +341,48 @@ export const getBedData = async (roomId: number) => {
   }
 };
 
-export const getBedsInCart = async (roomId: number) => {
+export const getCartBedsOfRoom = async (roomId: number) => {
   try {
-    logger("info", "Fetching beds in cart", { roomId });
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching beds in cart for particular room and user", {
+      roomId,
+    });
+    const beds = await db
+      .select({
+        bedId: BedTable.id,
+      })
+      .from(BedTable)
+      .innerJoin(CartTable, eq(BedTable.id, CartTable.bedId))
+      .where(
+        and(eq(BedTable.roomId, roomId), eq(CartTable.userId, userId.data)),
+      );
+
+    logger("info", "Fetched beds in cart of user for particular room");
+    return { status: "success", data: beds };
+  } catch (error) {
+    logger("error", "Error fetching beds in cart of user for particular room", {
+      error,
+    });
+    return { status: "error", data: null };
+  }
+};
+
+export const getBedsInCart = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching beds in cart", { userId: userId.data });
     const beds = await db
       .select({
         guestId: CartTable.guestId,
@@ -353,7 +392,7 @@ export const getBedsInCart = async (roomId: number) => {
       })
       .from(CartTable)
       .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id))
-      .where(eq(BedTable.roomId, roomId));
+      .where(eq(CartTable.userId, userId.data));
     logger("info", "Fetched beds in cart");
 
     const formattedBeds = beds.map((bed) => ({
@@ -429,6 +468,27 @@ export const getOccupancyOfBed = async (bedId: number) => {
   }
 };
 
+export const getGuests = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    const guests = await db
+      .select()
+      .from(GuestTable)
+      .where(eq(GuestTable.userId, userId.data));
+
+    return { status: "success", data: guests };
+  } catch (error) {
+    logger("error", "Error fetching guests", { error });
+    return { status: "error", data: null };
+  }
+};
+
 export const createGuest = async ({
   name,
   phone,
@@ -445,6 +505,34 @@ export const createGuest = async ({
     if (!userId.data) {
       logger("info", "User not found");
       return { status: "error", data: null, message: "User not found" };
+    }
+
+    const existingGuest = await db
+      .select()
+      .from(GuestTable)
+      .where(
+        and(
+          eq(GuestTable.userId, userId.data),
+          eq(GuestTable.name, name),
+          eq(GuestTable.phone, phone),
+          eq(GuestTable.email, email),
+        ),
+      );
+
+    if (existingGuest.length > 0) {
+      logger("info", "Guest already exists, updating guest");
+      const updatedGuest = await db
+        .update(GuestTable)
+        .set({
+          dob,
+          purpose,
+          photoUrl,
+          aadhaarUrl,
+        })
+        .where(eq(GuestTable.id, existingGuest[0].id))
+        .returning();
+
+      return { status: "success", data: updatedGuest[0].id };
     }
 
     const guest = await db
@@ -490,47 +578,18 @@ export const addToCart = async (
       checkOut,
     });
 
-    const cartItem = await db
-      .insert(CartTable)
-      .values({
-        userId: userId.data,
-        guestId,
-        bedId,
-        checkIn,
-        checkOut,
-      })
-      .returning();
+    await db.insert(CartTable).values({
+      userId: userId.data,
+      guestId,
+      bedId,
+      checkIn,
+      checkOut,
+    });
     logger("info", "Added to cart successfully");
-    return { status: "success", data: cartItem[0] };
+    return { status: "success" };
   } catch (error) {
     logger("error", "Error in adding to cart", { error });
-    return { status: "error", data: null, message: "Error adding to cart" };
-  }
-};
-
-export const getCartItemsCount = async () => {
-  try {
-    const userId = await getUserId();
-
-    if (!userId.data) {
-      logger("info", "User not found");
-      return { status: "error", data: null };
-    }
-
-    logger("info", "Fetching total cart items for user", { userId });
-    const totalItems = await db
-      .select({
-        count: count(),
-      })
-      .from(CartTable)
-      .where(eq(CartTable.userId, userId.data));
-
-    logger("info", "Fetched total cart items for user", totalItems);
-
-    return { status: "success", data: totalItems[0].count };
-  } catch (error) {
-    logger("error", "Error fetching total cart items for user", { error });
-    return { status: "error", data: null };
+    return { status: "error" };
   }
 };
 
@@ -568,14 +627,12 @@ export const getCartItems = async () => {
     return {
       status: "success",
       data: cartItems,
-      message: "Fetched cart items",
     };
   } catch (error) {
     logger("error", "Error fetching cart items", { error });
     return {
       status: "error",
       data: null,
-      message: "Error fetching cart items",
     };
   }
 };
@@ -639,6 +696,34 @@ export const getAdminRoomData = async () => {
     return { status: "success", data: rooms };
   } catch (error) {
     logger("error", "Error fetching room data", { error });
+    return { status: "error", data: null };
+  }
+};
+
+export const getCartItemsCount = async () => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Fetching cart items count");
+    const cartItemsCount = await db
+      .select({
+        count: count(),
+      })
+      .from(CartTable)
+      .where(eq(CartTable.userId, userId.data));
+
+    logger("info", "Fetched cart items count", {
+      cartItemsCount: cartItemsCount[0].count,
+    });
+
+    return { status: "success", data: cartItemsCount[0].count };
+  } catch (error) {
+    logger("error", "Error fetching cart items count", { error });
     return { status: "error", data: null };
   }
 };
@@ -780,13 +865,13 @@ export const getUserTransactions = async (userId: number) => {
   try {
     const transactions = await db
       .select({
-        id: TranscationTable.id,
-        amount: TranscationTable.amount,
-        createdAt: TranscationTable.createdAt,
-        verified: TranscationTable.verified,
+        id: TransactionTable.id,
+        amount: TransactionTable.totalAmount,
+        createdAt: TransactionTable.createdAt,
+        verified: TransactionTable.verified,
       })
-      .from(TranscationTable)
-      .where(eq(TranscationTable.userId, userId));
+      .from(TransactionTable)
+      .where(eq(TransactionTable.userId, userId));
 
     logger("info", "Fetched user transactions", { transactions });
     return { status: "success", data: transactions };
@@ -1007,9 +1092,9 @@ export const getAnalyticsData = async () => {
   try {
     const totalRevenue = await db
       .select({
-        total: sql<number>`SUM(${TranscationTable.amount})`,
+        total: sql<number>`SUM(${TransactionTable.totalAmount})`,
       })
-      .from(TranscationTable);
+      .from(TransactionTable);
 
     const totalBookings = await db
       .select({
@@ -1044,7 +1129,7 @@ export const getAnalyticsData = async () => {
   }
 };
 
-export const getGuests = async () => {
+export const getGuestsAdmin = async () => {
   try {
     logger("info", "Fetching guests");
     const guests = await db
@@ -1167,15 +1252,20 @@ export const createBooking = async ({
     await db.transaction(async (trx) => {
       try {
         transactionId = await trx
-          .insert(TranscationTable)
+          .insert(TransactionTable)
           .values({
-            userId: userId.data,
-            amount,
             token,
+            discount: 0,
+            rentAmount: 0,
+            securityDeposit: 0,
+            additionalCharges: 0,
+            totalAmount: amount,
+            verified: false,
             invoiceUrl,
+            userId: userId.data,
           })
           .returning({
-            id: TranscationTable.id,
+            id: TransactionTable.id,
           });
 
         bookingId = await trx
@@ -1277,14 +1367,14 @@ export const getBookingDetails = async (bookingId: number) => {
         userName: UserTable.name,
         userEmail: UserTable.email,
         userPhone: UserTable.phone,
-        amount: TranscationTable.amount,
-        invoiceUrl: TranscationTable.invoiceUrl,
+        amount: TransactionTable.totalAmount,
+        invoiceUrl: TransactionTable.invoiceUrl,
       })
       .from(BookingTable)
       .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
       .innerJoin(
-        TranscationTable,
-        eq(BookingTable.userId, TranscationTable.userId),
+        TransactionTable,
+        eq(BookingTable.userId, TransactionTable.userId),
       )
       .where(eq(BookingTable.id, bookingId))
       .limit(1);
@@ -1733,14 +1823,14 @@ export const getRevenueAndBookingsData = async (
     });
     const revenueAndBookings = await db
       .select({
-        month: sql<string>`to_char(${TranscationTable.createdAt}, 'Month')`,
-        revenue: sql<number>`sum(${TranscationTable.amount})`,
+        month: sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`,
+        revenue: sql<number>`sum(${TransactionTable.totalAmount})`,
         bookings: count(BookingTable.id),
       })
-      .from(TranscationTable)
+      .from(TransactionTable)
       .innerJoin(
         BookingTable,
-        eq(TranscationTable.id, BookingTable.transactionId),
+        eq(TransactionTable.id, BookingTable.transactionId),
       )
       .innerJoin(
         BedBookingTable,
@@ -1751,12 +1841,12 @@ export const getRevenueAndBookingsData = async (
       )
       .where(
         and(
-          gte(TranscationTable.createdAt, startDate),
-          lte(TranscationTable.createdAt, endDate),
+          gte(TransactionTable.createdAt, startDate),
+          lte(TransactionTable.createdAt, endDate),
         ),
       )
-      .groupBy(sql<string>`to_char(${TranscationTable.createdAt}, 'Month')`)
-      .orderBy(sql<string>`to_char(${TranscationTable.createdAt}, 'Month')`);
+      .groupBy(sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`)
+      .orderBy(sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`);
 
     const formattedData = revenueAndBookings.map((item) => ({
       month: item.month,

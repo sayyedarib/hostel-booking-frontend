@@ -1,5 +1,7 @@
 "use client";
 
+import "react-day-picker/style.css";
+
 import {
   ChevronDown,
   ChevronLeft,
@@ -75,7 +77,7 @@ function Calendar({
                   "bg-accent text-accent-foreground hover:bg-accent hover:text-accent-foreground rounded-none last:rounded-e-md first:rounded-s-md",
                 modifiers.outside &&
                   modifiers.selected &&
-                  "bg-accent/40 text-muted-foreground",
+                  "bg-yellow-400 text-muted-foreground",
               )}
               {...buttonProps}
               aria-selected={modifiers.selected || buttonProps["aria-selected"]}

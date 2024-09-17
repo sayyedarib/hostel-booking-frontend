@@ -1,19 +1,15 @@
 "use client";
 
+import Image from "next/image";
+import Lottie from "lottie-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { IndianRupee, Trash2 } from "lucide-react";
-import { parseAsInteger, useQueryState } from "nuqs";
-import Lottie from "lottie-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
-import {
-  getCartItems,
-  removeFromCart,
-  getSecurityDepositStatus,
-} from "@/db/queries";
+import { getCartItems, removeFromCart } from "@/db/queries";
 import { calculateRent, logger } from "@/lib/utils";
 import { CartItem } from "@/interface";
 import { Separator } from "@/components/ui/separator";
@@ -23,28 +19,39 @@ import emptyCartAnimation from "../../../public/empty_cart.json";
 
 export default function CartPage() {
   const router = useRouter();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [cartItemsCount, setCartItemsCount] = useQueryState(
-    "cartItemsCount",
-    parseAsInteger.withDefault(0),
-  );
+  const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [securityDepositStatus, setSecurityDepositStatus] = useState<
-    "paid" | "pending" | "lost" | null
-  >("pending");
-  const [fetching, setFetching] = useState(true);
+  const [enhancedCartItems, setEnhancedCartItems] = useState<CartItem[]>([]);
+
+  const { data: cartItems, isLoading: fetching } = useQuery({
+    queryKey: ["cartItems"],
+    queryFn: async () => {
+      const { status, data } = await getCartItems();
+      if (status === "error") {
+        return [];
+      }
+      return data;
+    },
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: removeFromCart,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cartItems"] });
+    },
+    onError: () => {
+      toast({
+        variant: "destructive",
+        title: "Something went wrong",
+        description: "Failed to remove item from cart, Please try again later",
+      });
+      logger("error", "Failed to remove item from cart");
+    },
+  });
 
   useEffect(() => {
-    const fetchCartItems = async () => {
-      const { data: cartData } = await getCartItems();
-      const { data: securityDepositData } = await getSecurityDepositStatus();
-
-      if (!cartData) {
-        logger("info", "Failed to fetch cart items");
-        return;
-      }
-
-      const enhancedData = cartData.map((item) => ({
+    if (cartItems) {
+      const enhancedData = cartItems.map((item) => ({
         ...item,
         totalRent: calculateRent(
           item.monthlyRent,
@@ -57,36 +64,21 @@ export default function CartPage() {
           new Date(item.checkOut),
         ).payableRent,
       }));
-
-      setFetching(false);
-      setCartItems(enhancedData);
-      setCartItemsCount(enhancedData.length);
-      setSecurityDepositStatus(
-        securityDepositData as "paid" | "pending" | "lost",
-      );
-    };
-
-    fetchCartItems();
-  }, []);
-
-  const handleRemove = async (cartId: number) => {
-    const response = await removeFromCart(cartId);
-    if (response.status === "success") {
-      setCartItemsCount(cartItemsCount - 1);
-      setCartItems(cartItems.filter((item) => item.id !== cartId));
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Something went wrong",
-        description: "Failed to remove item from cart, Please try again later",
-      });
-      logger("error", "Failed to remove item from cart");
-      return;
+      setEnhancedCartItems(enhancedData);
     }
+  }, [cartItems]);
+
+  const handleRemove = (cartId: number) => {
+    removeMutation.mutate(cartId);
   };
 
   const calculateTotal = () => {
-    return cartItems.reduce((total, item) => total + item?.payableRent, 0);
+    return (
+      enhancedCartItems?.reduce(
+        (total, item) => total + item?.payableRent,
+        0,
+      ) || 0
+    );
   };
 
   return (
@@ -102,7 +94,7 @@ export default function CartPage() {
             unoptimized={true}
           />
         </div>
-      ) : cartItems.length === 0 ? (
+      ) : cartItems?.length === 0 ? (
         <div className="min-h-[80vh] min-w-screen flex flex-col justify-center items-center">
           <Lottie
             animationData={emptyCartAnimation}
@@ -123,7 +115,7 @@ export default function CartPage() {
           </h1>
           <div className="bg-white shadow-md rounded-lg p-4 sm:p-6">
             <ul className="divide-y divide-gray-200">
-              {cartItems.map((item) => (
+              {enhancedCartItems.map((item) => (
                 <li
                   key={item.id}
                   className="py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between"
@@ -193,8 +185,7 @@ export default function CartPage() {
               <Separator className="my-4" />
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-2 flex items-center">
                 Total: <IndianRupee />
-                {calculateTotal() +
-                  (securityDepositStatus !== "paid" ? 1000 : 0)}
+                {calculateTotal()}
               </h2>
               <Button
                 onClick={() => router.push("/agreement-checkout")}

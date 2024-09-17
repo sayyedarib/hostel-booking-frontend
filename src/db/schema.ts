@@ -158,7 +158,7 @@ export const BookingTable = pgTable("booking", {
     .references(() => UserTable.id),
   agreementUrl: text("agreement_url").notNull(),
   transactionId: integer("transaction_id")
-    .references(() => TranscationTable.id)
+    .references(() => TransactionTable.id)
     .notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -213,13 +213,17 @@ export const securityDepositTable = pgTable("security_deposit", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const TranscationTable = pgTable("transaction", {
+export const TransactionTable = pgTable("transaction", {
   id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => UserTable.id),
-  amount: integer("amount").notNull(),
   token: text("token").notNull(),
+  discount: integer("discount").notNull(),
+  rentAmount: integer("rent_amount").notNull(),
+  securityDeposit: integer("security_deposit").notNull(),
+  additionalCharges: integer("additional_charges").notNull(),
+  totalAmount: integer("total_amount").notNull(),
   verified: boolean("verified").notNull().default(false),
   invoiceUrl: text("invoice_url").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),

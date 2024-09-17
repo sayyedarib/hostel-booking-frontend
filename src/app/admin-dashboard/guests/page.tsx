@@ -4,7 +4,7 @@ import { EllipsisVertical } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 
-import { getGuests, deleteGuest } from "@/db/queries";
+import { getGuestsAdmin, deleteGuest } from "@/db/queries";
 import {
   Table,
   TableBody,
@@ -42,7 +42,7 @@ export default function Guests() {
   } = useQuery<Guest[]>({
     queryKey: ["guests"],
     queryFn: async () => {
-      const response = await getGuests();
+      const response = await getGuestsAdmin();
       if (response.status === "success" && response.data !== null) {
         return response.data;
       }

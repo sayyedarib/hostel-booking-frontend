@@ -1,13 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useQueryState, parseAsInteger } from "nuqs";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, CircleX, MoveRight } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
-
-import { getCartItemsCount } from "@/db/queries";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -16,23 +13,10 @@ export default function Header({
   className,
 }: React.HTMLAttributes<HTMLDivElement>) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [cartItemsCount, setCartItemsCount] = useQueryState(
-    "cartItemsCount",
-    parseAsInteger.withDefault(0),
-  );
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
-  useEffect(() => {
-    const fetchCartItems = async () => {
-      const { data } = await getCartItemsCount();
-      setCartItemsCount(data);
-    };
-
-    fetchCartItems();
-  }, []);
 
   return (
     <>
