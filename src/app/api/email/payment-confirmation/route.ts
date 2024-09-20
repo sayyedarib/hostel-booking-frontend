@@ -2,7 +2,7 @@
 
 import { NextResponse, NextRequest } from "next/server";
 import { db } from "@/db";
-import { BedBookingTable, TranscationTable } from "@/db/schema";
+import { BedBookingTable, TransactionTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { logger } from "@/lib/utils";
 
@@ -28,9 +28,9 @@ export async function GET(request: NextRequest) {
       .execute();
 
     await db
-      .update(TranscationTable)
+      .update(TransactionTable)
       .set({ verified: true })
-      .where(eq(TranscationTable.token, token))
+      .where(eq(TransactionTable.token, token))
       .execute();
 
     logger("info", "Payment confirmed");
