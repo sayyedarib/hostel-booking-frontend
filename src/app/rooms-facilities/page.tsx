@@ -26,6 +26,22 @@ export default function CarouselPlugin() {
     },
   ];
 
+  const carouselItems2 = [
+    { src: "/img/rooms/Room_7_1.jpeg", alt: "" },
+    {
+      src: "/img/rooms/Room_6_1.jpeg",
+      alt: "",
+    },
+    {
+      src: "/img/rooms/room3.webp",
+      alt: "",
+    },
+    {
+      src: "/img/rooms/room8.jpg",
+      alt: "",
+    },
+  ];
+
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
   );
@@ -108,7 +124,7 @@ export default function CarouselPlugin() {
           </p>
         </div>
         <div className="w-full lg:w-1/2 xl:w-1/4 ">
-          <Carousel3 items={carouselItems} />
+          <Carousel3 Nextbutton={false} items={carouselItems} />
         </div>
       </section>
       <section className="flex flex-col items-start justify-center py-8 pb-16 px-5 gap-12">
@@ -273,6 +289,111 @@ export default function CarouselPlugin() {
             Wombat's has collected more than 50 international HOSCARS
             (Hostelworld Customer Annual Ratings).
           </p>
+        </div>
+      </section>
+      <section className="flex flex-col-reverse lg:flex-row items-center justify-center py-8 pb-16 px-5 gap-12">
+        <div className="flex flex-col">
+          <Image
+            src="/img/rooms/Room_7_1.jpeg"
+            width={500}
+            height={500}
+            alt=""
+            className="rounded-xl w-[75vw] lg:w-[unset]"
+          />
+          <ul className="list-disc pl-5 my-5 text-lg">
+            <li>wooden bunk beds (bed sheets included)</li>
+            <li>private shower and toilet facilities en-suite</li>
+            <li>security lockers for your belongings</li>
+            <li>free WIFI</li>
+            <li>minimum age 18</li>
+          </ul>
+        </div>
+        <div className="flex flex-col">
+          <h3 className="text-4xl mb-3 font-black text-[#212529]">
+            beds in dorms
+          </h3>
+          <Image
+            src="/img/rooms/room6.webp"
+            width={500}
+            height={500}
+            alt=""
+            className="rounded-xl w-[75vw] lg:w-[unset]"
+          />
+        </div>
+      </section>
+      <section className="flex flex-col lg:flex-row items-center justify-center py-8 pb-16 px-5 gap-12 bg-black text-white">
+        <div className="flex flex-col">
+          <h3 className="text-4xl mb-3 font-black">private double rooms</h3>
+          <Image
+            src="/img/rooms/room9.jpg"
+            width={500}
+            height={500}
+            alt=""
+            className="rounded-xl w-[75vw] lg:w-[unset]"
+          />
+        </div>
+        <div className="flex flex-col">
+          <Image
+            src="/img/rooms/room8.jpg"
+            width={500}
+            height={500}
+            alt=""
+            className="rounded-xl w-[75vw] lg:w-[unset]"
+          />
+          <p className="my-5 max-w-[50vw]">
+            That's the reason why Wombat's City Hostels are becoming
+            increasingly popular for travelling couples and business trips.
+            Where else can you find a double room in the city center at such
+            rates? We are happy to welcome non-typical hostel guests; it makes
+            our crowd even more colorful and exciting.
+          </p>
+        </div>
+      </section>
+      <section className="flex flex-col-reverse lg:flex-row items-center justify-center py-8 pb-16 px-5 gap-12">
+        <div className="flex flex-col">
+          <Image
+            src="/img/rooms/room2.webp"
+            width={500}
+            height={500}
+            alt=""
+            className="rounded-xl w-[75vw] lg:w-[unset]"
+          />
+          <p className="my-5 max-w-[50vw]">
+            Are you on a ladies' trip or do you prefer female-only travel
+            parties inside your room? We are happy to offer special rooms where
+            travelling ladies can share their dorm and have their own space.
+            Just look out for "female-only" marked dorms in your booking
+            process, or contact us; we are always happy to assist.
+          </p>
+        </div>
+        <div className="flex flex-col">
+          <h3 className="text-4xl mb-3 font-black text-[#212529]">
+            female only rooms
+          </h3>
+          <Image
+            src="/img/rooms/room0.webp"
+            width={500}
+            height={500}
+            alt=""
+            className="rounded-xl w-[75vw] lg:w-[unset]"
+          />
+        </div>
+      </section>
+      <section className="flex flex-col justify-evenly lg:flex-row py-16 px-4 bg-black text-white">
+        <div className="max-w-4xl">
+          <h2 className="text-5xl font-bold mb-8">
+            why Wombat's City Hostels?
+          </h2>
+          <p className="text-xl mb-8 max-w-xl">
+            We have private rooms, we have dorms, we have guest kitchens, we
+            have bars... but above all: we have the vibe. Wombat's City Hostels
+            are the right place to meet people from around the world, share
+            travel stories, get in contact with locals, enjoy great food &
+            drinks, and experience unforgettable moments.
+          </p>
+        </div>
+        <div className="w-full lg:w-1/2 xl:w-1/4 ">
+          <Carousel3 Nextbutton={true} items={carouselItems2} />
         </div>
       </section>
     </>

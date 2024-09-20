@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import { MoveRight } from "lucide-react";
 
 interface CarouselItem {
   src: string;
@@ -10,9 +11,10 @@ interface CarouselItem {
 
 interface CarouselProps {
   items: CarouselItem[];
+  Nextbutton: boolean;
 }
 
-const Carousel: React.FC<CarouselProps> = ({ items }) => {
+const Carousel: React.FC<CarouselProps> = ({ items, Nextbutton }) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const handlePrev = () => {
@@ -61,6 +63,16 @@ const Carousel: React.FC<CarouselProps> = ({ items }) => {
           />
         ))}
       </div>
+      {Nextbutton && (
+        <div className="absolute top-1/2 -translate-y-1/2 right-4 z-10">
+          <button
+            className="hover:bg-black border text-white transition-all aspect-square py-2 px-4 rounded-full"
+            onClick={handleNext}
+          >
+            <MoveRight />
+          </button>
+        </div>
+      )}
     </div>
   );
 };
