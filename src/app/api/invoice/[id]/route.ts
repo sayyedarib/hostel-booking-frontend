@@ -1,12 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer-core";
+import chromium from "@sparticuz/chromium-min";
 import fs from "fs";
 import path from "path";
 
 export async function GET(req: NextRequest, res: NextResponse) {
   const url = "http://localhost:3000/invoice/2";
-  console.log("opening browser");
-  const browser = await puppeteer.launch();
+
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath("https://github.com/Sparticuz/chromium/releases/download/v127.0.0/chromium-v127.0.0-pack.tar"),
+    headless: true,
+  });
   console.log("opening page");
   const page = await browser.newPage();
   await page.goto(url);
