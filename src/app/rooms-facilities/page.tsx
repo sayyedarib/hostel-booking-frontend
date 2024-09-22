@@ -16,6 +16,16 @@ import {
 } from "@/components/ui/carousel";
 import Carousel3 from "@/components/ui/carousel-3";
 import { Button } from "@/components/ui/button";
+import Footer from "@/components/landing-page/footer";
+import {
+  Facebook,
+  Instagram,
+  Linkedin,
+  MoveRight,
+  Share2Icon,
+  Youtube,
+} from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export default function CarouselPlugin() {
   const carouselItems = [
@@ -396,6 +406,98 @@ export default function CarouselPlugin() {
           <Carousel3 Nextbutton={true} items={carouselItems2} />
         </div>
       </section>
+      <section className="w-full flex flex-col items-center justify-cetner px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 backdrop-blur-3xl shadow-md">
+        <div className="flex flex-col rounded-3xl w-full overflow-hidden">
+          <Image
+            src="/img/rooms/Room_7_1.jpeg"
+            width={500}
+            height={500}
+            alt=""
+            className="w-full"
+          />
+          <div className="flex flex-col bg-black text-white py-16 px-16 gap-5 rounded-3xl w-full -translate-y-[17.5px]">
+            <h3 className="text-5xl font-black ">better together</h3>
+            <p>
+              Are you a travel party of 15 people or more? Welcome to our group
+              booking! This is where you can get the best rates!
+            </p>
+            <Button className="text-white bg-transparent hover:bg-white hover:text-black border border-white group text-md rounded-full px-8 py-3 w-fit">
+              Groups booking
+              <MoveRight className="ml-2 group-hover:w-10 w-0 transition-all" />
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <div className="w-full flex flex-col items-center justify-cetner px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 backdrop-blur-3xl shadow-md">
+        <div className="flex justify-between gap-7">
+          <div className="flex flex-col gap-3 bg-[#f3f3f0] p-10 py-12 rounded-2xl">
+            <h4 className="font-bold">Subscribe to our newsletter</h4>
+            <form action="">
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="first name"
+                  className="rounded-full"
+                />
+                <Input
+                  type="text"
+                  placeholder="last name"
+                  className="rounded-full"
+                />
+              </div>
+              <Input
+                type="text"
+                placeholder="your email"
+                className="rounded-full mt-3"
+                required
+              />
+              <p className="max-w-sm mt-7">
+                <input type="checkbox" name="newsletter" id="newsletter" />
+                Yes, I want to receive the latest news about Wombat's City
+                Hostels. I know I can choose to stop sharing my personal data at
+                any time.
+              </p>
+              <Button className="text-white bg-black hover:bg-black hover:text-[#ffd500] group text-sm rounded-full px-8 py-3 mt-4">
+                Subscribe
+                <Image
+                  src="/arrow.svg"
+                  width={50}
+                  height={50}
+                  alt=""
+                  className="ml-2 group-hover:w-5 w-0 transition-all"
+                />
+              </Button>
+            </form>
+          </div>
+          <div className="flex flex-col gap-3 bg-[#f3f3f0] p-10 py-12 rounded-2xl">
+            <h4 className="font-bold">Follow us on our social networks</h4>
+            <div className="flex flex-wrap gap-3 md:w-[75%]">
+              <p className="flex gap-2 group">
+                <Instagram className="group-hover:text-[#ffd500]" />
+                Instagram
+              </p>
+              <p className="flex gap-2 group">
+                {/* < /> */}
+                Tiktok
+              </p>
+              <p className="flex gap-2 group">
+                <Youtube className="group-hover:text-[#ffd500]" />
+                Youtube
+              </p>
+              <p className="flex gap-2 group">
+                <Facebook className="group-hover:text-[#ffd500]" />
+                Facebook
+              </p>
+              <p className="flex gap-2 group">
+                <Linkedin className="group-hover:text-[#ffd500]" />
+                Linkedin
+              </p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
     </>
   );
 }
