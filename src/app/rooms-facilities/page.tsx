@@ -111,8 +111,8 @@ export default function CarouselPlugin() {
           className="absolute md:top-10 top-16 right-[10%]"
         />
         <div className="max-w-4xl text-center space-y-20">
-          <h2 className="text-5xl font-bold my-4">rooms & facilities</h2>
-          <p className="text-lg md:mx-24">
+          <h2 className="text-[52px] font-bold my-4">rooms & facilities</h2>
+          <p className="text-xl md:mx-24">
             Clean, safe, inviting, and inspiring: Wombat’s has been awarded many
             times and has all the facilities to ensure a carefree stay. Our goal
             is to create spaces where travellers feel invited to come together
