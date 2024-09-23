@@ -21,8 +21,11 @@ import {
   Facebook,
   Instagram,
   Linkedin,
+  Mail,
   MoveRight,
+  Share2,
   Share2Icon,
+  Twitter,
   Youtube,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -55,6 +58,9 @@ export default function CarouselPlugin() {
   const plugin = React.useRef(
     Autoplay({ delay: 2000, stopOnInteraction: true })
   );
+
+  const [isHovered, setIsHovered] = React.useState(false);
+
   return (
     <>
       <Header className="fixed top-0 left-0 right-0 z-10" />
@@ -497,6 +503,46 @@ export default function CarouselPlugin() {
                 <Linkedin className="group-hover:text-[#ffd500]" />
                 Linkedin
               </p>
+              <div
+                className="relative inline-block overflow-hidden"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+              >
+                <button className="text-gray-600 py-2 rounded-full overflow-hidden">
+                  <div className="flex items-center">
+                    <div
+                      className={`bg-white border border-gray-300 flex items-center justify-center mr-2 w-8 h-8 rounded-full transition-all duration-300 ${
+                        isHovered ? "opacity-0 translate-y-full" : "opacity-100"
+                      }`}
+                    >
+                      <Share2
+                        className={`"w-5 h-5 transition-all duration-300 ${
+                          isHovered
+                            ? "opacity-0 translate-y-full"
+                            : "opacity-100"
+                        }`}
+                      />
+                    </div>
+                    <span
+                      className={`transition-all duration-300 ${
+                        isHovered ? "opacity-0 translate-y-full" : "opacity-100"
+                      }`}
+                    >
+                      Share Site
+                    </span>
+                  </div>
+                  <div
+                    className={`absolute inset-0 flex justify-center items-center transition-all duration-300 ${
+                      isHovered ? "translate-y-0" : "-translate-y-full"
+                    } ${isHovered ? " translate-y-0" : "-translate-y-full"}`}
+                  >
+                    <Facebook className="w-5 h-5 mx-1 text-gray-600 hover:text-yellow-500 transition-colors" />
+                    <Mail className="w-5 h-5 mx-1 text-gray-600 hover:text-yellow-500 transition-colors" />
+                    <Twitter className="w-5 h-5 mx-1 text-gray-600 hover:text-yellow-500 transition-colors" />
+                    <Linkedin className="w-5 h-5 mx-1 text-gray-600 hover:text-yellow-500 transition-colors" />
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
