@@ -138,7 +138,9 @@ export default function CarouselPlugin() {
         </div>
       </section>
       <section className="flex flex-col items-start justify-center py-8 pb-16 px-5 gap-12">
-        <h2 className="text-5xl font-bold my-4">Facilities Wombat's Hostels</h2>
+        <h2 className="text-[40px] font-bold my-4">
+          Facilities Wombat's Hostels
+        </h2>
         <Carousel plugins={[plugin.current]} className="max-w-screen w-full">
           <CarouselContent className="-ml-1">
             <CarouselItem className="pl-1 md:basis-1/3 basis-1/2 lg:basis-1/4">
@@ -189,7 +191,7 @@ export default function CarouselPlugin() {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-10 bg-[#f3f3f0] py-16">
         <div className="flex flex-col items-center gap-2">
           <Image src="/24_7_wombats_200.svg" width={150} height={150} alt="" />
-          <h4 className="font-bold">24hr Reception</h4>
+          <h4 className="font-bold text-xl">24hr Reception</h4>
           <p className="max-w-80 text-center tracking-wider">
             All of our hostels are staffed with a 24/7 reception. Our
             enthusiastic team can provide you with tips and insights anytime,
@@ -204,7 +206,7 @@ export default function CarouselPlugin() {
             height={150}
             alt=""
           />
-          <h4 className="font-bold">Luggage Storage</h4>
+          <h4 className="font-bold text-xl">Luggage Storage</h4>
           <p className="max-w-80 text-center tracking-wider">
             We're more than happy to offer you luggage storage options before
             you check in or after checking out. Explore the city without the
@@ -213,7 +215,7 @@ export default function CarouselPlugin() {
         </div>
         <div className="flex flex-col items-center gap-2">
           <Image src="/brekkie_200.svg" width={150} height={150} alt="" />
-          <h4 className="font-bold">Tasty Brekkie</h4>
+          <h4 className="font-bold text-xl">Tasty Brekkie</h4>
           <p className="max-w-80 text-center tracking-wider">
             Fuel up for a day of adventuring with our fresh, organic, and
             locally sourced breakfast. Unlimited coffee and tea included!
@@ -226,7 +228,7 @@ export default function CarouselPlugin() {
             height={150}
             alt=""
           />
-          <h4 className="font-bold">Laundry</h4>
+          <h4 className="font-bold text-xl">Laundry</h4>
           <p className="max-w-80 text-center tracking-wider">
             Breathe new life into your backpack and freshen your clothes with
             our laundry facilities.
@@ -239,7 +241,7 @@ export default function CarouselPlugin() {
             height={150}
             alt=""
           />
-          <h4 className="font-bold">Guest Kitchen</h4>
+          <h4 className="font-bold text-xl">Guest Kitchen</h4>
           <p className="max-w-80 text-center tracking-wider">
             Craving a home-cooked meal? Show off your signature dish with the
             help of our fully equipped guest kitchen!
@@ -247,7 +249,7 @@ export default function CarouselPlugin() {
         </div>
         <div className="flex flex-col items-center gap-2">
           <Image src="/towels_wombats.svg" width={150} height={150} alt="" />
-          <h4 className="font-bold">Towels</h4>
+          <h4 className="font-bold text-xl">Towels</h4>
           <p className="max-w-80 text-center tracking-wider">
             You pre-order your towel online or rent one for a small fee at
             reception :) Towels are provided in double and twin rooms.
@@ -260,7 +262,7 @@ export default function CarouselPlugin() {
             height={150}
             alt=""
           />
-          <h4 className="font-bold">Lockers</h4>
+          <h4 className="font-bold text-xl">Lockers</h4>
           <p className="max-w-80 text-center tracking-wider">
             Every room is equipped with robust lockers for each individual
             guest. Keep your valuables safe and put your mind at ease.
@@ -273,7 +275,7 @@ export default function CarouselPlugin() {
             height={150}
             alt=""
           />
-          <h4 className="font-bold">WomBAR</h4>
+          <h4 className="font-bold text-xl">WomBAR</h4>
           <p className="max-w-80 text-center tracking-wider">
             If you’re looking to meet fellow guests, cap off a long day of
             exploring, or begin a big night out, the WomBAR is open for you.
@@ -286,7 +288,7 @@ export default function CarouselPlugin() {
             height={150}
             alt=""
           />
-          <h4 className="font-bold">Rentables</h4>
+          <h4 className="font-bold text-xl">Rentables</h4>
           <p className="max-w-80 text-center tracking-wider">
             Irons, hairdryers, adapters, and more – we have an array of handy
             items available to you from reception.
@@ -294,7 +296,7 @@ export default function CarouselPlugin() {
         </div>
         <div className="flex flex-col items-center gap-2">
           <Image src="/250px.svg" width={150} height={150} alt="" />
-          <h4 className="font-bold">Top Host</h4>
+          <h4 className="font-bold text-xl">Top Host</h4>
           <p className="max-w-80 text-center tracking-wider">
             Wombat's has collected more than 50 international HOSCARS
             (Hostelworld Customer Annual Ratings).
