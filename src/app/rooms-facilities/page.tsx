@@ -312,7 +312,7 @@ export default function CarouselPlugin() {
             alt=""
             className="rounded-xl w-[75vw] lg:w-[unset]"
           />
-          <ul className="list-disc pl-5 my-5 text-lg">
+          <ul className="list-disc pl-5 my-5 text-xl">
             <li>wooden bunk beds (bed sheets included)</li>
             <li>private shower and toilet facilities en-suite</li>
             <li>security lockers for your belongings</li>
@@ -321,7 +321,7 @@ export default function CarouselPlugin() {
           </ul>
         </div>
         <div className="flex flex-col">
-          <h3 className="text-4xl mb-3 font-black text-[#212529]">
+          <h3 className="text-[48px] mb-3 font-black text-[#212529]">
             beds in dorms
           </h3>
           <Image
@@ -335,7 +335,7 @@ export default function CarouselPlugin() {
       </section>
       <section className="flex flex-col lg:flex-row items-center justify-center py-8 pb-16 px-5 gap-12 bg-black text-white">
         <div className="flex flex-col">
-          <h3 className="text-4xl mb-3 font-black">private double rooms</h3>
+          <h3 className="text-[48px] mb-3 font-black">private double rooms</h3>
           <Image
             src="/img/rooms/room9.jpg"
             width={500}
@@ -352,7 +352,7 @@ export default function CarouselPlugin() {
             alt=""
             className="rounded-xl w-[75vw] lg:w-[unset]"
           />
-          <p className="my-5 max-w-[50vw]">
+          <p className="my-5 text-xl max-w-[50vw]">
             That's the reason why Wombat's City Hostels are becoming
             increasingly popular for travelling couples and business trips.
             Where else can you find a double room in the city center at such
