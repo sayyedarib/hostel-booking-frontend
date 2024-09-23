@@ -321,7 +321,7 @@ export default function CarouselPlugin() {
           </ul>
         </div>
         <div className="flex flex-col">
-          <h3 className="text-[48px] mb-3 font-black text-[#212529]">
+          <h3 className="text-5xl mb-3 font-black text-[#212529]">
             beds in dorms
           </h3>
           <Image
@@ -335,7 +335,7 @@ export default function CarouselPlugin() {
       </section>
       <section className="flex flex-col lg:flex-row items-center justify-center py-8 pb-16 px-5 gap-12 bg-black text-white">
         <div className="flex flex-col">
-          <h3 className="text-[48px] mb-3 font-black">private double rooms</h3>
+          <h3 className="text-5xl mb-3 font-black">private double rooms</h3>
           <Image
             src="/img/rooms/room9.jpg"
             width={500}
@@ -370,7 +370,7 @@ export default function CarouselPlugin() {
             alt=""
             className="rounded-xl w-[75vw] lg:w-[unset]"
           />
-          <p className="my-5 max-w-[50vw]">
+          <p className="my-5 text-xl max-w-[50vw]">
             Are you on a ladies' trip or do you prefer female-only travel
             parties inside your room? We are happy to offer special rooms where
             travelling ladies can share their dorm and have their own space.
@@ -379,7 +379,7 @@ export default function CarouselPlugin() {
           </p>
         </div>
         <div className="flex flex-col">
-          <h3 className="text-4xl mb-3 font-black text-[#212529]">
+          <h3 className="text-5xl mb-3 font-black text-[#212529]">
             female only rooms
           </h3>
           <Image
@@ -419,7 +419,7 @@ export default function CarouselPlugin() {
           />
           <div className="flex flex-col bg-black text-white py-16 px-16 gap-5 rounded-3xl w-full -translate-y-[17.5px]">
             <h3 className="text-5xl font-black ">better together</h3>
-            <p>
+            <p className="text-xl">
               Are you a travel party of 15 people or more? Welcome to our group
               booking! This is where you can get the best rates!
             </p>
@@ -434,7 +434,7 @@ export default function CarouselPlugin() {
       <div className="w-full flex flex-col items-center justify-cetner px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 backdrop-blur-3xl shadow-md">
         <div className="flex justify-between gap-7">
           <div className="flex flex-col gap-3 bg-[#f3f3f0] p-10 py-12 rounded-2xl">
-            <h4 className="font-bold">Subscribe to our newsletter</h4>
+            <h4 className="font-bold text-xl">Subscribe to our newsletter</h4>
             <form action="">
               <div className="flex gap-2">
                 <Input
@@ -473,7 +473,9 @@ export default function CarouselPlugin() {
             </form>
           </div>
           <div className="flex flex-col gap-3 bg-[#f3f3f0] p-10 py-12 rounded-2xl">
-            <h4 className="font-bold">Follow us on our social networks</h4>
+            <h4 className="font-bold text-xl">
+              Follow us on our social networks
+            </h4>
             <div className="flex flex-wrap gap-3 md:w-[75%]">
               <p className="flex gap-2 group">
                 <Instagram className="group-hover:text-[#ffd500]" />
