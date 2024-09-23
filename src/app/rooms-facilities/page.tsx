@@ -65,10 +65,10 @@ export default function CarouselPlugin() {
             <div className="relative">
               <Card>
                 <CardContent className="flex flex-col aspect-square w-screen h-screen items-center justify-center bg-[url('/img/rooms/Room_6_1.jpeg')] bg-cover relative">
-                  <h3 className="text-3xl font-bold text-white">
+                  <h3 className="md:text-6xl sm:text-4xl text-2xl font-bold text-white">
                     by travellers for travellers
                   </h3>
-                  <h4 className="text-white skew-x-[5deg] skew-y-[5deg]">
+                  <h4 className="text-white md:text-5xl text-3xl skew-x-[5deg] skew-y-[5deg]">
                     Since 1999
                   </h4>
                 </CardContent>
@@ -79,10 +79,10 @@ export default function CarouselPlugin() {
             <div className="relative">
               <Card>
                 <CardContent className="flex flex-col aspect-square w-screen h-screen items-center justify-center bg-[url('/img/rooms/room0.webp')] bg-cover relative">
-                  <h3 className="text-3xl font-bold text-white">
+                  <h3 className="md:text-6xl sm:text-4xl text-2xl font-bold text-white">
                     rooms & facilities
                   </h3>
-                  <h4 className="text-white skew-x-[5deg] skew-y-[5deg]">
+                  <h4 className="text-white md:text-5xl text-3xl skew-x-[5deg] skew-y-[5deg]">
                     Khan Group of PG
                   </h4>
                 </CardContent>
