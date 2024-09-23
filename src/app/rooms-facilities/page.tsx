@@ -482,7 +482,7 @@ export default function CarouselPlugin() {
                 Instagram
               </p>
               <p className="flex gap-2 group">
-                {/* < /> */}
+                <Image src={"/Tiktok.png"} width={24} height={24} alt="" />
                 Tiktok
               </p>
               <p className="flex gap-2 group">
