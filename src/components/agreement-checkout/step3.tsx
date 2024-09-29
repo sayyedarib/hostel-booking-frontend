@@ -1,26 +1,26 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { useReactToPrint } from "react-to-print";
-import html2pdf from "html2pdf.js";
+import { useState } from "react";
 import Image from "next/image";
-import { LoaderCircle } from "lucide-react";
-
-import type { AgreementForm } from "@/interface";
+import { LoaderCircle, MoveLeft } from "lucide-react";
+import { useQuery } from '@tanstack/react-query';
 
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
 import {
   createBooking,
-  getAgreementFormData,
   getSecurityDepositStatus,
+  getCheckoutData,
 } from "@/db/queries";
-import { logger, calculateRent, generateToken } from "@/lib/utils";
-import ForwardedPrintableForm from "../printable-registration-form";
-import PrintableInvoice from "../printable-invoice";
-import { Description } from "@radix-ui/react-dialog";
+import { logger, calculateRent } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+
+interface CheckoutData {
+  guestName: string;
+  monthlyRent: number;
+  checkIn: string;
+  checkOut: string;
+}
 
 export default function Step3({
   handleNext,
@@ -30,322 +30,54 @@ export default function Step3({
   handlePrev: () => void;
 }) {
   const { toast } = useToast();
-  const supabase = createClient();
 
-  const agreementRef = useRef<HTMLDivElement>(null);
-  const invoiceRef = useRef<HTMLDivElement>(null);
-
-  const [agreementForm, setAgreementForm] = useState<AgreementForm | null>(
-    null,
-  );
-
-  const [securityDeposit, setSecurityDeposit] = useState<number>(0);
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [invoiceUrl, setInvoiceUrl] = useState<string | null>(null);
-  const [agreementUrl, setAgreementUrl] = useState<string | null>(null);
   const [isPaidChecked, setIsPaidChecked] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const { data: agreementData } = await getAgreementFormData();
-      const { data: securityDepositData } = await getSecurityDepositStatus();
-
-      if (!agreementData) {
+  const { data: checkoutData } = useQuery<CheckoutData[]>({
+    queryKey: ['checkoutData'],
+    queryFn: async () => {
+      const result = await getCheckoutData();
+      if (!result.data) {
         logger("info", "Failed to fetch data");
-        return;
+        throw new Error("Failed to fetch checkout data");
       }
-
-      const enhancedAgreementData = {
-        ...agreementData,
-        guests: agreementData.guests.map((guest) => ({
-          ...guest,
-          totalRent: calculateRent(
-            guest.monthlyRent,
-            new Date(guest.checkIn),
-            new Date(guest.checkOut),
-          ).totalRent,
-          payableRent: calculateRent(
-            guest.monthlyRent,
-            new Date(guest.checkIn),
-            new Date(guest.checkOut),
-          ).payableRent,
-        })),
-      };
-
-      setSecurityDeposit(securityDepositData != "paid" ? 1000 : 0);
-      setTotalAmount(
-        enhancedAgreementData.guests.reduce(
-          (acc, item) => acc + item.payableRent,
-          0,
-        ),
-      );
-      setAgreementForm(agreementData);
-    };
-
-    fetchData();
-  }, []);
-
-  const uploadToSupabase = useCallback(
-    async (file: Blob, bucket: string, fileName: string): Promise<void> => {
-      try {
-        logger("info", "Uploading file to bucket");
-        const { data, error } = await supabase.storage
-          .from(bucket)
-          .upload(fileName, file);
-
-        const { data: publicUrlData } = supabase.storage
-          .from(bucket)
-          .getPublicUrl(fileName);
-
-        if (publicUrlData) {
-          logger(
-            "info",
-            `File uploaded successfully: ${publicUrlData.publicUrl}`,
-          );
-          if (bucket === "invoice") {
-            setInvoiceUrl(publicUrlData.publicUrl);
-          } else {
-            setAgreementUrl(publicUrlData.publicUrl);
-          }
-        }
-
-        if (error) {
-          logger("error", "Error uploading file to Supabase:", error);
-          throw new Error(`Error uploading file to Supabase: ${error.message}`);
-        } else {
-          console.log("File uploaded successfully:", data);
-        }
-      } catch (error) {
-        logger("error", "Error uploading file to Supabase:", error as Error);
-        throw error;
-      }
+      return result.data;
     },
-    [],
-  );
+  });
 
-  const handleBeforePrintInvoice = useCallback(async () => {
-    try {
-      const html = invoiceRef.current;
-      if (html) {
-        const options = {
-          margin: 10,
-          filename: `invoice-${new Date().getTime()}.pdf`,
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        };
+  const { data: securityDepositStatus } = useQuery({
+    queryKey: ['securityDepositStatus'],
+    queryFn: getSecurityDepositStatus,
+  });
 
-        logger("info", "Starting PDF generation with html2pdf");
-        toast({
-          variant: "default",
-          description: (
-            <div className="space-x-2 flex gap-2">
-              <LoaderCircle className="animate-spin" /> Generating Invoice...
-            </div>
-          ),
-        });
-        const pdfBlob = await html2pdf()
-          .from(html)
-          .set(options)
-          .outputPdf("blob");
+  const securityDeposit = securityDepositStatus?.status !== "paid" ? 1000 : 0;
 
-        if (pdfBlob instanceof Blob) {
-          logger("info", "PDF generated successfully, downloading invoice PDF");
-          toast({
-            variant: "default",
-            description: (
-              <div className="space-x-2">Invoice Generated successfully!</div>
-            ),
-          });
+  const totalAmount = checkoutData?.reduce((total, data) => 
+    total + calculateRent(
+      data.monthlyRent,
+      new Date(data.checkIn),
+      new Date(data.checkOut)
+    ).payableRent,
+  0) || 0;
 
-          toast({
-            variant: "default",
-            description: (
-              <div className="space-x-2">Downloading Invoice...</div>
-            ),
-          });
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(pdfBlob);
-          link.download = options.filename;
-          link.click();
-
-          logger("info", "Uploading invoice PDF to Supabase");
-          toast({
-            variant: "default",
-            description: (
-              <div className="space-x-2 flex gap-2">
-                <LoaderCircle className="animate-spin" /> Uploading invoice...
-              </div>
-            ),
-          });
-
-          await uploadToSupabase(pdfBlob, "invoice", options.filename);
-        } else {
-          throw new Error("Generated PDF is not a valid Blob object");
-        }
-      } else {
-        throw new Error("invoiceRef.current is null or undefined");
-      }
-    } catch (error) {
-      logger("error", "Error in generating or uploading PDF", error as Error);
-    }
-  }, []);
-
-  const handleBeforePrintAgreement = useCallback(async () => {
-    try {
-      const html = agreementRef.current;
-      if (html) {
-        const options = {
-          margin: 10,
-          filename: `agreement-${new Date().getTime()}.pdf`,
-          jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-        };
-
-        logger("info", "Starting PDF generation with html2pdf");
-        toast({
-          variant: "default",
-          description: (
-            <div className="space-x-2 flex gap-2">
-              <LoaderCircle className="animate-spin" /> Generating Agreement...
-            </div>
-          ),
-        });
-        const pdfBlob = await html2pdf()
-          .from(html)
-          .set(options)
-          .outputPdf("blob");
-
-        if (pdfBlob instanceof Blob) {
-          logger(
-            "info",
-            "Agreement generated successfully, downloading agreement PDF",
-          );
-
-          toast({
-            variant: "default",
-            description: (
-              <div className="space-x-2">Agreement Generated successfully!</div>
-            ),
-          });
-          const link = document.createElement("a");
-          link.href = URL.createObjectURL(pdfBlob);
-          link.download = options.filename;
-          link.click();
-
-          logger("info", "Uploading agreement PDF to Supabase");
-          toast({
-            variant: "default",
-            description: (
-              <div className="space-x-2 flex gap-2">
-                <LoaderCircle className="animate-spin" /> Uploading agreement
-                PDF...
-              </div>
-            ),
-          });
-          await uploadToSupabase(pdfBlob, "agreement", options.filename);
-        } else {
-          throw new Error("Generated PDF is not a valid Blob object");
-        }
-      } else {
-        throw new Error("agreementRef.current is null or undefined");
-      }
-    } catch (error) {
-      logger("error", "Error in generating or uploading PDF", error as Error);
-    }
-  }, []);
-
-  useEffect(() => {
-    const createBookingIfUrlsExist = async () => {
-      if (invoiceUrl && agreementUrl) {
-        logger("info", "Generating token....");
-        const token = generateToken();
-
-        logger("info", "Creating booking in database");
-        const { status, data } = await createBooking({
-          amount: totalAmount + securityDeposit,
-          invoiceUrl,
-          agreementUrl,
-          token,
-        });
-
-        if (status === "error") {
-          logger("error", "Failed to create booking", { data: data });
-          toast({
-            variant: "destructive",
-            description: (
-              <div>
-                Error in creating booking, please try again or contact support
-                email...
-              </div>
-            ),
-          });
-          return;
-        }
-
-        logger("info", "Booking created successfully");
-        toast({
-          variant: "default",
-          description: (
-            <div className="space-x-2 flex gap-2">
-              <LoaderCircle className="animate-spin" /> Sending confirmation
-              email...
-            </div>
-          ),
-        });
-
-        // Send confirmation emails
-        logger("info", "Sending confirmation email to owner for booking id");
-        await fetch("/api/email/booking-confirmation", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ bookingId: data?.bookingId, token }),
-        }).catch((error) => {
-          logger(
-            "error",
-            "Error in sending confirmation email",
-            error as Error,
-          );
-
-          return;
-        });
-
-        toast({
-          variant: "default",
-          description: (
-            <div className="space-x-2">Email sent successfully!</div>
-          ),
-        });
-
-        logger("info", "Booking created successfully", { data: data });
-        setLoading(false);
-        handleNext();
-
-        setLoading(false);
-      }
-    };
-
-    createBookingIfUrlsExist();
-  }, [invoiceUrl, agreementUrl]);
-
-  const handlePaymentConfirmation = async () => {
+  const handlePayment = async () => {
     setLoading(true);
-
-    try {
-      logger("info", "Generating and uploading invoice");
-      await handleBeforePrintInvoice();
-
-      logger("info", "Generating and uploading agreement");
-      await handleBeforePrintAgreement();
-      setLoading(false);
-    } catch (error) {
-      logger("error", "Error in generating or uploading PDF", error as Error);
-      setLoading(false);
+    const result = await createBooking({ payableRent: totalAmount, securityDeposit });
+    handleNext();
+    if (result.status === 'success') {
+      toast({
+        title: "Payment successful",
+        description: "Your payment has been processed",
+      });
     }
   };
 
   return (
-    <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl flex flex-col md:flex-row">
+    <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl flex flex-col md:flex-row relative">
+      <Button variant="ghost" onClick={handlePrev} className="absolute top-0 left-0">
+        <MoveLeft size={40} />
+      </Button>
       <div className="flex md:flex-col gap-3 md:w-1/2 items-center">
         <div>
           <Image
@@ -365,29 +97,28 @@ export default function Step3({
         </div>
       </div>
       <div className="flex flex-col gap-3 md:w-1/2">
-        <Separator />
         <span className="text-gray-600">
-          Total Bed(s): <strong>{agreementForm?.guests.length}</strong>
+          Total Bed(s): <strong>{checkoutData?.length}</strong>
         </span>
         <span className="text-gray-600">
           Guest(s):{" "}
           <strong>
-            {agreementForm?.guests
-              .map((item) => item.name.split(" ")[0])
+            {checkoutData
+              ?.map((item) => item.guestName.split(" ")[0])
               .join(", ")}
           </strong>
         </span>
         <span className="text-gray-600">
-          Total Rent: <strong>Rs. {totalAmount}</strong>
+          Total Rent: <strong>₹ {totalAmount}</strong>
         </span>
-        {securityDeposit && (
+        {securityDeposit > 0 && (
           <span className="text-gray-600">
-            Security Deposit(Refundable): <strong>Rs. 1000</strong>
+            Security Deposit(Refundable): <strong>₹ {securityDeposit}</strong>
           </span>
         )}
         <Separator />
         <span className="text-gray-800 font-semibold">
-          Total Amount: <strong>Rs.{totalAmount + securityDeposit}</strong>
+          Total Amount: <strong>₹ {totalAmount + securityDeposit}</strong>
         </span>
         <div className="flex items-center gap-2 mt-4">
           <Checkbox
@@ -400,9 +131,9 @@ export default function Step3({
           </Label>
         </div>
         <Button
-          onClick={handlePaymentConfirmation}
+          onClick={handlePayment}
           disabled={!isPaidChecked || loading}
-          className={`mt-4 ${isPaidChecked ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"} text-white font-semibold py-2 px-4 rounded-lg`}
+          className="mt-4 font-semibold"
         >
           {loading ? (
             <LoaderCircle className="animate-spin" />
@@ -411,34 +142,6 @@ export default function Step3({
           )}
         </Button>
       </div>
-
-      {agreementForm && (
-        <div className="hidden">
-          <ForwardedPrintableForm ref={agreementRef} {...agreementForm} />
-        </div>
-      )}
-      {agreementForm && (
-        <div className="hidden">
-          <PrintableInvoice
-            ref={invoiceRef}
-            invoiceNumber={`INV-${new Date().getTime()}`}
-            invoiceDate={new Date()}
-            customerName={agreementForm?.name}
-            customerPhone={agreementForm?.phone}
-            customerAddress={{
-              address: agreementForm?.address ?? "",
-              city: agreementForm?.city ?? "",
-              pin: agreementForm?.pin ?? "",
-              state: agreementForm?.state ?? "",
-            }}
-            items={agreementForm.guests}
-            securityDeposit={securityDeposit}
-            discount={0}
-            fine={0}
-            roomCode={agreementForm.guests[0]?.roomCode}
-          />
-        </div>
-      )}
     </div>
   );
 }

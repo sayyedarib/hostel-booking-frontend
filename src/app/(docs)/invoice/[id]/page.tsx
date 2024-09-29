@@ -1,59 +1,22 @@
-import { useCallback } from "react";
+
 import { toWords } from "number-to-words";
 import Image from "next/image";
+
 import { cn, formatDate, calculateRent } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
+import { getInvoiceDetails } from "@/db/queries";
 
-const dummyInvoiceData = {
-  invoiceNumber: "12345",
-  invoiceDate: new Date(),
-  customerName: "John Doe",
-  customerPhone: "1234567890",
-  customerAddress: {
-    address: "123 Main St",
-    city: "Aligarh",
-    pin: "202001",
-    state: "Uttar Pradesh",
-  },
-  instituteName: "Aligarh Muslim University",
-  enrollmentNumber: "1234567890",
-  items: [
-    {
-      roomCode: "A1",
-      bedCode: "B1",
-      monthlyRent: 5000,
-      checkIn: new Date(),
-      checkOut: new Date(),
-    },
-  ],
-  securityDeposit: 1000,
-  discount: 0,
-  fine: 200,
-};
 
-export default function InvoicePage({ params }: { params: { id: string } }) {
-  const invoiceData = dummyInvoiceData;
+export default async function InvoicePage({ params, searchParams }: { params: { id: string }, searchParams: { userId: string } }) {
+  const userId = Number(searchParams.userId)
 
-  const calculateSubtotal = useCallback(() => {
-    return invoiceData.items.reduce(
-      (sum, item) =>
-        sum +
-        calculateRent(
-          item.monthlyRent,
-          new Date(item.checkIn),
-          new Date(item.checkOut),
-        ).payableRent,
-      0,
-    );
-  }, [invoiceData]);
-
-  const subtotal = calculateSubtotal();
-  const grandTotal = subtotal + invoiceData.securityDeposit;
+  console.log("userId in invoice page", userId);
+  const { data: invoiceDetails } = await getInvoiceDetails(Number(params.id), userId);
 
   return (
     <div
       className={cn(
-        "max-w-4xl mx-auto text-base leading-relaxed font-serif shadow-md p-8",
+        "max-w-4xl mx-auto text-base leading-relaxed font-serif p-4",
       )}
     >
       <header>
@@ -62,18 +25,18 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
         </h2>
         <div className="flex justify-between">
           <p className="mb-2">
-            <strong>Invoice #:</strong> {invoiceData.invoiceNumber}
+            <strong>Invoice #:</strong> KH_{Date.now()}
           </p>
           <p className="mb-2">
-            <strong>Invoice Date:</strong> {formatDate(invoiceData.invoiceDate)}
+            <strong>Invoice Date:</strong> {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}
           </p>
         </div>
 
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold mb-2">KHAN GROUP OF PG</h1>
-            <p className="mb-1">Mobile: 8791476473</p>
-            <p className="mb-2">
+            <p>Mobile: 8791476473</p>
+            <p>
               Campus View Apartment, <br /> Beside Sultan Jahan Coaching,
               Shamshad Market, <br /> Aligarh 202001, <br /> Uttar Pradesh,
               India
@@ -92,26 +55,26 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
         </div>
       </header>
 
-      <div className="w-full h-[1px] bg-slate-300 my-2" />
+      <div className="w-full h-[1px] bg-slate-200 my-2" />
       <section>
         <div>
           <p>
             <strong>Bill To:</strong>
           </p>
-          <p>{invoiceData.customerName}</p>
-          <p>Ph: {invoiceData.customerPhone}</p>
-          <p>Enrollment No: {invoiceData.enrollmentNumber}</p>
-          <p>Institute Name: {invoiceData.instituteName}</p>
+          <p>{invoiceDetails?.userName}</p>
+          <p>Ph: {invoiceDetails?.userPhone}</p>
+          <p>Enrollment No: GM6697</p>
+          <p>Institute Name: Aligarh Muslim University</p>
           <div className="flex gap-4 justify-between mt-3">
             <div className="mb-2">
               <p>
                 <strong>Permanent Address:</strong>
               </p>
               <p>
-                {invoiceData.customerAddress.address},<br />
-                {invoiceData.customerAddress.city},{" "}
-                {invoiceData.customerAddress.pin},{" "}
-                {invoiceData.customerAddress.state}
+                {invoiceDetails?.address},<br />
+                {invoiceDetails?.city},{" "}
+                {invoiceDetails?.pin},{" "}
+                {invoiceDetails?.state}
               </p>
             </div>
             <div className="mb-2">
@@ -142,7 +105,7 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
             </tr>
           </thead>
           <tbody>
-            {invoiceData.items.map((item, index) => (
+            {invoiceDetails?.beds?.map((item: any, index: number) => (
               <tr key={index}>
                 <td className="border p-2">
                   Room {item.roomCode} | Bed {item.bedCode}
@@ -168,14 +131,14 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
               <td className="border p-2 text-right">₹1000</td>
               <td className="border p-2 text-right">1</td>
               <td className="border p-2 text-right">
-                {invoiceData.securityDeposit}
+                ₹{invoiceDetails?.securityDeposit}
               </td>
             </tr>
             <tr>
               <td className="border p-2">Additional Charges</td>
-              <td className="border p-2 text-right">₹{invoiceData.fine}</td>
+              <td className="border p-2 text-right">₹{invoiceDetails?.additionalCharges}</td>
               <td className="border p-2 text-right">1</td>
-              <td className="border p-2 text-right">₹{invoiceData.fine}</td>
+              <td className="border p-2 text-right">₹{invoiceDetails?.additionalCharges}</td>
             </tr>
           </tbody>
         </table>
@@ -185,27 +148,27 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
         <div className="flex justify-between">
           <div>
             <p>
-              <strong>Total Items:</strong> {invoiceData.items.length + 1}
+              <strong>Total Items:</strong> {(invoiceDetails?.beds?.length ?? 0) + 1}
             </p>
           </div>
           <div>
             <p>
-              <strong>Subtotal:</strong> ₹{subtotal}
+              <strong>Subtotal:</strong> ₹{invoiceDetails?.rentAmount}
             </p>
             <p>
-              <strong>Security Deposit:</strong> ₹{invoiceData.securityDeposit}
+              <strong>Security Deposit:</strong> ₹{invoiceDetails?.securityDeposit}
             </p>
             <p>
-              <strong>Total Amount:</strong> ₹{grandTotal}
+              <strong>Total Amount:</strong> ₹{invoiceDetails?.totalAmount}
             </p>
             <p>
-              <strong>Amount in words:</strong> {toWords(grandTotal)} Rupees
+              <strong>Amount in words:</strong> {toWords(invoiceDetails?.totalAmount ?? 0)} Rupees
               Only
             </p>
           </div>
         </div>
       </section>
-      <Separator />
+      <Separator className="my-2" />
       <footer className="h-52 flex flex-col justify-between">
         <div>
           <p className="font-bold text-lg mb-2">For KHAN GROUP OF PG</p>
@@ -218,7 +181,7 @@ export default function InvoicePage({ params }: { params: { id: string } }) {
           />
           <p className="text-sm font-semibold">Authorized Signatory</p>
         </div>
-        <div className="border-t pt-2">
+        <div className="pt-2">
           <p className="text-xs text-center text-gray-600">
             This is a computer-generated document. No physical signature is
             required.

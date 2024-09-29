@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
 
   try {
     logger("info", `Updating booking status for ID: ${id}`);
+    // TODO: it should done automatically when the checkin date is today
     await db
       .update(BedBookingTable)
       .set({ status: "checked_in" })

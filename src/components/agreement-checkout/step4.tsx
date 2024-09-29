@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import Lottie from "lottie-react";
+import successAnimation from "../../../public/success-animation.json";
 
 interface Step4Props {
   handlePrev: () => void;
@@ -11,33 +12,44 @@ export default function Step4({ handlePrev }: Step4Props) {
   const [countdown, setCountdown] = useState(5);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => prev - 1);
+    const countdownTimer = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(countdownTimer);
+          // Uncomment the following line to enable redirection
+          // router.push("/");
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
 
-    if (countdown === 0) {
-      clearInterval(timer);
-      router.push("/");
-    }
-
-    return () => clearInterval(timer);
-  }, [countdown, router]);
+    return () => {
+      clearInterval(countdownTimer);
+    };
+  }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md text-center">
-        <h1 className="text-2xl font-semibold text-gray-800 mb-4">
-          Booking Confirmed
-        </h1>
-        <p className="text-gray-600 mb-4">
-          Your bed has been successfully booked. A confirmation email has been
-          sent to your registered email address.
+    <div className="flex flex-col items-center justify-center h-screen lg:w-1/2 mx-auto md:w-2/3 w-full">
+      <div className="flex flex-col items-center">
+        <Lottie
+          animationData={successAnimation}
+          loop={false}
+          style={{ width: 200, height: 200 }}
+        />
+        <p className="text-xl font-semibold text-gray-800">
+          Booking Successful!
         </p>
-        <p className="text-gray-600 mb-4">
-          You will be redirected in{" "}
-          <span className="font-bold">{countdown}</span> seconds.
-        </p>
-        <p className="text-gray-400 mb-4">(Payment will be verified shortly)</p>
+        <div className="bg-white p-4 rounded-lg shadow-md text-center">
+          <p className="text-gray-600 mb-4">
+A confirmation email has been sent to your registered email address.
+          </p>
+          <p className="text-gray-400 mb-4">(After payment verification you&apos;ll receive the invoice and hostel ID card)</p>
+          <p className="text-gray-600 mb-4">
+            You will be redirected in{" "}
+            <span className="font-bold">{countdown}</span> seconds.
+          </p>
+        </div>
       </div>
     </div>
   );

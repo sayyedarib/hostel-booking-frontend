@@ -7,20 +7,19 @@ import {
   updateUserIdImage,
   updateGuardianIdImage,
   updateGuardianPhoto,
+  getUserId,
 } from "@/db/queries";
 
 interface DocumentUploadProps {
   title: string;
   imageUrl?: string;
   field: string;
-  userId: number;
 }
 
 const DocumentUpload: React.FC<DocumentUploadProps> = ({
   title,
   imageUrl,
   field,
-  userId,
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(imageUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -30,6 +29,14 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       setPreviewUrl(URL.createObjectURL(file));
+
+      const { data } = await getUserId();
+      const userId = data;
+
+      if (!userId) {
+        console.error("User ID not found");
+        return;
+      }
 
       const fileName = `${field}_${userId}.${new Date().getTime()}`;
 

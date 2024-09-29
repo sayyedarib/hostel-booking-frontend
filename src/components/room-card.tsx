@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { Star } from "lucide-react";
+import { Star, AlertCircle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -39,7 +39,14 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
       <CardDescription className="text-sm text-gray-600">
         Room: {roomData.roomCode} | Max Persons: {roomData.bedCount}
       </CardDescription>
-      <AddToCartDrawer roomId={Number(roomData.id)} />
+      {roomData.available ? (
+        <AddToCartDrawer roomId={Number(roomData.id)} />
+      ) : (
+        <div className="flex items-center justify-center p-2 bg-red-100 text-red-600 rounded-md">
+          <AlertCircle size={18} className="mr-2" />
+          <p className="font-semibold">No Space Available</p>
+        </div>
+      )}
     </Card>
   );
 }

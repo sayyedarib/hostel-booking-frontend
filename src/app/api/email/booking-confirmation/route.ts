@@ -25,10 +25,6 @@ export async function POST(request: NextRequest) {
 
     const confirmationLink = `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://aligarhhostel.com"}/api/email/payment-confirmation?id=${bookingDetails.id}&token=${token}`;
 
-    logger("info", "Fetching agreement PDFs");
-    const agreementPdf = await axios.get(bookingDetails.agreementUrl, {
-      responseType: "arraybuffer",
-    });
 
     logger("info", "Fetching invoice PDF");
     const invoicePdf = await axios.get(bookingDetails.invoiceUrl, {
@@ -79,10 +75,6 @@ export async function POST(request: NextRequest) {
         html: mailContent,
         attachments: [
           {
-            filename: "agreement.pdf",
-            content: agreementPdf.data,
-          },
-          {
             filename: "invoice.pdf",
             content: invoicePdf.data,
           },
@@ -126,10 +118,6 @@ export async function POST(request: NextRequest) {
         subject: "Booking Confirmation",
         html: userMailContent,
         attachments: [
-          {
-            filename: "agreement.pdf",
-            content: agreementPdf.data,
-          },
           {
             filename: "invoice.pdf",
             content: invoicePdf.data,

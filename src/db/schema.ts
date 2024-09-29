@@ -71,6 +71,7 @@ export const RoomTable = pgTable("room", {
     .array()
     .notNull()
     .default(["/img/fall_back_room.png"]),
+  available: boolean("available").default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
     .notNull()
@@ -156,7 +157,6 @@ export const BookingTable = pgTable("booking", {
   userId: integer("user_id")
     .notNull()
     .references(() => UserTable.id),
-  agreementUrl: text("agreement_url").notNull(),
   transactionId: integer("transaction_id")
     .references(() => TransactionTable.id)
     .notNull(),
@@ -222,7 +222,7 @@ export const TransactionTable = pgTable("transaction", {
   discount: integer("discount").notNull(),
   rentAmount: integer("rent_amount").notNull(),
   securityDeposit: integer("security_deposit").notNull(),
-  additionalCharges: integer("additional_charges").notNull(),
+  additionalCharges: integer("additional_charge").notNull(),
   totalAmount: integer("total_amount").notNull(),
   verified: boolean("verified").notNull().default(false),
   invoiceUrl: text("invoice_url").notNull(),

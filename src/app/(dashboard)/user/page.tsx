@@ -32,32 +32,28 @@ import {
 } from "@/db/queries";
 import { createClient } from "@/lib/supabase/client";
 
-export default function UserProfilePage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function UserProfilePage() {
   const supabase = createClient();
   const queryClient = useQueryClient();
-  const { id: userId } = params;
+
   const inputRef = useRef<HTMLInputElement>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const { data: user, isLoading: isLoadingUser } = useQuery({
-    queryKey: ["user", userId],
-    queryFn: () => getUserDataById(Number(userId)),
+    queryKey: ["userData"],
+    queryFn: () => getUserDataById(),
   });
 
   const { data: transactions, isLoading: isLoadingTransactions } = useQuery({
-    queryKey: ["transactions", userId],
-    queryFn: () => getUserTransactions(Number(userId)),
+    queryKey: ["transactions"],
+    queryFn: () => getUserTransactions(),
   });
 
   const { mutate: updateUserDetails } = useMutation({
     mutationFn: (data: FormData) =>
-      updateUserPersonalDetails(data, Number(userId)),
+      updateUserPersonalDetails(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user", userId] });
+      queryClient.invalidateQueries({ queryKey: ["userData"] });
     },
   });
 
@@ -73,7 +69,7 @@ export default function UserProfilePage({
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
 
-      const fileName = `${userId}_${new Date().getTime()}`;
+      const fileName = `${new Date().getTime()}`;
       const { data, error } = await supabase.storage
         .from("user_photo")
         .upload(fileName, file);
@@ -85,8 +81,8 @@ export default function UserProfilePage({
           .from("user_photo")
           .getPublicUrl(fileName);
         const imageUrl = publicUrlData.publicUrl;
-        updateUserImageUrl({ userId: Number(userId), imageUrl });
-        queryClient.invalidateQueries({ queryKey: ["user", userId] });
+        updateUserImageUrl({ imageUrl });
+        queryClient.invalidateQueries({ queryKey: ["userData"] });
       }
     }
   };
@@ -104,7 +100,6 @@ export default function UserProfilePage({
           </Avatar>
           <div>
             <CardTitle>{user?.data?.[0]?.name}</CardTitle>
-            <CardDescription>User ID: {userId}</CardDescription>
             <Button onClick={() => inputRef.current?.click()}>
               Upload Photo
             </Button>

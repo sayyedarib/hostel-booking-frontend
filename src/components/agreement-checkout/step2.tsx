@@ -141,7 +141,6 @@ export default function Step2({
 
   return (
     <div className="w-full p-3 md:p-8">
-      <h2 className="text-lg font-semibold mt-4 mb-2 underline">Declaration</h2>
       <ol className="mb-4 space-y-2 text-xs md:text-md lg:text-lg">
         {checkboxItems.map(({ id, label }) => (
           <li key={id} className="grid grid-cols-6 md:grid-cols-12">

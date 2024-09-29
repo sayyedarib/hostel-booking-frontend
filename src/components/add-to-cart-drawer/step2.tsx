@@ -183,7 +183,7 @@ export const AddToCartStep2 = ({
               <Calendar
                 autoFocus
                 mode="range"
-                numberOfMonths={2}
+                numberOfMonths={1}
                 selected={date}
                 onSelect={handleSelect}
                 modifiers={{
@@ -204,7 +204,7 @@ export const AddToCartStep2 = ({
           </TabsContent>
           <TabsContent
             value="months"
-            className="space-y-2 flex flex-col text-sm md:text-md"
+            className="flex flex-col w-full items-center mt-4 text-sm md:text-md"
           >
             <DropdownMenu>
               <DropdownMenuTrigger className="border p-2 rounded-lg min-w-32">
@@ -238,7 +238,7 @@ export const AddToCartStep2 = ({
             <Calendar
               autoFocus
               mode="range"
-              numberOfMonths={2}
+              numberOfMonths={1}
               selected={date}
               onSelect={handleSelect}
               modifiers={{

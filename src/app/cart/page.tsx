@@ -56,12 +56,12 @@ export default function CartPage() {
         totalRent: calculateRent(
           item.monthlyRent,
           new Date(item.checkIn),
-          new Date(item.checkOut),
+          new Date(item.checkOut)
         ).totalRent,
         payableRent: calculateRent(
           item.monthlyRent,
           new Date(item.checkIn),
-          new Date(item.checkOut),
+          new Date(item.checkOut)
         ).payableRent,
       }));
       setEnhancedCartItems(enhancedData);
@@ -76,7 +76,7 @@ export default function CartPage() {
     return (
       enhancedCartItems?.reduce(
         (total, item) => total + item?.payableRent,
-        0,
+        0
       ) || 0
     );
   };
@@ -138,7 +138,7 @@ export default function CartPage() {
                       <p className="text-gray-500">
                         {differenceInDays(
                           new Date(item.checkOut),
-                          new Date(item.checkIn),
+                          new Date(item.checkIn)
                         )}{" "}
                         Days |{" "}
                         {new Date(item.checkIn).toLocaleDateString("en-US", {
@@ -187,17 +187,11 @@ export default function CartPage() {
                 Total: <IndianRupee />
                 {calculateTotal()}
               </h2>
-              <Button
-                onClick={() => router.push("/agreement-checkout")}
-                className="hidden md:block"
-              >
-                Checkout
+              <Button onClick={() => router.push("/agreement-checkout")} className="hidden md:block">
+                Proceed to Checkout
               </Button>
-              <Button
-                onClick={() => router.push("/agreement-checkout")}
-                className="md:hidden fixed bottom-0 left-0 rounded-none w-full"
-              >
-                Checkout
+              <Button onClick={() => router.push("/agreement-checkout")} className="md:hidden fixed bottom-0 left-0 right-0 rounded-none w-full">
+                Proceed to Checkout
               </Button>
             </div>
           </div>
