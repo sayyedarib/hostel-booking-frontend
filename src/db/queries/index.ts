@@ -283,8 +283,8 @@ export const getAllRoomCards = async () => {
         roomCode: RoomTable.roomCode,
         imageUrls: RoomTable.imageUrls,
         gender: RoomTable.gender,
-        available: RoomTable.available,
         bedCount: sql<number>`COUNT(${BedTable.id})::int`,
+        available: RoomTable.available,
       })
       .from(RoomTable)
       .innerJoin(PropertyTable, eq(RoomTable.propertyId, PropertyTable.id))
@@ -303,7 +303,7 @@ export const getBedData = async (roomId: number) => {
     logger("info", "Fetching bed info", { roomId });
     const currentDate = new Date();
     const fifteenDaysLater = new Date(
-      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000
+      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000,
     );
 
     const bedInfo = await db
@@ -360,7 +360,7 @@ export const getCartBedsOfRoom = async (roomId: number) => {
       .from(BedTable)
       .innerJoin(CartTable, eq(BedTable.id, CartTable.bedId))
       .where(
-        and(eq(BedTable.roomId, roomId), eq(CartTable.userId, userId.data))
+        and(eq(BedTable.roomId, roomId), eq(CartTable.userId, userId.data)),
       );
 
     logger("info", "Fetched beds in cart of user for particular room");
@@ -478,8 +478,8 @@ export const createGuest = async ({
           eq(GuestTable.userId, userId.data),
           eq(GuestTable.name, name),
           eq(GuestTable.phone, phone),
-          eq(GuestTable.email, email)
-        )
+          eq(GuestTable.email, email),
+        ),
       );
 
     if (existingGuest.length > 0) {
@@ -523,7 +523,7 @@ export const addToCart = async (
   guestId: number,
   bedId: number,
   checkIn: string,
-  checkOut: string
+  checkOut: string,
 ) => {
   try {
     const userId = await getUserId();
@@ -995,7 +995,7 @@ export const getUserDataById = async (userId?: number | null) => {
 
 export const updateUserPersonalDetails = async (
   data: FormData,
-  userId?: number | null
+  userId?: number | null,
 ) => {
   if (!userId) {
     const { data } = await getUserId();
@@ -1205,7 +1205,7 @@ export const getAvailableBeds = async (roomId: number) => {
 export const checkOccupiedRange = async (
   bedId: number,
   checkIn: Date,
-  checkOut: Date
+  checkOut: Date,
 ) => {
   try {
     const occupiedRanges = await db
@@ -1217,14 +1217,14 @@ export const checkOccupiedRange = async (
           or(
             and(
               gte(BedBookingTable.checkIn, checkIn.toISOString()),
-              lte(BedBookingTable.checkIn, checkOut.toISOString())
+              lte(BedBookingTable.checkIn, checkOut.toISOString()),
             ),
             and(
               gte(BedBookingTable.checkOut, checkIn.toISOString()),
-              lte(BedBookingTable.checkOut, checkOut.toISOString())
-            )
-          )
-        )
+              lte(BedBookingTable.checkOut, checkOut.toISOString()),
+            ),
+          ),
+        ),
       );
     return occupiedRanges.length > 0;
   } catch (error) {
@@ -1261,12 +1261,12 @@ export const getInvoiceDetails = async (bookingId: number, userId: number) => {
     .from(BookingTable)
     .innerJoin(
       TransactionTable,
-      eq(BookingTable.transactionId, TransactionTable.id)
+      eq(BookingTable.transactionId, TransactionTable.id),
     )
     .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
     .innerJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
     .where(
-      and(eq(BookingTable.id, bookingId), eq(BookingTable.userId, userId))
+      and(eq(BookingTable.id, bookingId), eq(BookingTable.userId, userId)),
     );
 
   console.log("invoiceDetails", invoiceDetails);
@@ -1277,13 +1277,14 @@ export const getInvoiceDetails = async (bookingId: number, userId: number) => {
       roomCode: RoomTable.roomCode,
       bedType: BedTable.type,
       monthlyRent: BedTable.monthlyRent,
-      checkIn: CartTable.checkIn,
-      checkOut: CartTable.checkOut,
+      checkIn: BedBookingTable.checkIn,
+      checkOut: BedBookingTable.checkOut,
     })
-    .from(CartTable)
-    .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id))
+    .from(BookingTable)
+    .innerJoin(BedBookingTable, eq(BookingTable.id, BedBookingTable.bookingId))
+    .innerJoin(BedTable, eq(BedBookingTable.bedId, BedTable.id))
     .innerJoin(RoomTable, eq(BedTable.roomId, RoomTable.id))
-    .where(eq(CartTable.userId, userId));
+    .where(eq(BookingTable.id, bookingId));
 
   console.log("bedDetails", bedDetails);
 
@@ -1326,7 +1327,7 @@ export const createBooking = async ({
             additionalCharges: 0,
             totalAmount: payableRent + securityDeposit,
             verified: false,
-            invoiceUrl: '', // We'll update this later
+            invoiceUrl: "", // We'll update this later
           })
           .returning({
             id: TransactionTable.id,
@@ -1346,27 +1347,6 @@ export const createBooking = async ({
 
         bookingId = bookingResult.id;
 
-        // Now that we have the bookingId, we can generate the invoice URL
-        const invoiceUrl = await fetch(
-          `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/invoice`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              bookingId: bookingId,
-              userId: userId.data,
-            }),
-          }
-        ).then((res) => res.json());
-
-        // Update the transaction with the invoice URL
-        await trx
-          .update(TransactionTable)
-          .set({ invoiceUrl })
-          .where(eq(TransactionTable.id, transactionId));
-
         const cartItems = await db
           .select({
             guestId: CartTable.guestId,
@@ -1377,12 +1357,12 @@ export const createBooking = async ({
           .from(CartTable)
           .where(eq(CartTable.userId, userId.data));
 
-          if(!bookingId) {
-            logger("error", "No booking ID found");
-            return;
-          }
-          
-          const bedBookings = cartItems.map((item) => ({
+        if (!bookingId) {
+          logger("error", "No booking ID found");
+          return;
+        }
+
+        const bedBookings = cartItems.map((item) => ({
           bedId: item.bedId,
           guestId: item.guestId,
           checkIn: item.checkIn,
@@ -1411,11 +1391,11 @@ export const createBooking = async ({
       } catch (error) {
         console.error(
           `[ERROR] ${new Date().toISOString()} - Error in transaction:`,
-          error
+          error,
         );
         throw error;
       }
-    })
+    });
 
     if (!bookingId || !transactionId) {
       logger("error", "Error in creating booking");
@@ -1424,7 +1404,62 @@ export const createBooking = async ({
         message: "Error in creating booking",
         data: null,
       };
-    } 
+    }
+
+    // Now that we have the bookingId, we can generate the invoice URL
+    const { invoiceUrl } = await fetch(
+      `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/invoice`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingId: bookingId,
+          userId: userId.data,
+        }),
+      },
+    ).then((res) => res.json());
+
+    await db
+      .update(TransactionTable)
+      .set({ invoiceUrl })
+      .where(eq(TransactionTable.id, transactionId));
+
+    const userDetails = await db
+      .select({
+        name: UserTable.name,
+        email: UserTable.email,
+        phone: UserTable.phone,
+      })
+      .from(UserTable)
+      .where(eq(UserTable.id, userId.data))
+      .limit(1);
+
+    if (userDetails.length === 0) {
+      logger("error", "User details not found");
+      return {
+        status: "error",
+        message: "User details not found",
+        data: null,
+      };
+    }
+
+    const {
+      name: userName,
+      email: userEmail,
+      phone: userPhone,
+    } = userDetails[0];
+    const amount = payableRent + securityDeposit;
+
+    await sendEmail({
+      bookingId,
+      token,
+      userEmail,
+      userName,
+      userPhone,
+      amount,
+    });
 
     return {
       status: "success",
@@ -1441,8 +1476,51 @@ export const createBooking = async ({
   }
 };
 
+// Function to send the email
+async function sendEmail({
+  bookingId,
+  token,
+  userEmail,
+  userName,
+  userPhone,
+  amount,
+}: {
+  bookingId: number;
+  token: string;
+  userEmail: string;
+  userName: string;
+  userPhone: string;
+  amount: number;
+}) {
+  try {
+    const response = await fetch("/api/email/booking-confirmation", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        bookingId,
+        token,
+        userEmail,
+        userName,
+        userPhone,
+        amount,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to send email");
+    }
+
+    logger("info", "Email sent successfully");
+  } catch (error) {
+    logger("error", "Error sending email:", error as Error);
+  }
+}
+
 export const getBookingDetails = async (bookingId: number) => {
   try {
+    logger("info", "fetching booking details of: ", { bookingId: bookingId });
     const bookingDetails = await db
       .select({
         id: BookingTable.id,
@@ -1458,7 +1536,7 @@ export const getBookingDetails = async (bookingId: number) => {
       .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
       .innerJoin(
         TransactionTable,
-        eq(BookingTable.userId, TransactionTable.userId)
+        eq(BookingTable.userId, TransactionTable.userId),
       )
       .where(eq(BookingTable.id, bookingId))
       .limit(1);
@@ -1495,7 +1573,7 @@ export const getBookingDetails = async (bookingId: number) => {
 export const updateUserData = async (
   userId: number,
   field: string,
-  value: string
+  value: string,
 ) => {
   try {
     logger("info", "Updating user data", { userId, field, value });
@@ -1512,7 +1590,7 @@ export const updateUserData = async (
 
 export const updateUserSignatureByUserId = async (
   userId: number,
-  signatureUrl: string
+  signatureUrl: string,
 ) => {
   try {
     logger("info", "Updating user signature", { userId, signatureUrl });
@@ -1537,7 +1615,7 @@ export const updateUserSignatureByUserId = async (
 
 export const updateGuardianIdImage = async (
   userId: number,
-  guardianIdImageUrl: string
+  guardianIdImageUrl: string,
 ) => {
   try {
     logger("info", "Updating guardian ID image", {
@@ -1565,7 +1643,7 @@ export const updateGuardianIdImage = async (
 
 export const updateUserIdImage = async (
   userId: number,
-  userIdImageUrl: string
+  userIdImageUrl: string,
 ) => {
   try {
     logger("info", "Updating user ID image", { userId, userIdImageUrl });
@@ -1590,7 +1668,7 @@ export const updateUserIdImage = async (
 
 export const updateGuardianPhoto = async (
   userId: number,
-  guardianPhotoUrl: string
+  guardianPhotoUrl: string,
 ) => {
   try {
     logger("info", "Updating guardian photo", { userId, guardianPhotoUrl });
@@ -1694,7 +1772,7 @@ export const addBedToRoom = async (
   bedCode: string,
   type: string,
   monthlyRent: number,
-  dailyRent: number
+  dailyRent: number,
 ) => {
   try {
     logger("info", "Adding bed to room", {
@@ -1728,7 +1806,7 @@ export const updateRoomDetails = async (
   roomId: number,
   roomCode: string,
   floor: number,
-  gender: string
+  gender: string,
 ) => {
   try {
     logger("info", "Updating room details", {
@@ -1769,7 +1847,7 @@ export const updateBedDetails = async (
   bedId: number,
   bedCode: string,
   type: string,
-  monthlyRent: number
+  monthlyRent: number,
 ) => {
   try {
     logger("info", "Updating bed details", {
@@ -1869,7 +1947,7 @@ export const createRoom = async (
   roomCode: string,
   floor: number,
   gender: string,
-  propertyId: number
+  propertyId: number,
 ) => {
   try {
     logger("info", "Creating room", { roomCode, floor, gender, propertyId });
@@ -1904,7 +1982,7 @@ export const createRoom = async (
 
 export const getRevenueAndBookingsData = async (
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ) => {
   try {
     logger("info", "Fetching revenue and bookings data", {
@@ -1920,20 +1998,20 @@ export const getRevenueAndBookingsData = async (
       .from(TransactionTable)
       .innerJoin(
         BookingTable,
-        eq(TransactionTable.id, BookingTable.transactionId)
+        eq(TransactionTable.id, BookingTable.transactionId),
       )
       .innerJoin(
         BedBookingTable,
         and(
           eq(BookingTable.id, BedBookingTable.bookingId),
-          inArray(BedBookingTable.status, ["checked_in", "checked_out"])
-        )
+          inArray(BedBookingTable.status, ["checked_in", "checked_out"]),
+        ),
       )
       .where(
         and(
           gte(TransactionTable.createdAt, startDate),
-          lte(TransactionTable.createdAt, endDate)
-        )
+          lte(TransactionTable.createdAt, endDate),
+        ),
       )
       .groupBy(sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`)
       .orderBy(sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`);

@@ -4,7 +4,6 @@ import chromium from "@sparticuz/chromium-min";
 import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest, res: NextResponse) {
-
   const { userId, bookingId } = await req.json();
   console.log("userID in api route: ", userId);
   console.log("bookingId in api route: ", bookingId);
@@ -14,7 +13,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath("https://github.com/Sparticuz/chromium/releases/download/v127.0.0/chromium-v127.0.0-pack.tar"),
+    executablePath: await chromium.executablePath(
+      "https://github.com/Sparticuz/chromium/releases/download/v127.0.0/chromium-v127.0.0-pack.tar",
+    ),
     headless: true,
   });
   console.log("opening page");
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   await page.goto(url);
   try {
     console.log("generating pdf");
-    const pdfBuffer = await page.pdf({ 
+    const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
       preferCSSPageSize: false,
@@ -38,12 +39,15 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const { data, error } = await supabase.storage
       .from("invoice")
       .upload(fileName, pdfBuffer, {
-        contentType: "application/pdf"
+        contentType: "application/pdf",
       });
 
     if (error) {
       console.error("Error uploading PDF:", error);
-      return NextResponse.json({ error: 'Failed to upload PDF' }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to upload PDF" },
+        { status: 500 },
+      );
     }
 
     // Get public URL of the uploaded file
@@ -53,13 +57,22 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     if (!publicUrlData) {
       console.error("Failed to get public URL of uploaded PDF");
-      return NextResponse.json({ error: 'Failed to get public URL of uploaded PDF' }, { status: 500 });
+      return NextResponse.json(
+        { error: "Failed to get public URL of uploaded PDF" },
+        { status: 500 },
+      );
     }
 
-    return NextResponse.json({ pdfUrl: publicUrlData.publicUrl }, { status: 200 });
+    return NextResponse.json(
+      { invoiceUrl: publicUrlData.publicUrl },
+      { status: 200 },
+    );
   } catch (error) {
     console.error(error);
-    return NextResponse.json({ error: 'An error occurred while processing the request' }, { status: 500 });
+    return NextResponse.json(
+      { error: "An error occurred while processing the request" },
+      { status: 500 },
+    );
   }
 }
 

@@ -16,8 +16,7 @@ export default function Step4({ handlePrev }: Step4Props) {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(countdownTimer);
-          // Uncomment the following line to enable redirection
-          // router.push("/");
+          router.push("/");
           return 0;
         }
         return prev - 1;
@@ -42,9 +41,12 @@ export default function Step4({ handlePrev }: Step4Props) {
         </p>
         <div className="bg-white p-4 rounded-lg shadow-md text-center">
           <p className="text-gray-600 mb-4">
-A confirmation email has been sent to your registered email address.
+            A confirmation email has been sent to your registered email address.
           </p>
-          <p className="text-gray-400 mb-4">(After payment verification you&apos;ll receive the invoice and hostel ID card)</p>
+          <p className="text-gray-400 mb-4">
+            (After payment verification you&apos;ll receive the invoice and
+            hostel ID card)
+          </p>
           <p className="text-gray-600 mb-4">
             You will be redirected in{" "}
             <span className="font-bold">{countdown}</span> seconds.

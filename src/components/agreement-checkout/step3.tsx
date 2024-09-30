@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { LoaderCircle, MoveLeft } from "lucide-react";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery } from "@tanstack/react-query";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -35,7 +35,7 @@ export default function Step3({
   const [loading, setLoading] = useState(false);
 
   const { data: checkoutData } = useQuery<CheckoutData[]>({
-    queryKey: ['checkoutData'],
+    queryKey: ["checkoutData"],
     queryFn: async () => {
       const result = await getCheckoutData();
       if (!result.data) {
@@ -47,25 +47,32 @@ export default function Step3({
   });
 
   const { data: securityDepositStatus } = useQuery({
-    queryKey: ['securityDepositStatus'],
+    queryKey: ["securityDepositStatus"],
     queryFn: getSecurityDepositStatus,
   });
 
   const securityDeposit = securityDepositStatus?.status !== "paid" ? 1000 : 0;
 
-  const totalAmount = checkoutData?.reduce((total, data) => 
-    total + calculateRent(
-      data.monthlyRent,
-      new Date(data.checkIn),
-      new Date(data.checkOut)
-    ).payableRent,
-  0) || 0;
+  const totalAmount =
+    checkoutData?.reduce(
+      (total, data) =>
+        total +
+        calculateRent(
+          data.monthlyRent,
+          new Date(data.checkIn),
+          new Date(data.checkOut),
+        ).payableRent,
+      0,
+    ) || 0;
 
   const handlePayment = async () => {
     setLoading(true);
-    const result = await createBooking({ payableRent: totalAmount, securityDeposit });
+    const result = await createBooking({
+      payableRent: totalAmount,
+      securityDeposit,
+    });
     handleNext();
-    if (result.status === 'success') {
+    if (result.status === "success") {
       toast({
         title: "Payment successful",
         description: "Your payment has been processed",
@@ -75,7 +82,11 @@ export default function Step3({
 
   return (
     <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl flex flex-col md:flex-row relative">
-      <Button variant="ghost" onClick={handlePrev} className="absolute top-0 left-0">
+      <Button
+        variant="ghost"
+        onClick={handlePrev}
+        className="absolute top-0 left-0"
+      >
         <MoveLeft size={40} />
       </Button>
       <div className="flex md:flex-col gap-3 md:w-1/2 items-center">

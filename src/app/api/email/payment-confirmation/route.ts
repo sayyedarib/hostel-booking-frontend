@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
 
   try {
     logger("info", `Updating booking status for ID: ${id}`);
+
     // TODO: it should done automatically when the checkin date is today
     await db
       .update(BedBookingTable)
@@ -33,6 +34,27 @@ export async function GET(request: NextRequest) {
       .set({ verified: true })
       .where(eq(TransactionTable.token, token))
       .execute();
+
+    const { invoiceUrl } = await db
+      .select({ invoiceUrl: TransactionTable.invoiceUrl })
+      .from(TransactionTable)
+      .where(eq(TransactionTable.token, token))
+      .execute()
+      .then((results) => results[0] || {});
+
+    await fetch(
+      `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://aligarhhostel.com"}/api/payment-verified`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingId: id,
+          token,
+        }),
+      },
+    );
 
     logger("info", "Payment confirmed");
     return NextResponse.redirect(new URL("/payment-confirmed", request.url));

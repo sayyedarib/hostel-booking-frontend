@@ -149,6 +149,10 @@ export const AddToCartStep2 = ({
     setTotalRent(totalAmount);
   };
 
+  const isNextButtonEnabled = () => {
+    return date?.from && date?.to && differenceInDays(date.to, date.from) >= 1;
+  };
+
   return (
     <>
       <div className="flex flex-col items-center px-2 mx-auto w-full md:w-1/2 bg-white shadow-lg rounded-lg">
@@ -160,11 +164,11 @@ export const AddToCartStep2 = ({
               className="cursor-pointer"
             />
             <span className="text-center text-lg lg:text-xl">
-              Select Check-In Date
+              Select Checkin and Checkout Date
             </span>
           </DrawerTitle>
         </DrawerHeader>
-        <Tabs defaultValue="days" className="w-full">
+        <Tabs defaultValue="months" className="w-full">
           <TabsList>
             <TabsTrigger value="days">Days</TabsTrigger>
             <TabsTrigger value="months">Months</TabsTrigger>
@@ -207,10 +211,26 @@ export const AddToCartStep2 = ({
             className="flex flex-col w-full items-center mt-4 text-sm md:text-md"
           >
             <DropdownMenu>
-              <DropdownMenuTrigger className="border p-2 rounded-lg min-w-32">
-                {numberOfMonths
-                  ? numberOfMonths + " Month"
-                  : "Select number of months you want to stay"}
+              <DropdownMenuTrigger className="border p-2 rounded-lg min-w-32 flex items-center justify-between">
+                <span>
+                  {numberOfMonths
+                    ? numberOfMonths + " Month"
+                    : "Select number of months you want to stay"}
+                </span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="ml-2"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuRadioGroup
@@ -284,7 +304,7 @@ export const AddToCartStep2 = ({
           <Button
             onClick={handleNext}
             className="w-full h-12 rounded-lg"
-            disabled={!date}
+            disabled={!isNextButtonEnabled()}
           >
             Next
           </Button>

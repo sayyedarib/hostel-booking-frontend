@@ -1,4 +1,3 @@
-
 import { toWords } from "number-to-words";
 import Image from "next/image";
 
@@ -6,12 +5,21 @@ import { cn, formatDate, calculateRent } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { getInvoiceDetails } from "@/db/queries";
 
-
-export default async function InvoicePage({ params, searchParams }: { params: { id: string }, searchParams: { userId: string } }) {
-  const userId = Number(searchParams.userId)
+export default async function InvoicePage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { userId: string };
+}) {
+  // here params.id = bookingId and searchParams = userId
+  const userId = Number(searchParams.userId);
 
   console.log("userId in invoice page", userId);
-  const { data: invoiceDetails } = await getInvoiceDetails(Number(params.id), userId);
+  const { data: invoiceDetails } = await getInvoiceDetails(
+    Number(params.id),
+    userId,
+  );
 
   return (
     <div
@@ -28,7 +36,14 @@ export default async function InvoicePage({ params, searchParams }: { params: { 
             <strong>Invoice #:</strong> KH_{Date.now()}
           </p>
           <p className="mb-2">
-            <strong>Invoice Date:</strong> {new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, ' ')}
+            <strong>Invoice Date:</strong>{" "}
+            {new Date()
+              .toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })
+              .replace(/ /g, " ")}
           </p>
         </div>
 
@@ -72,8 +87,7 @@ export default async function InvoicePage({ params, searchParams }: { params: { 
               </p>
               <p>
                 {invoiceDetails?.address},<br />
-                {invoiceDetails?.city},{" "}
-                {invoiceDetails?.pin},{" "}
+                {invoiceDetails?.city}, {invoiceDetails?.pin},{" "}
                 {invoiceDetails?.state}
               </p>
             </div>
@@ -136,9 +150,13 @@ export default async function InvoicePage({ params, searchParams }: { params: { 
             </tr>
             <tr>
               <td className="border p-2">Additional Charges</td>
-              <td className="border p-2 text-right">₹{invoiceDetails?.additionalCharges}</td>
+              <td className="border p-2 text-right">
+                ₹{invoiceDetails?.additionalCharges}
+              </td>
               <td className="border p-2 text-right">1</td>
-              <td className="border p-2 text-right">₹{invoiceDetails?.additionalCharges}</td>
+              <td className="border p-2 text-right">
+                ₹{invoiceDetails?.additionalCharges}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -148,7 +166,8 @@ export default async function InvoicePage({ params, searchParams }: { params: { 
         <div className="flex justify-between">
           <div>
             <p>
-              <strong>Total Items:</strong> {(invoiceDetails?.beds?.length ?? 0) + 1}
+              <strong>Total Items:</strong>{" "}
+              {(invoiceDetails?.beds?.length ?? 0) + 1}
             </p>
           </div>
           <div>
@@ -156,14 +175,15 @@ export default async function InvoicePage({ params, searchParams }: { params: { 
               <strong>Subtotal:</strong> ₹{invoiceDetails?.rentAmount}
             </p>
             <p>
-              <strong>Security Deposit:</strong> ₹{invoiceDetails?.securityDeposit}
+              <strong>Security Deposit:</strong> ₹
+              {invoiceDetails?.securityDeposit}
             </p>
             <p>
               <strong>Total Amount:</strong> ₹{invoiceDetails?.totalAmount}
             </p>
             <p>
-              <strong>Amount in words:</strong> {toWords(invoiceDetails?.totalAmount ?? 0)} Rupees
-              Only
+              <strong>Amount in words:</strong>{" "}
+              {toWords(invoiceDetails?.totalAmount ?? 0)} Rupees Only
             </p>
           </div>
         </div>

@@ -50,8 +50,7 @@ export default function UserProfilePage() {
   });
 
   const { mutate: updateUserDetails } = useMutation({
-    mutationFn: (data: FormData) =>
-      updateUserPersonalDetails(data),
+    mutationFn: (data: FormData) => updateUserPersonalDetails(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userData"] });
     },

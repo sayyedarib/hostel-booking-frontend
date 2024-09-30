@@ -44,7 +44,7 @@ export default function Rooms() {
     queryKey: ["cartItemsCount"],
     queryFn: async () => {
       const { status, data } = await getCartItemsCount();
-      if (status === "error" || !data) {
+      if (status === "error") {
         toast({
           variant: "destructive",
           title: "Something went wrong",
