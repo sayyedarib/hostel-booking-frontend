@@ -102,7 +102,7 @@ export default function UserProfilePage() {
               />
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
-            <div>
+            <div className="space-y-2">
               <CardTitle>{user?.data?.[0]?.name}</CardTitle>
               <Button onClick={() => inputRef.current?.click()}>
                 Upload Photo
