@@ -87,13 +87,13 @@ export default function Rooms() {
             href="/cart"
             className="flex items-center justify-center relative"
           >
-            <ShoppingCart size={48} color="black" strokeWidth={2} />
+            <ShoppingCart size={48} color="black" strokeWidth={1.5} />
             {cartItemsCountError ? (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center z-2">
                 !
               </span>
             ) : (
-              cartItemsCount && (
+               cartItemsCount != 0 && (
                 <span className="absolute -top-3 -right-2 bg-black text-white text-lg rounded-full w-5 h-5 flex items-center justify-center z-2">
                   {isCartItemsCountLoading ? (
                     <Loader2 size={16} className="animate-spin" />
