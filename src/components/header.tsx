@@ -131,7 +131,7 @@ export default function Header({
             <li className="py-2 w-full">
               <SignedOut>
                 <Link
-                  href="/sign-in?redirect_url=https://aligarhhostel.com/rooms"
+                  href="/sign-in?redirect_url=/rooms"
                   className="flex items-center justify-between"
                 >
                   sign in
