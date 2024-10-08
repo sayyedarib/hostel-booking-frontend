@@ -48,11 +48,9 @@ export default function Rooms() {
         toast({
           variant: "destructive",
           title: "Something went wrong",
-          description:
-            "Failed to fetch cart items count, Please try again later",
+          description: "Failed to fetch cart items, Please try again later",
         });
         logger("error", "Failed to fetch cart items count");
-        throw new Error("Failed to fetch cart items count");
       }
       return data;
     },
@@ -95,13 +93,15 @@ export default function Rooms() {
                 !
               </span>
             ) : (
-              <span className="absolute -top-3 -right-2 bg-black text-white text-lg rounded-full w-5 h-5 flex items-center justify-center z-2">
-                {isCartItemsCountLoading ? (
-                  <Loader2 size={16} className="animate-spin" />
-                ) : (
-                  cartItemsCount
-                )}
-              </span>
+              cartItemsCount && (
+                <span className="absolute -top-3 -right-2 bg-black text-white text-lg rounded-full w-5 h-5 flex items-center justify-center z-2">
+                  {isCartItemsCountLoading ? (
+                    <Loader2 size={16} className="animate-spin" />
+                  ) : (
+                    cartItemsCount
+                  )}
+                </span>
+              )
             )}
           </Link>
         </Button>

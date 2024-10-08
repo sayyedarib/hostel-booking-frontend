@@ -692,7 +692,7 @@ export const getCartItemsCount = async () => {
 
     if (!userId.data) {
       logger("info", "User not found");
-      return { status: "error", data: null };
+      return { status: "access_denied", data: null };
     }
 
     logger("info", "Fetching cart items count");
