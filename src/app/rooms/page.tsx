@@ -82,12 +82,12 @@ export default function Rooms() {
             ))}
           </div>
         )}
-        <Button className="fixed bottom-6 right-6 rounded-full h-14 w-14 md:h-16 md:w-16 bg-yellow-400 hover:bg-yellow-500 text-white shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
+        <Button className="fixed bottom-3 right-3 md:bottom-6 md:right-6 rounded-full h-14 w-14 md:h-16 md:w-16 bg-yellow-400 hover:bg-yellow-500 text-white shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
           <Link
             href="/cart"
             className="flex items-center justify-center relative"
           >
-            <ShoppingCart size={48} strokeWidth={2} />
+            <ShoppingCart size={48} color="black" strokeWidth={2} />
             {cartItemsCountError ? (
               <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center z-2">
                 !

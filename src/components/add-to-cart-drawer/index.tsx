@@ -128,7 +128,7 @@ export default function AddToCartDrawer({
         <Button
           className={cn(
             className,
-            "w-full py-2 bg-primary text-center font-semibold hover:bg-primary-dark transition-colors",
+            "w-full py-2 bg-primary text-center font-semibold hover:bg-primary-dark transition-colors text-black",
           )}
           onClick={handleOpenDrawer}
         >
