@@ -29,7 +29,7 @@ const checkboxItems = [
   {
     id: "item4",
     label:
-      "By signing this form, you agree to follow the hostel’s and Guest Rooms rules and the purpose described above, plus consenting to the usage of your personal information for administrative and marketing purposes.",
+      "By signing this form, you agree to follow the hostel&apos;s and Guest Rooms rules and the purpose described above, plus consenting to the usage of your personal information for administrative and marketing purposes.",
   },
   {
     id: "item5",

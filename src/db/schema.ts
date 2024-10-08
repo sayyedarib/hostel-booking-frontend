@@ -101,6 +101,7 @@ export const UserTable = pgTable("user", {
   phone: text("phone").notNull(),
   email: text("email").notNull(),
   dob: date("dob"),
+  purpose: text("purpose"),
   imageUrl: text("image_url").notNull(),
   idUrl: text("id_url"),
   guardianName: text("guardian_name"),

@@ -7,4 +7,5 @@ export interface CreateGuest {
   photoUrl: string;
   purpose: string;
   aadhaarUrl: string;
+  someoneElse?: boolean;
 }

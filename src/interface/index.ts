@@ -1,4 +1,4 @@
-import { CreateUser, UserSubProfile, User } from "./user";
+import { CreateUser, UpdateUser, UserSubProfile, User } from "./user";
 import { CreateGuest } from "./guest";
 import { LogLevel, LogContext } from "./utils";
 import {
@@ -26,6 +26,7 @@ export type {
   LogContext,
   OccupiedDateRange,
   RoomCard,
+  UpdateUser,
   User,
   UserSubProfile,
 };

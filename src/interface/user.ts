@@ -37,3 +37,12 @@ export interface User {
   city: string | null;
   state: string | null;
 }
+
+export interface UpdateUser {
+  name: string;
+  phone: string;
+  dob: string;
+  purpose: string;
+  aadhaarUrl: string;
+  photoUrl: string;
+}

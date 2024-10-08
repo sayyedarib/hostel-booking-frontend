@@ -24,6 +24,7 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { logger } from "@/lib/utils";
 
 export const AddToCartStep3 = ({
   handleBack,
@@ -133,21 +134,30 @@ export const AddToCartStep3 = ({
 
     const file = e.target.files[0];
     setUploading(true);
+    toast({
+      title: "Uploading image",
+      description: "Please wait...",
+    });
 
     try {
       const { data, error } = await supabase.storage
-        .from("guest-images")
+        .from("guest_image")
         .upload(`${Date.now()}-${file.name}`, file);
 
       if (error) {
-        throw error;
+        logger("error", "error in uploading image", { error });
+        return;
       }
 
       if (data) {
         const { data: urlData } = supabase.storage
-          .from("guest-images")
+          .from("guest_image")
           .getPublicUrl(data.path);
         setPhotoUrl(urlData.publicUrl);
+        toast({
+          title: "Image uploaded successfully",
+          description: "Your guest image has been uploaded.",
+        });
       }
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -171,10 +181,14 @@ export const AddToCartStep3 = ({
 
     const file = e.target.files[0];
     setUploading(true);
+    toast({
+      title: "Uploading ID proof",
+      description: "Please wait...",
+    });
 
     try {
       const { data, error } = await supabase.storage
-        .from("aadhaar-images")
+        .from("guest_aadhaar")
         .upload(`${Date.now()}-${file.name}`, file);
 
       if (error) {
@@ -183,9 +197,13 @@ export const AddToCartStep3 = ({
 
       if (data) {
         const { data: urlData } = supabase.storage
-          .from("aadhaar-images")
+          .from("guest_aadhaar")
           .getPublicUrl(data.path);
         setAadhaarUrl(urlData.publicUrl);
+        toast({
+          title: "ID proof uploaded successfully",
+          description: "Your ID proof has been uploaded.",
+        });
       }
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -377,27 +395,27 @@ export const AddToCartStep3 = ({
               >
                 Photo
               </Label>
-              {photoUrl ? (
-                <div className="mt-2">
+              <div
+                className="mt-2 border-2 border-dashed border-gray-300 rounded-lg h-40 p-4 text-center flex flex-col items-center justify-center cursor-pointer"
+                onClick={() => guestImageInputRef.current?.click()}
+              >
+                {photoUrl ? (
                   <Image
                     width={100}
                     height={300}
                     src={photoUrl}
                     alt="Guest"
-                    className="w-full h-40 object-cover rounded-lg"
+                    className="w-full h-full object-cover rounded-lg"
                   />
-                </div>
-              ) : (
-                <div
-                  className="mt-2 border-2 border-dashed border-gray-300 rounded-lg h-40 p-4 text-center flex flex-col items-center justify-center cursor-pointer"
-                  onClick={() => guestImageInputRef.current?.click()}
-                >
-                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-1 text-sm text-gray-600">
-                    Upload passport size photo
-                  </p>
-                </div>
-              )}
+                ) : (
+                  <>
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <p className="mt-1 text-sm text-gray-600">
+                      Upload passport size photo
+                    </p>
+                  </>
+                )}
+              </div>
               <Input
                 id="guestImage"
                 type="file"
@@ -415,25 +433,27 @@ export const AddToCartStep3 = ({
               >
                 Valid ID proof
               </Label>
-              {aadhaarUrl ? (
-                <div className="mt-2">
+              <div
+                className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-4 h-40 flex flex-col items-center justify-center cursor-pointer"
+                onClick={() => aadhaarImageInputRef.current?.click()}
+              >
+                {aadhaarUrl ? (
                   <Image
                     width={200}
                     height={300}
                     src={aadhaarUrl}
                     alt="Aadhaar"
-                    className="w-full h-40 object-cover rounded-lg"
+                    className="w-full h-full object-cover rounded-lg"
                   />
-                </div>
-              ) : (
-                <div
-                  className="mt-2 border-2 border-dashed border-gray-300 rounded-lg p-4 h-40 flex flex-col items-center justify-center cursor-pointer"
-                  onClick={() => aadhaarImageInputRef.current?.click()}
-                >
-                  <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-1 text-sm text-gray-600">Upload ID proof</p>
-                </div>
-              )}
+                ) : (
+                  <>
+                    <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                    <p className="mt-1 text-sm text-gray-600">
+                      Upload ID proof
+                    </p>
+                  </>
+                )}
+              </div>
               <Input
                 id="aadhaarImage"
                 type="file"

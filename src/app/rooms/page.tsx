@@ -93,7 +93,7 @@ export default function Rooms() {
                 !
               </span>
             ) : (
-               cartItemsCount != 0 && (
+              cartItemsCount != 0 && (
                 <span className="absolute -top-3 -right-2 bg-black text-white text-lg rounded-full w-5 h-5 flex items-center justify-center z-2">
                   {isCartItemsCountLoading ? (
                     <Loader2 size={16} className="animate-spin" />

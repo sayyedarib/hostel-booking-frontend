@@ -24,6 +24,7 @@ import {
   CreateUser,
   CreateGuest,
   CreateAddress,
+  UpdateUser,
 } from "@/interface";
 
 import { auth } from "@clerk/nextjs/server";
@@ -128,7 +129,7 @@ export const getUserData = async () => {
         pin: AddressBookTable.pin,
       })
       .from(UserTable)
-      .innerJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
+      .leftJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
       .where(eq(UserTable.id, userId.data));
 
     logger("info", "Fetched user data", { user: user[0] });
@@ -452,6 +453,63 @@ export const getGuests = async () => {
   }
 };
 
+export const updateUserDetails = async ({
+  name,
+  phone,
+  dob,
+  purpose,
+  photoUrl,
+  aadhaarUrl,
+}: UpdateUser) => {
+  try {
+    logger("info", "Updating user details", { name, phone, dob, purpose });
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null, message: "User not found" };
+    }
+
+    const updatedUser = await db
+      .update(UserTable)
+      .set({
+        name,
+        phone,
+        dob,
+        purpose,
+        imageUrl: photoUrl,
+        idUrl: aadhaarUrl,
+      })
+      .where(eq(UserTable.id, userId.data))
+      .returning();
+
+    if (updatedUser.length === 0) {
+      logger("error", "Failed to update user details");
+      return {
+        status: "error",
+        data: null,
+        message: "Failed to update user details",
+      };
+    }
+
+    logger("info", "User details updated successfully");
+    return {
+      status: "success",
+      data: updatedUser[0],
+      message: "User details updated successfully",
+    };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    logger("error", "Error updating user details", { error: errorMessage });
+    return {
+      status: "error",
+      data: null,
+      message: "Error updating user details",
+    };
+  }
+};
+
 export const createGuest = async ({
   name,
   phone,
@@ -460,6 +518,7 @@ export const createGuest = async ({
   purpose,
   photoUrl,
   aadhaarUrl,
+  someoneElse,
 }: CreateGuest) => {
   try {
     logger("info", "Creating guest", { name, phone, email });
@@ -468,6 +527,17 @@ export const createGuest = async ({
     if (!userId.data) {
       logger("info", "User not found");
       return { status: "error", data: null, message: "User not found" };
+    }
+
+    if (!someoneElse) {
+      await updateUserDetails({
+        name,
+        phone,
+        dob,
+        purpose,
+        photoUrl,
+        aadhaarUrl,
+      });
     }
 
     const existingGuest = await db
@@ -1452,7 +1522,8 @@ export const createBooking = async ({
     } = userDetails[0];
     const amount = payableRent + securityDeposit;
 
-    await sendEmail({
+    logger("info", "sending email", {userEmail});
+    sendEmail({
       bookingId,
       token,
       userEmail,
