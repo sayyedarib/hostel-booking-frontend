@@ -95,7 +95,7 @@ export default async function InvoicePage({
               <p>
                 <strong>Correspondence Address:</strong>
                 <br />
-                Bed No. 101, Room No. 101
+                Bed No. {invoiceDetails?.beds[0].bedCode}, Room No. {invoiceDetails?.beds[0]?.roomCode}
                 <br />
                 Campus View Apartment, Beside Sultan Jahan Coaching,
                 <br />

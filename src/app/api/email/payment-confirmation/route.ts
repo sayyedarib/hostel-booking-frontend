@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       .then((results) => results[0] || {});
 
     await fetch(
-      `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://aligarhhostel.com"}/api/payment-verified`,
+      `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/email/payment-verified`,
       {
         method: "POST",
         headers: {
