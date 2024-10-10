@@ -4,12 +4,16 @@ import Image from "next/image";
 import Lottie from "lottie-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { IndianRupee, Trash2 } from "lucide-react";
+import { IndianRupee, Trash2, Loader2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import Header from "@/components/header";
 import { Button } from "@/components/ui/button";
-import { getCartItems, removeFromCart } from "@/db/queries";
+import {
+  getCartItems,
+  removeFromCart,
+  getSecurityDepositStatus,
+} from "@/db/queries";
 import { calculateRent, logger } from "@/lib/utils";
 import { CartItem } from "@/interface";
 import { Separator } from "@/components/ui/separator";
@@ -21,7 +25,20 @@ export default function CartPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+
   const [enhancedCartItems, setEnhancedCartItems] = useState<CartItem[]>([]);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+
+  const { data: securityDepositStatus } = useQuery({
+    queryKey: ["securityDepositStatus"],
+    queryFn: async () => {
+      const { status, data } = await getCartItems();
+      if (status === "error") {
+        return [];
+      }
+      return data;
+    },
+  });
 
   const { data: cartItems, isLoading: fetching } = useQuery({
     queryKey: ["cartItems"],
@@ -79,6 +96,11 @@ export default function CartPage() {
         0,
       ) || 0
     );
+  };
+
+  const handleCheckout = () => {
+    setIsCheckingOut(true);
+    router.push("/agreement-checkout");
   };
 
   return (
@@ -184,20 +206,36 @@ export default function CartPage() {
               </span>
               <Separator className="my-4" />
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-2 flex items-center">
-                Total: <IndianRupee />
-                {calculateTotal()}
+                Total: <IndianRupee size={18} />
+                {calculateTotal() + (securityDepositStatus ? 1000 : 0)}
               </h2>
               <Button
-                onClick={() => router.push("/agreement-checkout")}
-                className="hidden md:block"
+                onClick={handleCheckout}
+                className="hidden md:block text-black"
+                disabled={isCheckingOut}
               >
-                Proceed to Checkout
+                {isCheckingOut ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait
+                  </>
+                ) : (
+                  "Proceed to Checkout"
+                )}
               </Button>
               <Button
-                onClick={() => router.push("/agreement-checkout")}
-                className="md:hidden fixed bottom-0 left-0 right-0 rounded-none w-full"
+                onClick={handleCheckout}
+                className="md:hidden fixed bottom-0 left-0 right-0 rounded-none w-full flex gap-2"
+                disabled={isCheckingOut}
               >
-                Proceed to Checkout
+                {isCheckingOut ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait
+                  </>
+                ) : (
+                  "Proceed to Checkout"
+                )}
               </Button>
             </div>
           </div>

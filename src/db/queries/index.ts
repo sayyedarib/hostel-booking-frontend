@@ -1429,9 +1429,8 @@ export const createBooking = async ({
       return { status: "error", message: "User not found" };
     }
     logger("info", "Creating booking", { userId });
-
     logger("info", "Generating token");
-    const token = generateToken();
+    const token: string = generateToken();
 
     let bookingId: number | null = null;
     let transactionId: number | null = null;
@@ -1528,61 +1527,13 @@ export const createBooking = async ({
       };
     }
 
-    // Now that we have the bookingId, we can generate the invoice URL
-    const { invoiceUrl } = await fetch(
-      `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/invoice`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          bookingId: bookingId,
-          userId: userId.data,
-        }),
-      },
-    ).then((res) => res.json());
-
-    await db
-      .update(TransactionTable)
-      .set({ invoiceUrl })
-      .where(eq(TransactionTable.id, transactionId));
-
-    const userDetails = await db
-      .select({
-        name: UserTable.name,
-        email: UserTable.email,
-        phone: UserTable.phone,
-      })
-      .from(UserTable)
-      .where(eq(UserTable.id, userId.data))
-      .limit(1);
-
-    if (userDetails.length === 0) {
-      logger("error", "User details not found");
-      return {
-        status: "error",
-        message: "User details not found",
-        data: null,
-      };
-    }
-
-    const {
-      name: userName,
-      email: userEmail,
-      phone: userPhone,
-    } = userDetails[0];
-    const amount = payableRent + securityDeposit;
-
-    logger("info", "sending email", { userEmail });
-    sendEmail({
+    // Now that we have the bookingId, we can generate the invoice URL and send email
+    generateInvoiceAndUpdateTransaction(
       bookingId,
+      userId.data,
+      transactionId,
       token,
-      userEmail,
-      userName,
-      userPhone,
-      amount,
-    });
+    );
 
     return {
       status: "success",
@@ -1616,6 +1567,14 @@ async function sendEmail({
   amount: number;
 }) {
   try {
+    logger("info", "sending email: ", {
+      bookingId,
+      token,
+      userEmail,
+      userName,
+      userPhone,
+      amount,
+    });
     const response = await fetch("/api/email/booking-confirmation", {
       method: "POST",
       headers: {
@@ -1638,6 +1597,107 @@ async function sendEmail({
     logger("info", "Email sent successfully");
   } catch (error) {
     logger("error", "Error sending email:", error as Error);
+  }
+}
+
+// Function to generate invoice and update transaction
+async function generateInvoiceAndUpdateTransaction(
+  bookingId: number,
+  userId: number,
+  transactionId: number,
+  token: string,
+) {
+  try {
+    const invoiceUrl = await generateInvoice(bookingId, userId);
+
+    await db
+      .update(TransactionTable)
+      .set({ invoiceUrl })
+      .where(eq(TransactionTable.id, transactionId));
+
+    logger("info", "Invoice generated and transaction updated successfully");
+
+    const userDetails = await db
+      .select({
+        name: UserTable.name,
+        email: UserTable.email,
+        phone: UserTable.phone,
+      })
+      .from(UserTable)
+      .where(eq(UserTable.id, userId))
+      .limit(1);
+
+    if (userDetails.length === 0) {
+      logger("error", "User details not found");
+      return;
+    }
+
+    const {
+      name: userName,
+      email: userEmail,
+      phone: userPhone,
+    } = userDetails[0];
+
+    const transaction = await db
+      .select({
+        totalAmount: TransactionTable.totalAmount,
+      })
+      .from(TransactionTable)
+      .where(eq(TransactionTable.id, transactionId))
+      .limit(1);
+
+    if (transaction.length === 0) {
+      logger("error", "Transaction details not found");
+      return;
+    }
+
+    const amount = transaction[0].totalAmount;
+
+    logger("info", "sending email", { userEmail });
+    await sendEmail({
+      bookingId,
+      token,
+      userEmail,
+      userName,
+      userPhone,
+      amount,
+    });
+  } catch (error) {
+    logger(
+      "error",
+      "Error generating invoice and updating transaction:",
+      error as Error,
+    );
+  }
+}
+
+// Function to generate invoice
+async function generateInvoice(bookingId: number, userId: number) {
+  try {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/invoice`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingId: bookingId,
+          userId: userId,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to generate invoice");
+    }
+
+    const { invoiceUrl } = await response.json();
+    logger("info", "Invoice generated successfully");
+    return invoiceUrl;
+  } catch (error) {
+    logger("error", "Error generating invoice:", error as Error);
+    throw error;
   }
 }
 

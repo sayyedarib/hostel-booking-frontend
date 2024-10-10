@@ -163,15 +163,10 @@ export default function Step2({
         ))}
       </ol>
 
-      <div className="mb-4">
+      <div className="mb-4 flex justify-center items-center flex-col">
         <h2 className="text-xl font-semibold mb-2">Signature</h2>
-        <div className="border border-gray-300 mb-2 h-32">
-          <SignatureCanvas
-            ref={signatureRef}
-            canvasProps={{
-              className: "signature-canvas max-w-full h-32",
-            }}
-          />
+        <div className="border border-gray-300 mb-2 w-64 h-32">
+          <SignatureCanvas ref={signatureRef} />
         </div>
         <Eraser
           onClick={handleClearSignature}

@@ -68,19 +68,20 @@ export async function POST(request: NextRequest) {
     try {
       logger("info", "Sending emails to owner");
 
-      await transporter.sendEmail({
+      await transporter.sendMail({
         from: "support@aligarhhostel.com",
         to: ["sayyedaribhussain4321@gmail.com"],
         subject: `Booking Verification for ${userName}`,
         html: mailContent,
-        attachments: [
-          {
-            filename: "invoice.pdf",
-            content: invoicePdf.data,
-          },
-        ],
+        // attachments: [
+        //   {
+        //     filename: "invoice.pdf",
+        //     content: invoicePdf.data,
+        //   },
+        // ],
       });
     } catch (error) {
+      console.log("error in sending email ", error);
       logger("error", "Error sending emails to owner", error as Error);
       return NextResponse.json(
         { message: "COULD NOT SEND MESSAGES TO OWNER" },
@@ -112,7 +113,7 @@ export async function POST(request: NextRequest) {
       logger("info", "Sending emails to user", {
         email: userEmail,
       });
-      await transporter.sendEmail({
+      await transporter.sendMail({
         from: "support@aligarhhostel.com",
         to: userEmail,
         subject: "Booking Confirmation",

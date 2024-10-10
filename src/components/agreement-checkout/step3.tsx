@@ -144,7 +144,7 @@ export default function Step3({
         <Button
           onClick={handlePayment}
           disabled={!isPaidChecked || loading}
-          className="mt-4 font-semibold"
+          className="mt-4 font-semibold text-black"
         >
           {loading ? (
             <LoaderCircle className="animate-spin" />
