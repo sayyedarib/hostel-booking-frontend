@@ -13,9 +13,15 @@ import { AddToCartStep1 } from "@/components/add-to-cart-drawer/step1";
 import { AddToCartStep2 } from "@/components/add-to-cart-drawer/step2";
 import { AddToCartStep3 } from "@/components/add-to-cart-drawer/step3";
 import { AddToCartStep4 } from "@/components/add-to-cart-drawer/step4";
+import { AddToCartStep5 } from "@/components/add-to-cart-drawer/step5";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
-import { getBedData, addToCart, getCartBedsOfRoom } from "@/db/queries";
+import {
+  getBedData,
+  addToCart,
+  getCartBedsOfRoom,
+  getUserOnboardingStatus,
+} from "@/db/queries";
 import { logger, cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { Progress } from "@/components/ui/progress";
@@ -66,6 +72,19 @@ export default function AddToCartDrawer({
     placeholderData: keepPreviousData,
   });
 
+  const { data: onboardingStatus } = useQuery({
+    queryKey: ["onboardingStatus", roomId],
+    queryFn: async () => {
+      const { status, data } = await getUserOnboardingStatus();
+      if (status === "error" || !data) {
+        throw new Error("Error in fetching onboarding status");
+      }
+      return data;
+    },
+    enabled: isOpen && !!roomId,
+    placeholderData: keepPreviousData,
+  });
+
   const addToCartMutation = useMutation({
     mutationFn: async (guestId: number) => {
       if (!checkIn || !checkOut || !guestId || !bedId) {
@@ -95,7 +114,7 @@ export default function AddToCartDrawer({
       queryClient.invalidateQueries({ queryKey: ["cartData"] });
       queryClient.invalidateQueries({ queryKey: ["cartItemsCount"] });
       logger("info", "Added to cart", { bedId, checkIn, checkOut });
-      setCurrentStep(4);
+      setCurrentStep(5);
       setTimeout(() => {
         setIsOpen(false);
         setCurrentStep(1);
@@ -103,8 +122,20 @@ export default function AddToCartDrawer({
     },
   });
 
-  const handleNext = () => setCurrentStep((prev) => prev + 1);
-  const handleBack = () => setCurrentStep((prev) => prev - 1);
+  const handleNext = () => {
+    if (currentStep === 2 && onboardingStatus?.onboarded) {
+      setCurrentStep(4);
+    } else {
+      setCurrentStep((prev) => prev + 1);
+    }
+  };
+  const handleBack = () => {
+    if (currentStep === 4 && onboardingStatus?.onboarded) {
+      setCurrentStep(2);
+    } else {
+      setCurrentStep((prev) => prev - 1);
+    }
+  };
   const handleBedSelect = (bedId: number) => {
     setBedId(bedId);
     handleNext();
@@ -137,7 +168,7 @@ export default function AddToCartDrawer({
       </DrawerTrigger>
       <DrawerContent className="min-h-[60vh]">
         <Progress
-          value={((currentStep - 1) / 3) * 100}
+          value={((currentStep - 1) / 4) * 100}
           className="w-full mt-1 mb-2"
         />
         {currentStep === 1 && (
@@ -157,15 +188,18 @@ export default function AddToCartDrawer({
             handleBack={handleBack}
           />
         )}
-        {currentStep === 3 && (
-          <AddToCartStep3
+        {currentStep === 3 && !onboardingStatus?.onboarded && (
+          <AddToCartStep3 handleBack={handleBack} handleNext={handleNext} />
+        )}
+        {currentStep === 4 && (
+          <AddToCartStep4
             handleAddToCart={handleAddToCart}
             handleBack={handleBack}
             handleNext={handleNext}
             loading={addToCartMutation.isPending}
           />
         )}
-        {currentStep === 4 && <AddToCartStep4 />}
+        {currentStep === 5 && <AddToCartStep5 />}
       </DrawerContent>
     </Drawer>
   );

@@ -45,4 +45,8 @@ export interface UpdateUser {
   purpose: string;
   aadhaarUrl: string;
   photoUrl: string;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  pin?: string | null;
 }

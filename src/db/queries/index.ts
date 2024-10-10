@@ -116,20 +116,12 @@ export const getUserData = async () => {
         name: UserTable.name,
         phone: UserTable.phone,
         email: UserTable.email,
-        guardianName: UserTable.guardianName,
-        guardianPhone: UserTable.guardianPhone,
-        guardianPhoto: UserTable.guardianPhoto,
-        guardianIdImage: UserTable.guardianIdUrl,
         applicantPhoto: UserTable.imageUrl,
         dob: UserTable.dob,
+        purpose: UserTable.purpose,
         userIdImage: UserTable.idUrl,
-        address: AddressBookTable.address,
-        city: AddressBookTable.city,
-        state: AddressBookTable.state,
-        pin: AddressBookTable.pin,
       })
       .from(UserTable)
-      .leftJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
       .where(eq(UserTable.id, userId.data));
 
     logger("info", "Fetched user data", { user: user[0] });
@@ -140,7 +132,7 @@ export const getUserData = async () => {
   }
 };
 
-export const getUserOnboadingStatus = async () => {
+export const getUserOnboardingStatus = async () => {
   try {
     const userId = await getUserId();
 
@@ -507,6 +499,66 @@ export const updateUserDetails = async ({
       data: null,
       message: "Error updating user details",
     };
+  }
+};
+
+export const updateAddressAndGuardian = async ({
+  address,
+  city,
+  state,
+  pin,
+  guardianName,
+  guardianPhone,
+}: {
+  address: string;
+  city: string;
+  state: string;
+  pin: string;
+  guardianName: string;
+  guardianPhone: string;
+}) => {
+  try {
+    const userId = await getUserId();
+
+    if (!userId.data) {
+      logger("info", "User not found");
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Updating user address and guardian details", {
+      userId: userId.data,
+    });
+
+    // Create a new address
+    const newAddressId = await db
+      .insert(AddressBookTable)
+      .values({
+        address,
+        city,
+        state,
+        pin,
+      })
+      .returning({ id: AddressBookTable.id });
+
+    // Update user with new address and guardian details
+    await db
+      .update(UserTable)
+      .set({
+        addressId: newAddressId[0].id,
+        guardianName,
+        guardianPhone,
+        onboarded: true, // Set onboarded status to true
+      })
+      .where(eq(UserTable.id, userId.data))
+      .execute();
+
+    logger("info", "User address and guardian details updated successfully");
+    return { status: "success" };
+  } catch (error) {
+    logger("error", "Error in updating user address and guardian details", {
+      error,
+    });
+    return { status: "error", data: null };
   }
 };
 
@@ -1522,7 +1574,7 @@ export const createBooking = async ({
     } = userDetails[0];
     const amount = payableRent + securityDeposit;
 
-    logger("info", "sending email", {userEmail});
+    logger("info", "sending email", { userEmail });
     sendEmail({
       bookingId,
       token,

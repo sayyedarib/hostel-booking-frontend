@@ -7,5 +7,9 @@ export interface CreateGuest {
   photoUrl: string;
   purpose: string;
   aadhaarUrl: string;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  pin?: string | null;
   someoneElse?: boolean;
 }
