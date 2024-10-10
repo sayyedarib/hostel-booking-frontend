@@ -70,15 +70,9 @@ export async function POST(request: NextRequest) {
 
       await transporter.sendMail({
         from: "support@aligarhhostel.com",
-        to: ["sayyedaribhussain4321@gmail.com"],
+        to: ["sayyedaribhussain4321@gmail.com", "support@aligarhhostel.com"],
         subject: `Booking Verification for ${userName}`,
         html: mailContent,
-        // attachments: [
-        //   {
-        //     filename: "invoice.pdf",
-        //     content: invoicePdf.data,
-        //   },
-        // ],
       });
     } catch (error) {
       console.log("error in sending email ", error);

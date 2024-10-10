@@ -49,4 +49,6 @@ export interface UpdateUser {
   city?: string | null;
   state?: string | null;
   pin?: string | null;
+  enrollment?: string | null;
+  institute?: string | null;
 }

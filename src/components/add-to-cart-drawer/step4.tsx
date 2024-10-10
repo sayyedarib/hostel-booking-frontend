@@ -52,6 +52,8 @@ export const AddToCartStep4 = ({
   const [selectedExistingGuest, setSelectedExistingGuest] = useState<
     string | null
   >(null);
+  const [enrollemntNumber, setEnrollmentNumber] = useState<string | null>(null);
+  const [institute, setInstitute] = useState<string | null>(null);
 
   const { toast } = useToast();
 
@@ -388,6 +390,42 @@ export const AddToCartStep4 = ({
             />
           </div>
 
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label
+                htmlFor="enrollment"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Enrollment/Registration Number (Optional)
+              </Label>
+              <Input
+                id="enrollment"
+                type="text"
+                placeholder="e.g. GM9988"
+                className="rounded-lg p-2 w-full border border-gray-300"
+                value={enrollemntNumber ?? ""}
+                onChange={(e) => setEnrollmentNumber(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="institute"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Institute/College/Coaching Name (Optional)
+              </Label>
+              <Input
+                id="institute"
+                type="text"
+                placeholder="e.g. Brix Academy"
+                className="rounded-lg p-2 w-full border border-gray-300"
+                value={institute ?? ""}
+                onChange={(e) => setInstitute(e.target.value)}
+                required
+              />
+            </div>
+          </div>
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-1">
               <Label

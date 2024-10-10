@@ -11,5 +11,7 @@ export interface CreateGuest {
   city?: string | null;
   state?: string | null;
   pin?: string | null;
+  enrollment?: string | null;
+  institute?: string | null;
   someoneElse?: boolean;
 }

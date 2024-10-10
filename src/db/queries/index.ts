@@ -452,6 +452,8 @@ export const updateUserDetails = async ({
   purpose,
   photoUrl,
   aadhaarUrl,
+  enrollment,
+  institute,
 }: UpdateUser) => {
   try {
     logger("info", "Updating user details", { name, phone, dob, purpose });
@@ -471,6 +473,8 @@ export const updateUserDetails = async ({
         purpose,
         imageUrl: photoUrl,
         idUrl: aadhaarUrl,
+        enrollment,
+        institute,
       })
       .where(eq(UserTable.id, userId.data))
       .returning();
@@ -570,6 +574,8 @@ export const createGuest = async ({
   purpose,
   photoUrl,
   aadhaarUrl,
+  enrollment,
+  institute,
   someoneElse,
 }: CreateGuest) => {
   try {
@@ -589,6 +595,8 @@ export const createGuest = async ({
         purpose,
         photoUrl,
         aadhaarUrl,
+        enrollment,
+        institute,
       });
     }
 
@@ -1575,20 +1583,23 @@ async function sendEmail({
       userPhone,
       amount,
     });
-    const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/email/booking-confirmation`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/email/booking-confirmation`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          bookingId,
+          token,
+          userEmail,
+          userName,
+          userPhone,
+          amount,
+        }),
       },
-      body: JSON.stringify({
-        bookingId,
-        token,
-        userEmail,
-        userName,
-        userPhone,
-        amount,
-      }),
-    });
+    );
 
     if (!response.ok) {
       throw new Error("Failed to send email");
