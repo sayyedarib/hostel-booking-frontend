@@ -163,7 +163,7 @@ export default function Step2({
         ))}
       </ol>
 
-      <div className="mb-4 flex justify-center items-center flex-col">
+      <div className="mb-4 flex items-start flex-col">
         <h2 className="text-xl font-semibold mb-2">Signature</h2>
         <div className="border border-gray-300 mb-2 w-64 h-32">
           <SignatureCanvas ref={signatureRef} />

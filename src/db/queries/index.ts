@@ -1575,7 +1575,7 @@ async function sendEmail({
       userPhone,
       amount,
     });
-    const response = await fetch("/api/email/booking-confirmation", {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/email/booking-confirmation`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

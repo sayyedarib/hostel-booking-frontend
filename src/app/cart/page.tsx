@@ -211,7 +211,7 @@ export default function CartPage() {
               </h2>
               <Button
                 onClick={handleCheckout}
-                className="hidden md:block text-black"
+                className="hidden md:flex gap-2 text-black"
                 disabled={isCheckingOut}
               >
                 {isCheckingOut ? (

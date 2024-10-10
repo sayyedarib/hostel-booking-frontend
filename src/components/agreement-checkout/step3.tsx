@@ -74,8 +74,8 @@ export default function Step3({
     handleNext();
     if (result.status === "success") {
       toast({
-        title: "Payment successful",
-        description: "Your payment has been processed",
+        title: "Booking successful",
+        description: "Your will receive the invoice once payment verified",
       });
     }
   };
