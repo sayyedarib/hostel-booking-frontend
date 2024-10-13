@@ -82,6 +82,16 @@ export default function Header({
             </li>
             <li className="py-2">
               <Link
+                href="/room-facilities"
+                onClick={toggleMenu}
+                className="flex items-center justify-between gap-10 hover:text-white"
+              >
+                Room Facilties
+                <MoveRight size={24} />
+              </Link>
+            </li>
+            <li className="py-2">
+              <Link
                 href="/about"
                 onClick={toggleMenu}
                 className="flex items-center justify-between gap-10 hover:text-white"
@@ -96,7 +106,7 @@ export default function Header({
                 onClick={toggleMenu}
                 className="flex items-center justify-between gap-10 hover:text-white"
               >
-                events
+                Contact
                 <MoveRight size={24} />
               </Link>
             </li>
