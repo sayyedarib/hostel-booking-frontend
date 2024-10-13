@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Container from "@/components/ui/container";
 import Link from "next/link";
+import Header from "@/components/header";
 
 export default async function AboutPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <Container>
+      <Header className="fixed top-0 left-0 right-0 z-50" />
+
+      <Container className="mt-14">
         <section className="py-16 text-center">
           <h1 className="text-4xl font-bold text-gray-800">About Our Hostel</h1>
           <p className="mt-4 text-lg text-gray-600">

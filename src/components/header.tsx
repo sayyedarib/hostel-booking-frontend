@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, CircleX, MoveRight } from "lucide-react";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton, SignOutButton } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export default function Header({
         className={cn(
           className,
           "flex justify-between items-center p-4 bg-[#FFD600] lg:px-36",
-          isMenuOpen ? "fixed top-0 left-0 right-0 z-50" : "",
+          isMenuOpen ? "fixed top-0 left-0 right-0 z-50" : ""
         )}
       >
         <div className="flex items-center gap-3">
@@ -50,7 +50,7 @@ export default function Header({
         <div
           className={cn(
             "fixed top-0 left-0 right-0 bottom-0 bg-[#FFD600] z-40 flex flex-col justify-center items-center",
-            isMenuOpen ? "block" : "hidden",
+            isMenuOpen ? "block" : "hidden"
           )}
         >
           <div className="flex justify-between items-center p-4">
@@ -69,80 +69,72 @@ export default function Header({
               BOOK NOW!
             </Button>
           </div>
-          <ul className="flex flex-col items-start py-4 px-8 text-2xl space-y-2 font-extrabold text-black">
-            <li className="py-2 w-full">
+          <ul className="flex flex-col items-start py-4 px-8 lg:px-36 text-2xl space-y-2 font-extrabold text-black">
+            <li className="py-2">
               <Link
                 href="/rooms"
                 onClick={toggleMenu}
-                className="flex items-center justify-between"
+                className="flex items-center justify-between gap-10 hover:text-white"
               >
-                booking
+                Rooms
                 <MoveRight size={24} />
               </Link>
             </li>
-            <li className="py-2 w-full">
-              <Link
-                href="/locations"
-                onClick={toggleMenu}
-                className="flex items-center justify-between"
-              >
-                locations
-                <MoveRight size={24} />
-              </Link>
-            </li>
-            <li className="py-2 w-full">
-              <Link
-                href="/rooms-and-facilities"
-                onClick={toggleMenu}
-                className="flex items-center justify-between"
-              >
-                rooms & facilities
-              </Link>
-            </li>
-            <li className="py-2 w-full">
-              <Link
-                href="/food-and-drinks"
-                onClick={toggleMenu}
-                className="flex items-center justify-between"
-              >
-                food & drinks
-              </Link>
-            </li>
-            <li className="py-2 w-full">
+            <li className="py-2">
               <Link
                 href="/about"
                 onClick={toggleMenu}
-                className="flex items-center justify-between"
+                className="flex items-center justify-between gap-10 hover:text-white"
               >
-                about Aligarh&apos;s
+                About
                 <MoveRight size={24} />
               </Link>
             </li>
-            <li className="py-2 w-full">
+            <li className="py-2">
               <Link
                 href="/contact"
                 onClick={toggleMenu}
-                className="flex items-center justify-between"
+                className="flex items-center justify-between gap-10 hover:text-white"
               >
                 events
+                <MoveRight size={24} />
               </Link>
             </li>
+
             {/* signin */}
-            <li className="py-2 w-full">
-              <SignedOut>
-                <Link
-                  href="/sign-in?redirect_url=/rooms"
-                  className="flex items-center justify-between"
-                >
-                  sign in
-                </Link>
-              </SignedOut>
-            </li>
+            <SignedOut>
+              <li className="py-2">
+                  <Link
+                    href="/sign-in?redirect_url=/rooms"
+                    className="flex items-center justify-between  bg-black text-yellow-400 text-lg gap-10 px-2 py-2 rounded-lg"
+                  >
+                    sign in
+                    <MoveRight size={24} />
+                  </Link>
+              </li>
+            </SignedOut>
 
             {/* signout */}
-            <li className="py-2 w-full">
+            <li className="py-2">
               <SignedIn>
-                <UserButton />
+                <Link
+                  href="/user"
+                  className="flex items-center justify-between gap-10 hover:text-white"
+                >
+                  Dashboard
+                  <MoveRight size={24} />
+                </Link>
+              </SignedIn>
+            </li>
+
+            <li className="py-2">
+              <SignedIn>
+                  <Button
+                    className="flex items-center justify-between w-full bg-black text-yellow-400 text-lg"
+                    variant="ghost"
+                  >
+                    Sign out
+                  </Button>
               </SignedIn>
             </li>
           </ul>
