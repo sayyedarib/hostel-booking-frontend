@@ -17,6 +17,8 @@ import { RoomCard } from "@/interface";
 import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
+  const availableBeds = roomData.bedCount - roomData.occupiedCount;
+
   return (
     <Card className="w-full p-2 md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl space-y-3">
       <Image
@@ -40,9 +42,10 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
         </div>
       </div>
       <CardDescription className="text-sm text-gray-600">
-        Room: {roomData.roomCode} | Max Persons: {roomData.bedCount}
+        Room: {roomData.roomCode} | Max Persons: {roomData.bedCount} | Available
+        Beds: {availableBeds}
       </CardDescription>
-      {roomData.available ? (
+      {roomData.availableForBooking ? (
         <AddToCartDrawer roomId={Number(roomData.id)} />
       ) : (
         <div className="flex items-center justify-center p-2 bg-red-100 text-red-600 rounded-md">

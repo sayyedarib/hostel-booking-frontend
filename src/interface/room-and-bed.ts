@@ -20,7 +20,8 @@ export interface RoomCard {
   imageUrls: string[] | null;
   gender: string;
   bedCount: number;
-  available: boolean | null; // TODO: remove this null safely because default value is true
+  availableForBooking: boolean | null; // TODO: remove this null safely because default value is true
+  occupiedCount: number;
 }
 
 export interface CartItemShort {
