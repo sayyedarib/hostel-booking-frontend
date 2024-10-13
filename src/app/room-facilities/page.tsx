@@ -110,7 +110,7 @@ export default function CarouselPlugin() {
       </Carousel>
       <section className="flex flex-col items-center justify-center py-8 px-4 relative">
         <Image
-          src="/beds_yellow.svg"
+          src="/icons/beds_yellow.svg"
           width={120}
           height={120}
           alt=""
@@ -131,7 +131,7 @@ export default function CarouselPlugin() {
         <div className="max-w-4xl">
           <h2 className="text-5xl font-bold mb-8">
             privacy please vs.
-            <br /> bunk's not dead!
+            <br /> bunk&apos;s not dead!
           </h2>
           <p className="text-xl mb-8 max-w-xl">
             No matter if you prefer a private room or a multi-bed dorm, it will
@@ -176,7 +176,7 @@ export default function CarouselPlugin() {
             </CarouselItem>
             <CarouselItem className="pl-1 md:basis-1/3 basis-1/2 lg:basis-1/4">
               <div className="p-5">
-                <Card className="rounded-3xl bg-[url('/food-service.png')] bg-cover bg-center aspect-square"></Card>
+                <Card className="rounded-3xl bg-[url('/icons/food-service.png')] bg-cover bg-center aspect-square"></Card>
               </div>
             </CarouselItem>
           </CarouselContent>
@@ -186,7 +186,7 @@ export default function CarouselPlugin() {
         <Button className="text-black hover:bg-black hover:text-[#ffd500] group text-xl rounded-full px-8 py-7">
           Bring me to the gallery
           <Image
-            src="/arrow.svg"
+            src="/icons/arrow.svg"
             width={50}
             height={50}
             alt=""
@@ -196,7 +196,12 @@ export default function CarouselPlugin() {
       </section>
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-10 bg-[#f3f3f0] py-16">
         <div className="flex flex-col items-center gap-2">
-          <Image src="/24_7_wombats_200.svg" width={150} height={150} alt="" />
+          <Image
+            src="/icons/24_7_wombats_200.svg"
+            width={150}
+            height={150}
+            alt=""
+          />
           <h4 className="font-bold text-xl">24hr Reception</h4>
           <p className="max-w-80 text-center tracking-wider">
             All of our hostels are staffed with a 24/7 reception. Our
@@ -207,16 +212,16 @@ export default function CarouselPlugin() {
 
         <div className="flex flex-col items-center gap-2">
           <Image
-            src="/luggage_wombats_200.svg"
+            src="/icons/luggage_wombats_200.svg"
             width={150}
             height={150}
             alt=""
           />
           <h4 className="font-bold text-xl">Luggage Storage</h4>
           <p className="max-w-80 text-center tracking-wider">
-            We're more than happy to offer you luggage storage options before
-            you check in or after checking out. Explore the city without the
-            extra weight.
+            We&apos;re more than happy to offer you luggage storage options
+            before you check in or after checking out. Explore the city without
+            the extra weight.
           </p>
         </div>
         <div className="flex flex-col items-center gap-2">
@@ -229,7 +234,7 @@ export default function CarouselPlugin() {
         </div>
         <div className="flex flex-col items-center gap-2">
           <Image
-            src="/laundry_wombats_200.svg"
+            src="/icons/laundry_wombats_200.svg"
             width={150}
             height={150}
             alt=""
@@ -242,7 +247,7 @@ export default function CarouselPlugin() {
         </div>
         <div className="flex flex-col items-center gap-2">
           <Image
-            src="/guestkitchen_wombats_200.svg"
+            src="/icons/guestkitchen_wombats_200.svg"
             width={150}
             height={150}
             alt=""
@@ -254,16 +259,21 @@ export default function CarouselPlugin() {
           </p>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <Image src="/towels_wombats.svg" width={150} height={150} alt="" />
+          <Image
+            src="/icons/towels_wombats.svg"
+            width={150}
+            height={150}
+            alt=""
+          />
           <h4 className="font-bold text-xl">Towels</h4>
           <p className="max-w-80 text-center tracking-wider">
             You pre-order your towel online or rent one for a small fee at
-            reception :) Towels are provided in double and twin rooms.
+            reception &#128522; Towels are provided in double and twin rooms.
           </p>
         </div>
         <div className="flex flex-col items-center gap-2">
           <Image
-            src="/lockers_wombats_200.svg"
+            src="/icons/lockers_wombats_200.svg"
             width={150}
             height={150}
             alt=""
@@ -276,20 +286,7 @@ export default function CarouselPlugin() {
         </div>
         <div className="flex flex-col items-center gap-2">
           <Image
-            src="/wombar_wombats_200.svg"
-            width={150}
-            height={150}
-            alt=""
-          />
-          <h4 className="font-bold text-xl">WomBAR</h4>
-          <p className="max-w-80 text-center tracking-wider">
-            If you’re looking to meet fellow guests, cap off a long day of
-            exploring, or begin a big night out, the WomBAR is open for you.
-          </p>
-        </div>
-        <div className="flex flex-col items-center gap-2">
-          <Image
-            src="/rentables_wombats_200.svg"
+            src="/icons/rentables_wombats_200.svg"
             width={150}
             height={150}
             alt=""
@@ -301,7 +298,7 @@ export default function CarouselPlugin() {
           </p>
         </div>
         <div className="flex flex-col items-center gap-2">
-          <Image src="/250px.svg" width={150} height={150} alt="" />
+          <Image src="/icons/250px.svg" width={150} height={150} alt="" />
           <h4 className="font-bold text-xl">Top Host</h4>
           <p className="max-w-80 text-center tracking-wider">
             Aligarh&apos;s has collected more than 50 international HOSCARS
@@ -359,7 +356,7 @@ export default function CarouselPlugin() {
             className="rounded-xl w-[75vw] lg:w-[unset]"
           />
           <p className="my-5 text-xl max-w-[50vw]">
-            That's the reason why Aligarh&apos;s City Hostels are becoming
+            That&apos;s the reason why Aligarh&apos;s City Hostels are becoming
             increasingly popular for travelling couples and business trips.
             Where else can you find a double room in the city center at such
             rates? We are happy to welcome non-typical hostel guests; it makes
@@ -377,11 +374,11 @@ export default function CarouselPlugin() {
             className="rounded-xl w-[75vw] lg:w-[unset]"
           />
           <p className="my-5 text-xl max-w-[50vw]">
-            Are you on a ladies' trip or do you prefer female-only travel
+            Are you on a ladies&apos; trip or do you prefer female-only travel
             parties inside your room? We are happy to offer special rooms where
             travelling ladies can share their dorm and have their own space.
-            Just look out for "female-only" marked dorms in your booking
-            process, or contact us; we are always happy to assist.
+            Just look out for &quot;female-only&quot; marked dorms in your
+            booking process, or contact us; we are always happy to assist.
           </p>
         </div>
         <div className="flex flex-col">
@@ -469,7 +466,7 @@ export default function CarouselPlugin() {
               <Button className="text-white bg-black hover:bg-black hover:text-[#ffd500] group text-sm rounded-full px-8 py-3 mt-4">
                 Subscribe
                 <Image
-                  src="/arrow.svg"
+                  src="/icons/arrow.svg"
                   width={50}
                   height={50}
                   alt=""
