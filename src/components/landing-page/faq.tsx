@@ -29,7 +29,7 @@ export default function FAQ() {
         </div>
         <div className="order-1 lg:order-2">
           <Image
-            src="/faq.png"
+            src="/icons/faq.png"
             alt="FAQ"
             width={500}
             height={500}
