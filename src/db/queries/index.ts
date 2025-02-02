@@ -1384,6 +1384,8 @@ export const getInvoiceDetails = async (bookingId: number, userId: number) => {
       verified: TransactionTable.verified,
       invoiceUrl: TransactionTable.invoiceUrl,
       createdAt: TransactionTable.createdAt,
+      bedCode: BedTable.bedCode,
+      roomCode: RoomTable.roomCode,
       userName: UserTable.name,
       userPhone: UserTable.phone,
       userEmail: UserTable.email,
@@ -1399,6 +1401,9 @@ export const getInvoiceDetails = async (bookingId: number, userId: number) => {
       eq(BookingTable.transactionId, TransactionTable.id),
     )
     .innerJoin(UserTable, eq(BookingTable.userId, UserTable.id))
+    .innerJoin(BedBookingTable, eq(BookingTable.id, BedBookingTable.bookingId))
+    .innerJoin(BedTable, eq(BedBookingTable.bedId, BedTable.id))
+    .innerJoin(RoomTable, eq(BedTable.roomId, RoomTable.id))
     .innerJoin(AddressBookTable, eq(UserTable.addressId, AddressBookTable.id))
     .where(
       and(eq(BookingTable.id, bookingId), eq(BookingTable.userId, userId)),

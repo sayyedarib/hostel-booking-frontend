@@ -20,6 +20,7 @@ export default async function InvoicePage({
     Number(params.id),
     userId,
   );
+  console.log("invoice details: ", invoiceDetails);
 
   return (
     <div
@@ -95,7 +96,7 @@ export default async function InvoicePage({
               <p>
                 <strong>Correspondence Address:</strong>
                 <br />
-                Bed No. {invoiceDetails?.beds[0].bedCode}, Room No.{" "}
+                Bed No. {invoiceDetails?.beds[0]?.bedCode}, Room No.{" "}
                 {invoiceDetails?.beds[0]?.roomCode}
                 <br />
                 Campus View Apartment, Beside Sultan Jahan Coaching,
