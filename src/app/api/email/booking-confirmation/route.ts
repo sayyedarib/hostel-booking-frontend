@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { transporter } from "@/lib/server-utils";
 import { getBookingDetails } from "@/db/queries";
 import { logger } from "@/lib/utils";
-import axios from "axios";
+// import axios from "axios";
 
 export const maxDuration = 55;
 
@@ -26,10 +26,10 @@ export async function POST(request: NextRequest) {
 
     const confirmationLink = `${process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://aligarhhostel.com"}/api/email/payment-confirmation?id=${bookingDetails.id}&token=${token}`;
 
-    logger("info", "Fetching invoice PDF");
-    const invoicePdf = await axios.get(bookingDetails.invoiceUrl, {
-      responseType: "arraybuffer",
-    });
+    // logger("info", "Fetching invoice PDF");
+    // const invoicePdf = await axios.get(bookingDetails.invoiceUrl, {
+    //   responseType: "arraybuffer",
+    // });
 
     const bedBookingsHtml = bookingDetails.bedBookings
       .map(

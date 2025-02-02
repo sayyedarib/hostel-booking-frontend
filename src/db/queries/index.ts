@@ -1569,7 +1569,7 @@ export const createBooking = async ({
 };
 
 // Function to send the email
-async function sendEmail({
+export async function sendEmail({
   bookingId,
   token,
   userEmail,
