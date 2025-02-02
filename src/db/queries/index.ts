@@ -1637,7 +1637,12 @@ export async function generateInvoiceAndUpdateTransaction(
     //   .where(eq(TransactionTable.id, transactionId));
 
     // logger("info", "Invoice generated and transaction updated successfully");
+    console.log("bookingId", bookingId);
+    console.log("userId", userId);
+    console.log("transactionId", transactionId);
+    console.log("token", token);
 
+    console.log("fetching user details")
     const userDetails = await db
       .select({
         name: UserTable.name,
@@ -1647,6 +1652,8 @@ export async function generateInvoiceAndUpdateTransaction(
       .from(UserTable)
       .where(eq(UserTable.id, userId))
       .limit(1);
+
+    console.log("userDetails", userDetails);
 
     if (userDetails.length === 0) {
       logger("error", "User details not found");
@@ -1658,6 +1665,10 @@ export async function generateInvoiceAndUpdateTransaction(
       email: userEmail,
       phone: userPhone,
     } = userDetails[0];
+
+    console.log("userName", userName);
+    console.log("userEmail", userEmail);
+    console.log("userPhone", userPhone);
 
     const transaction = await db
       .select({
@@ -1672,7 +1683,9 @@ export async function generateInvoiceAndUpdateTransaction(
       return;
     }
 
+    
     const amount = transaction[0].totalAmount;
+    console.log("transaction", transaction);
 
     try {
       logger("info", "sending email", { userEmail });
