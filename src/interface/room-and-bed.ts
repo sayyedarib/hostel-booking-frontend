@@ -17,7 +17,7 @@ export interface RoomCard {
   id: number;
   buildingName: string;
   roomCode: string;
-  imageUrls: string[] | null;
+  imageUrls: string[];
   gender: string;
   bedCount: number;
   availableForBooking: boolean | null; // TODO: remove this null safely because default value is true

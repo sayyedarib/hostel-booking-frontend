@@ -18,12 +18,11 @@ import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   const availableBeds = roomData.bedCount - roomData.occupiedCount;
-
+  console.log("roomData", roomData);
   return (
     <Card className="w-full p-2 md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl space-y-3">
       <Image
-        src={roomData.imageUrls?.[0] || "/img/fall_back_room.jpg"}
-        placeholder="data:image/img/fall_back_room.png"
+        src={roomData.imageUrls[0]}
         height="1000"
         width="1000"
         className="h-64 w-full object-cover rounded-xl"
