@@ -67,9 +67,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch invoice PDF
-    const invoicePdf = await axios.get(booking[0].invoiceUrl, {
-      responseType: "arraybuffer",
-    });
+    // const invoicePdf = await axios.get(booking[0].invoiceUrl, {
+    //   responseType: "arraybuffer",
+    // });
 
     // Send email to user
     const mailContent = `
@@ -90,12 +90,12 @@ export async function POST(request: NextRequest) {
         to: user[0].email,
         subject: "Payment Confirmation and Invoice",
         html: mailContent,
-        attachments: [
-          {
-            filename: "invoice.pdf",
-            content: invoicePdf.data,
-          },
-        ],
+        // attachments: [
+        //   {
+        //     filename: "invoice.pdf",
+        //     content: invoicePdf.data,
+        //   },
+        // ],
       });
 
       logger("info", "Payment verification email sent to user");
