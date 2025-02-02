@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+
 import { toWords } from "number-to-words";
 import Image from "next/image";
 
