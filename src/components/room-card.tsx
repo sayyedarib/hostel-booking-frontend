@@ -22,7 +22,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   return (
     <Card className="w-full p-2 md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl space-y-3">
       <Image
-        src={roomData.imageUrls?.[0] || "/img/fall_back_room.png"}
+        src={roomData.imageUrls?.[0] || "/img/fall_back_room.jpg"}
         placeholder="data:image/img/fall_back_room.png"
         height="1000"
         width="1000"
