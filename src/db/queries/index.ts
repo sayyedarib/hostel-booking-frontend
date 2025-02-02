@@ -1629,14 +1629,14 @@ export async function generateInvoiceAndUpdateTransaction(
   token: string,
 ) {
   try {
-    const invoiceUrl = await generateInvoice(bookingId, userId);
+    // const invoiceUrl = await generateInvoice(bookingId, userId);
 
-    await db
-      .update(TransactionTable)
-      .set({ invoiceUrl })
-      .where(eq(TransactionTable.id, transactionId));
+    // await db
+    //   .update(TransactionTable)
+    //   .set({ invoiceUrl })
+    //   .where(eq(TransactionTable.id, transactionId));
 
-    logger("info", "Invoice generated and transaction updated successfully");
+    // logger("info", "Invoice generated and transaction updated successfully");
 
     const userDetails = await db
       .select({
