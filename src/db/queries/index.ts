@@ -1622,7 +1622,7 @@ async function sendEmail({
 }
 
 // Function to generate invoice and update transaction
-async function generateInvoiceAndUpdateTransaction(
+export async function generateInvoiceAndUpdateTransaction(
   bookingId: number,
   userId: number,
   transactionId: number,
@@ -1674,15 +1674,19 @@ async function generateInvoiceAndUpdateTransaction(
 
     const amount = transaction[0].totalAmount;
 
-    logger("info", "sending email", { userEmail });
-    await sendEmail({
-      bookingId,
-      token,
-      userEmail,
-      userName,
-      userPhone,
-      amount,
-    });
+    try {
+      logger("info", "sending email", { userEmail });
+      await sendEmail({
+        bookingId,
+        token,
+        userEmail,
+        userName,
+        userPhone,
+        amount,
+      });
+    }catch(error) {
+      logger("error", "Error sending email:", error as Error);
+    }
   } catch (error) {
     logger(
       "error",

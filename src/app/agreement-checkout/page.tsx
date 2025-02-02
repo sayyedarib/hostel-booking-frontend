@@ -7,7 +7,7 @@ import Step2 from "@/components/agreement-checkout/step2";
 import Step3 from "@/components/agreement-checkout/step3";
 import Step4 from "@/components/agreement-checkout/step4";
 
-export default async function AgreementCheckoutPage() {
+export default function AgreementCheckoutPage() {
   const [currentStep, setCurrentStep] = useState(2);
 
   const handleNext = () => {
