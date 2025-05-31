@@ -1,9 +1,11 @@
 ## Demo
+
 https://github.com/user-attachments/assets/602bd55c-917c-45b2-b371-ee60dff9ccc7
 
 ## Getting Started
 
 First, run the development server:
+
 ```bash
 npm run dev
 # or
@@ -22,20 +24,21 @@ This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-opti
 
 ## Additional Features
 
-- **Admin Dashboard** and **User Dashboard** for managing rooms, bookings, and user accounts.  
-- **Invoice Generation**: Create and export invoices.  
-- **Email Notifications**: Powered by Nodemailer.  
+- **Admin Dashboard** and **User Dashboard** for managing rooms, bookings, and user accounts.
+- **Invoice Generation**: Create and export invoices.
+- **Email Notifications**: Powered by Nodemailer.
 
 ## Tech Stack
 
-- **Next.js**  
-- **Supabase** with **Drizzle**  
-- **shadcn UI**  
-- **Tailwind CSS**  
+- **Next.js**
+- **Supabase** with **Drizzle**
+- **shadcn UI**
+- **Tailwind CSS**
 
 ## Environment Variables
 
 Create or update a `.env.local` file to include keys such as:
+
 ```bash
 NEXT_PUBLIC_SUPABASE_URL="<your-supabase-url>"
 NEXT_PUBLIC_SUPABASE_ANON_KEY="<your-supabase-anon-key>"
@@ -56,14 +59,15 @@ NEXT_PUBLIC_FRONTEND_URL="http://localhost:3000"
 
 NODE_ENV="development"
 ```
+
 Use these variables to connect to Supabase, Clerk, and to manage emails and authentication.
 
 ## Learn More
 
 To learn more about Next.js, take a look at:
 
-- [Next.js Documentation](https://nextjs.org/docs)  
-- [Learn Next.js](https://nextjs.org/learn)  
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Learn Next.js](https://nextjs.org/learn)
 
 Check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) as well.
 

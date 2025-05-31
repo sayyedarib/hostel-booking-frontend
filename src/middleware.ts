@@ -22,7 +22,7 @@ export default clerkMiddleware((auth, req) => {
       auth().userId === "user_2n9mnloqLf2QogRf5dXBc3kVvm4"
     )
   ) {
-    return NextResponse.redirect(new URL('/', req.url));
+    return NextResponse.redirect(new URL("/", req.url));
   }
 });
 

@@ -96,7 +96,9 @@ export const AddToCartStep1 = ({
                 key={index}
                 className={cn(
                   "h-24 rounded-lg flex flex-col justify-center items-start p-3 cursor-pointer transition-colors duration-200",
-                  !bed.available ? getStyle("occupied") : getStyle(getStatus(bed.id)),
+                  !bed.available
+                    ? getStyle("occupied")
+                    : getStyle(getStatus(bed.id)),
                 )}
                 onClick={() => handleBedSelect(bed.id)}
               >

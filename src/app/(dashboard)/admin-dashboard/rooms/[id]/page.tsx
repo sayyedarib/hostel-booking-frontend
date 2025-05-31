@@ -42,7 +42,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch"
+import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/use-toast";
 import AddBedDialogue from "@/components/add-bed-dialogue";
 import EditBedDialogue from "@/components/edit-bed-dialogue";
@@ -163,13 +163,25 @@ export default function RoomPage({ params }: { params: { id: string } }) {
                     </p>
                   </div>
                   <div className="flex gap-4">
-
-                    {
-                      room.data[0].available ? <Button variant="destructive" onClick={async () => await markRoomAsOccupied(room.data[0].id)}>
+                    {room.data[0].available ? (
+                      <Button
+                        variant="destructive"
+                        onClick={async () =>
+                          await markRoomAsOccupied(room.data[0].id)
+                        }
+                      >
                         Mark as occupied
-                      </Button> : <Button variant="secondary" onClick={async () => await markRoomAsAvailable(room.data[0].id)}>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        onClick={async () =>
+                          await markRoomAsAvailable(room.data[0].id)
+                        }
+                      >
                         Mark as available
-                      </Button>}
+                      </Button>
+                    )}
                     <Button
                       className="w-full md:w-auto"
                       onClick={async () =>
@@ -217,20 +229,21 @@ export default function RoomPage({ params }: { params: { id: string } }) {
                             checked={bed?.available}
                             onCheckedChange={async () => {
                               if (bed?.id) {
-                                await updateBedStatus(
-                                  bed.id,
-                                  !bed.available
-                                );
-                                queryClient.invalidateQueries({ queryKey: ["room", id] });
+                                await updateBedStatus(bed.id, !bed.available);
+                                queryClient.invalidateQueries({
+                                  queryKey: ["room", id],
+                                });
                               } else {
                                 toast({
                                   title: "Error",
-                                  description: "Bed ID is missing or bed is already occupied.",
+                                  description:
+                                    "Bed ID is missing or bed is already occupied.",
                                   variant: "destructive",
-                                })
+                                });
                               }
                             }}
-                          /></TableCell>
+                          />
+                        </TableCell>
                         <TableCell>
                           <EditBedDialogue bed={bed} />
                         </TableCell>

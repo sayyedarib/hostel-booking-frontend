@@ -268,30 +268,30 @@ export const updateUserSignature = async ({
 
 export const markRoomAsOccupied = async (roomId: number) => {
   try {
-    logger("info", "Marking room as occupied", {roomId});
+    logger("info", "Marking room as occupied", { roomId });
     await db
       .update(RoomTable)
       .set({
         available: false,
       })
-      .where(eq(RoomTable.id, roomId))
+      .where(eq(RoomTable.id, roomId));
   } catch (error) {
-    logger("error", "Error marking room as occupied", {error})
+    logger("error", "Error marking room as occupied", { error });
   }
-}
+};
 export const markRoomAsAvailable = async (roomId: number) => {
   try {
-    logger("info", "Marking room as occupied", {roomId});
+    logger("info", "Marking room as occupied", { roomId });
     await db
       .update(RoomTable)
       .set({
         available: true,
       })
-      .where(eq(RoomTable.id, roomId))
+      .where(eq(RoomTable.id, roomId));
   } catch (error) {
-    logger("error", "Error marking room as occupied", {error})
+    logger("error", "Error marking room as occupied", { error });
   }
-}
+};
 
 export const getAllRoomCards = async () => {
   try {
@@ -1671,7 +1671,7 @@ export async function generateInvoiceAndUpdateTransaction(
     console.log("transactionId", transactionId);
     console.log("token", token);
 
-    console.log("fetching user details")
+    console.log("fetching user details");
     const userDetails = await db
       .select({
         name: UserTable.name,
@@ -1712,7 +1712,6 @@ export async function generateInvoiceAndUpdateTransaction(
       return;
     }
 
-    
     const amount = transaction[0].totalAmount;
     console.log("transaction", transaction);
 
@@ -1726,7 +1725,7 @@ export async function generateInvoiceAndUpdateTransaction(
         userPhone,
         amount,
       });
-    }catch(error) {
+    } catch (error) {
       logger("error", "Error sending email:", error as Error);
     }
   } catch (error) {
@@ -2135,10 +2134,7 @@ export const updateBedDetails = async (
   }
 };
 
-export const updateBedStatus = async (
-  bedId: number,
-  available: boolean,
-) => {
+export const updateBedStatus = async (bedId: number, available: boolean) => {
   try {
     logger("info", "Updating bed status", { bedId, available });
 
@@ -2163,7 +2159,7 @@ export const updateBedStatus = async (
       message: "Failed to update bed status",
     };
   }
-}
+};
 
 export const addRoomImage = async (roomId: number, imageUrl: string) => {
   try {
