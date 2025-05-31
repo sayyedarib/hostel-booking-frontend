@@ -323,6 +323,7 @@ export const getAllRoomCards = async () => {
   }
 };
 
+// TODO: optimize query
 export const getBedData = async (roomId: number) => {
   try {
     logger("info", "Fetching bed info", { roomId });
@@ -338,6 +339,7 @@ export const getBedData = async (roomId: number) => {
         dailyRent: BedTable.dailyRent,
         monthlyRent: BedTable.monthlyRent,
         bedType: BedTable.type,
+        available: BedTable.available,
         occupiedDateRanges: sql<OccupiedDateRange[]>`
           array_agg(json_build_object(
             'startDate', ${BedBookingTable.checkIn},
@@ -1990,6 +1992,7 @@ export const getRoomById = async (roomId: number) => {
           id: BedTable.id,
           bedCode: BedTable.bedCode,
           type: BedTable.type,
+          available: BedTable.available,
           monthlyRent: BedTable.monthlyRent,
         },
         property: {
@@ -2131,6 +2134,36 @@ export const updateBedDetails = async (
     };
   }
 };
+
+export const updateBedStatus = async (
+  bedId: number,
+  available: boolean,
+) => {
+  try {
+    logger("info", "Updating bed status", { bedId, available });
+
+    const updatedBed = await db
+      .update(BedTable)
+      .set({ available })
+      .where(eq(BedTable.id, bedId))
+      .returning();
+
+    if (updatedBed.length === 0) {
+      logger("warn", "Bed not found for status update", { bedId });
+      return { status: "error", data: null, message: "Bed not found" };
+    }
+
+    logger("info", "Bed status updated successfully", { updatedBed });
+    return { status: "success", data: updatedBed[0] };
+  } catch (error) {
+    logger("error", "Error updating bed status", { error, bedId });
+    return {
+      status: "error",
+      data: null,
+      message: "Failed to update bed status",
+    };
+  }
+}
 
 export const addRoomImage = async (roomId: number, imageUrl: string) => {
   try {

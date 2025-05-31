@@ -86,6 +86,7 @@ export const BedTable = pgTable("bed", {
   bedCode: text("code").notNull(),
   type: text("type").notNull(),
   monthlyRent: integer("monthly_rent").notNull(),
+  available: boolean("available").notNull().default(true),
   dailyRent: integer("daily_rent").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")

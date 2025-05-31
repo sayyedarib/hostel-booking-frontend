@@ -55,9 +55,9 @@ export const AddToCartStep1 = ({
       case "selected":
         return "bg-green-500 text-white";
       case "occupied":
-        return "bg-red-500 text-white";
+        return "bg-red-500 text-white cursor-not-allowed pointer-events-none";
       case "cart":
-        return "bg-yellow-500 text-white cursor-not-allowed";
+        return "bg-yellow-500 text-white cursor-not-allowed pointer-events-none";
       default:
         return "bg-neutral-100 hover:bg-green-200";
     }
@@ -96,7 +96,7 @@ export const AddToCartStep1 = ({
                 key={index}
                 className={cn(
                   "h-24 rounded-lg flex flex-col justify-center items-start p-3 cursor-pointer transition-colors duration-200",
-                  getStyle(getStatus(bed.id)),
+                  !bed.available ? getStyle("occupied") : getStyle(getStatus(bed.id)),
                 )}
                 onClick={() => handleBedSelect(bed.id)}
               >

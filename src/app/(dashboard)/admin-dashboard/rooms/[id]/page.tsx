@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Upload, Trash2, Edit } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -13,7 +13,8 @@ import {
   addRoomImage,
   deleteImage,
   markRoomAsOccupied,
-  markRoomAsAvailable
+  markRoomAsAvailable,
+  updateBedStatus,
 } from "@/db/queries";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
@@ -41,12 +42,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch"
+import { toast } from "@/components/ui/use-toast";
 import AddBedDialogue from "@/components/add-bed-dialogue";
 import EditBedDialogue from "@/components/edit-bed-dialogue";
 
 export default function RoomPage({ params }: { params: { id: string } }) {
   const { id } = params;
   const supabase = createClient();
+  const queryClient = useQueryClient();
+
   const { data: room, isLoading } = useQuery({
     queryKey: ["room", id],
     queryFn: () => getRoomById(Number(id)),
@@ -159,26 +164,26 @@ export default function RoomPage({ params }: { params: { id: string } }) {
                   </div>
                   <div className="flex gap-4">
 
-                  {
-                    room.data[0].available ? <Button variant="destructive" onClick={async () => await markRoomAsOccupied(room.data[0].id)}>
-                      Mark as occupied
-                  </Button> : <Button variant="secondary" onClick={async () => await markRoomAsAvailable(room.data[0].id)}>
-                      Mark as available
-                  </Button>}
-                  <Button
-                    className="w-full md:w-auto"
-                    onClick={async () =>
-                      await updateRoomDetails(
-                        room.data[0].id,
-                        roomCode,
-                        parseInt(floor),
-                        gender,
-                      )
-                    }
+                    {
+                      room.data[0].available ? <Button variant="destructive" onClick={async () => await markRoomAsOccupied(room.data[0].id)}>
+                        Mark as occupied
+                      </Button> : <Button variant="secondary" onClick={async () => await markRoomAsAvailable(room.data[0].id)}>
+                        Mark as available
+                      </Button>}
+                    <Button
+                      className="w-full md:w-auto"
+                      onClick={async () =>
+                        await updateRoomDetails(
+                          room.data[0].id,
+                          roomCode,
+                          parseInt(floor),
+                          gender,
+                        )
+                      }
                     >
-                    Save Changes
-                  </Button>
-                    </div>
+                      Save Changes
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -196,6 +201,7 @@ export default function RoomPage({ params }: { params: { id: string } }) {
                       <TableHead>Bed Code</TableHead>
                       <TableHead>Type</TableHead>
                       <TableHead>Monthly Rent</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -205,6 +211,26 @@ export default function RoomPage({ params }: { params: { id: string } }) {
                         <TableCell>{bed?.bedCode.toString()}</TableCell>
                         <TableCell>{bed?.type.toString()}</TableCell>
                         <TableCell>{bed?.monthlyRent.toString()}</TableCell>
+                        <TableCell>
+                          {/* TODO: Fix avoid reordering rows when status changes */}
+                          <Switch
+                            checked={bed?.available}
+                            onCheckedChange={async () => {
+                              if (bed?.id) {
+                                await updateBedStatus(
+                                  bed.id,
+                                  !bed.available
+                                );
+                                queryClient.invalidateQueries({ queryKey: ["room", id] });
+                              } else {
+                                toast({
+                                  title: "Error",
+                                  description: "Bed ID is missing or bed is already occupied.",
+                                  variant: "destructive",
+                                })
+                              }
+                            }}
+                          /></TableCell>
                         <TableCell>
                           <EditBedDialogue bed={bed} />
                         </TableCell>
