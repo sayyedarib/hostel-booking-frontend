@@ -12,6 +12,8 @@ import {
   updateRoomDetails,
   addRoomImage,
   deleteImage,
+  markRoomAsOccupied,
+  markRoomAsAvailable
 } from "@/db/queries";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
@@ -155,6 +157,14 @@ export default function RoomPage({ params }: { params: { id: string } }) {
                       </Link>
                     </p>
                   </div>
+                  <div className="flex gap-4">
+
+                  {
+                    room.data[0].available ? <Button variant="destructive" onClick={async () => await markRoomAsOccupied(room.data[0].id)}>
+                      Mark as occupied
+                  </Button> : <Button variant="secondary" onClick={async () => await markRoomAsAvailable(room.data[0].id)}>
+                      Mark as available
+                  </Button>}
                   <Button
                     className="w-full md:w-auto"
                     onClick={async () =>
@@ -165,9 +175,10 @@ export default function RoomPage({ params }: { params: { id: string } }) {
                         gender,
                       )
                     }
-                  >
+                    >
                     Save Changes
                   </Button>
+                    </div>
                 </div>
               </CardContent>
             </Card>

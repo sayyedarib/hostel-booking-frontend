@@ -266,6 +266,33 @@ export const updateUserSignature = async ({
   }
 };
 
+export const markRoomAsOccupied = async (roomId: number) => {
+  try {
+    logger("info", "Marking room as occupied", {roomId});
+    await db
+      .update(RoomTable)
+      .set({
+        available: false,
+      })
+      .where(eq(RoomTable.id, roomId))
+  } catch (error) {
+    logger("error", "Error marking room as occupied", {error})
+  }
+}
+export const markRoomAsAvailable = async (roomId: number) => {
+  try {
+    logger("info", "Marking room as occupied", {roomId});
+    await db
+      .update(RoomTable)
+      .set({
+        available: true,
+      })
+      .where(eq(RoomTable.id, roomId))
+  } catch (error) {
+    logger("error", "Error marking room as occupied", {error})
+  }
+}
+
 export const getAllRoomCards = async () => {
   try {
     logger("info", "Fetching all room cards");
@@ -1958,6 +1985,7 @@ export const getRoomById = async (roomId: number) => {
         floor: RoomTable.floor,
         gender: RoomTable.gender,
         imageUrls: RoomTable.imageUrls,
+        available: RoomTable.available,
         beds: {
           id: BedTable.id,
           bedCode: BedTable.bedCode,
@@ -1974,7 +2002,6 @@ export const getRoomById = async (roomId: number) => {
       .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
       .innerJoin(PropertyTable, eq(RoomTable.propertyId, PropertyTable.id))
       .where(eq(RoomTable.id, roomId));
-
     const roomWithBeds = {
       ...room[0],
       beds: room.map((r) => r.beds).filter((bed) => bed?.id !== null),
