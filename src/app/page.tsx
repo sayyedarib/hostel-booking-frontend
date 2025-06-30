@@ -41,15 +41,14 @@ export default function Home() {
         <div className="max-w-4xl text-center space-y-20">
           <h2 className="text-5xl lg:text-9xl font-bold mb-6">
             Aligarh&apos;s <br />
-            City Hostels
+            City PG
           </h2>
           <p className="text-lg mb-8">
             We have <span className="font-semibold">private rooms</span>, we
             have <span className="font-semibold">dorms</span>, we have{" "}
-            <span className="font-semibold">guest kitchens</span>, we have{" "}
             <span className="font-semibold">study environment</span>...{" "}
             <span className="font-bold">but above all: we have the vibe</span>.
-            Wombat&apos;s City Hostels are the right place to{" "}
+            Khan&apos;s PG is the right place to{" "}
             <span className="font-semibold">
               meet people from around the world
             </span>
@@ -108,7 +107,7 @@ export default function Home() {
       <section className="flex flex-col lg:flex-row py-16 px-4 bg-black text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-5xl font-extrabold mb-8 lg:text-8xl relative">
-            why Aligarh&apos;s <br className="hidden lg:block" /> City
+            why Khan&apos;s <br className="hidden lg:block" /> PG
             <span className="inline-block align-middle ml-2 absolute -top-8 right-0">
               <Image
                 className="h-20 w-20 lg:h-52 lg:w-52"
@@ -118,14 +117,13 @@ export default function Home() {
                 height={500}
               />
             </span>{" "}
-            Hostels?
+            PG?
           </h2>
           <p className="text-lg mb-8 max-w-3xl">
-            It&apos;s about more than just a bed. Wombat&apos;s is your city
-            host, offering lovingly put-together breakfast variations, a WomBAR
-            in each hostel with a great vibe and fantastic offerings, as well as
-            events on a regular basis, including our WomBEATS concert series
-            with free admission.
+            It&apos;s about more than just a bed. Khan&apos;sPG is your city
+            host, offering lovingly put-together breakfast variations,as well as
+            events on a regular basis. We also provide full scholarship
+            to deserving and meritorious students
           </p>
         </div>
         <div className="w-full md:w-1/2 lg:w-1/3 ">
