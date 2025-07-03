@@ -34,8 +34,21 @@ export default function Home() {
       <Header className="fixed top-0 left-0 right-0 z-10" />
 
       <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center mt-20">
-        <HeroSection />
-      </section>
+
+  
+  <p className="text-yellow-400 font-bold text-xl animate-pulse bg-black px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
+    <Link
+      href="https://forms.gle/4DJnTpds7MP1h5J48" 
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      We also provide full scholarship to deserving and meritorious students. Click here!
+    </Link>
+  </p>
+
+  <HeroSection />
+</section>
+
 
       <section className="flex flex-col items-center justify-center py-8 px-4 bg-white text-[#212529]">
         <div className="max-w-4xl text-center space-y-20">
