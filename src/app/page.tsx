@@ -40,8 +40,8 @@ export default function Home() {
       <section className="flex flex-col items-center justify-center py-8 px-4 bg-white text-[#212529]">
         <div className="max-w-4xl text-center space-y-20">
           <h2 className="text-5xl lg:text-9xl font-bold mb-6">
-            Aligarh&apos;s <br />
-            City PG
+            Aligarh <br />
+            City&apos;s PG
           </h2>
           <p className="text-lg mb-8">
             We have <span className="font-semibold">private rooms</span>, we
@@ -107,7 +107,7 @@ export default function Home() {
       <section className="flex flex-col lg:flex-row py-16 px-4 bg-black text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-5xl font-extrabold mb-8 lg:text-8xl relative">
-            why Khan&apos;s <br className="hidden lg:block" /> PG
+            why Khan&apos;s PG <br className="hidden lg:block" /> 
             <span className="inline-block align-middle ml-2 absolute -top-8 right-0">
               <Image
                 className="h-20 w-20 lg:h-52 lg:w-52"
@@ -120,11 +120,12 @@ export default function Home() {
             PG?
           </h2>
           <p className="text-lg mb-8 max-w-3xl">
-            It&apos;s about more than just a bed. Khan&apos;sPG is your city
+            It&apos;s about more than just a bed. Khan&apos;s PG is your city
             host, offering lovingly put-together breakfast variations,as well as
-            events on a regular basis. We also provide full scholarship
-            to deserving and meritorious students
-          </p>
+            events on a regular basis. </p>
+          <p className="text-yellow-400 font-bold text-xl animate-pulse bg-black px-4 py-2 rounded-xl shadow-lg inline-block">
+           We also provide full scholarship to deserving and meritorious students. </p>
+
         </div>
         <div className="w-full md:w-1/2 lg:w-1/3 ">
           <Carousel items={carouselItems} />
