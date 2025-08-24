@@ -45,6 +45,27 @@ export default function Home() {
       We also provide full scholarship to deserving and meritorious students. Click here!
     </Link>
   </p>
+        <p className="text-yellow-400 font-bold text-xl animate-pulse bg-black px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
+  <Link
+    href="https://forms.gle/4DJnTpds7MP1h5J48" 
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    We also provide full scholarship to deserving and meritorious students. Click here!
+  </Link>
+</p>
+
+{/* New Register Link */}
+<p className="text-green-500 font-bold text-xl bg-black px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
+  <Link
+    href="https://tally.so/r/wvZZ9X"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Register here
+  </Link>
+</p>
+
 
   <HeroSection />
 </section>
