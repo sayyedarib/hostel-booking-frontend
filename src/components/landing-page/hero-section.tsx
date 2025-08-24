@@ -15,9 +15,9 @@ export default function HeroSection() {
       <p className="text-lg md:text-xl lg:text-2xl text-gray-600 mb-8">
         Your children are our responsibility. We provide a home away from home.
       </p>
-      <Button className="bg-primary font-semibold py-4 px-10 rounded-full text-black text-lg">
-        <Link href="/rooms">Book Now</Link>
-      </Button>
+      <Button className="relative font-semibold py-6 px-12 rounded-full text-2xl text-black bg-primary animate-glow">
+  <Link href="/rooms">Book Now</Link>
+</Button>
     </div>
   );
 }
