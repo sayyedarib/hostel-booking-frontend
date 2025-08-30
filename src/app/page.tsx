@@ -46,6 +46,16 @@ export default function Home() {
     </Link>
   </p>
 
+  <p className="bg-emerald-800 text-white animate-pulse font-bold text-xl px-4 py-2 rounded-xl shadow-lg inline-block mb-4 hover:bg-emerald-600 transition">
+    <Link
+      href="https://tally.so/r/wvZZ9X" 
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+     Click here to update your Hostel Information!
+    </Link>
+  </p>
+
   <HeroSection />
 </section>
 
@@ -119,29 +129,19 @@ export default function Home() {
 
       <section className="flex flex-col lg:flex-row py-16 px-4 bg-black text-white">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl font-extrabold mb-8 lg:text-8xl relative">
+          <h2 className="text-5xl font-extrabold mb-8 lg:text-8xl text-center">
             Why Khan&apos;s PG? <br className="hidden lg:block" /> 
-            <span className="inline-block align-middle ml-2 absolute -top-8 right-0">
-              <Image
-                className="h-20 w-20 lg:h-52 lg:w-52"
-                src="https://www.wombats-hostels.com/fileadmin/user_upload/Icons/big_womheart.svg"
-                alt="heart icon"
-                width={500}
-                height={500}
-              />
-            </span>{" "}
+           
            </h2>
           <p className="text-lg mb-8 max-w-3xl">
              It&apos;s about more than just a bed. Khan&apos;s PG is your city
              host, offering lovingly put-together breakfast variations,as well as
              events on a regular basis. </p>
-          <p className="text-yellow-400 font-bold text-xl animate-pulse bg-black px-4 py-2 rounded-xl shadow-lg inline-block">
-           We also provide full scholarship to deserving and meritorious students. </p>
-
+          
         </div>
-        <div className="w-full md:w-1/2 lg:w-1/3 ">
+        {/*<div className="w-full md:w-1/2 lg:w-1/3 ">
           <Carousel items={carouselItems} />
-        </div>
+    </div> */}
       </section>
 
       <div className="my-8 mx-4 md:mx-10">
