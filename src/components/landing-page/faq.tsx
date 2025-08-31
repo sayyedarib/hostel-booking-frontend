@@ -28,21 +28,13 @@ export default function FAQ() {
           </Accordion>
         </div>
         <div className="order-1 lg:order-2">
-          <Image
-            src="/icons/faq.png"
-            alt="FAQ"
-            width={500}
-            height={500}
-            className="absolute top-0 right-8 object-cover -z-10 h-28 w-28 md:h-36 md:w-36 lg:h-60 lg:w-60"
-          />
+         
           <h2 className="text-4xl text-[#212529] md:text-6xl lg:text-8xl font-extrabold mb-12">
             frequently <br /> asked <br /> questions
           </h2>
           <p>
-            Where do I get the best rates (here!), what is check-in time (2 pm),
-            are bed sheets included (yes!), do you have safe luggage storage
-            (yes!), when is the reception open (always!)...? Have a deep dive
-            into Wombat&apos;s basics in our FAQ section. Of course, we are
+            Where do I get the best rates (here!) do you have safe luggage storage
+            (yes!), Have a deep dive into Wombat&apos;s basics in our FAQ section. Of course, we are
             always happy to assist personally if you have more specific
             requests!
           </p>
@@ -65,13 +57,9 @@ const faqData = [
   },
   {
     question: "Is there a minimum age restriction?",
-    answer: "Yes, guests must be at least 18 years old to make a reservation.",
+    answer: "Yes, the canditdate must be at least 12 years old to make a reservation",
   },
-  {
-    question: "Is breakfast included in the booking?",
-    answer:
-      "Breakfast is included with most of our room rates. Please check the details of your specific booking.",
-  },
+  
   {
     question: "What about group bookings?",
     answer:
