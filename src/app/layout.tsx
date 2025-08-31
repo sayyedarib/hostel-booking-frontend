@@ -8,7 +8,7 @@ import "./globals.css";
 import { ReactQueryProvider } from "@/components/react-query-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
-import CartDrawer from "@/components/add-to-cart-drawer";
+
 
 
 const inter = Playfair_Display({ subsets: ["latin"] });
@@ -37,8 +37,6 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ReactQueryProvider>
-              <CartDrawer />
-
               {children}
               <Toaster />
               <SpeedInsights />
