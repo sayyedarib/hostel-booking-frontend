@@ -34,7 +34,15 @@ export default function Home() {
       <Header className="fixed top-0 left-0 right-0 z-10" />
 
       <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center mt-20">
-
+<p className="text-sky-200 font-bold text-xl animate-pulse bg-stone-900 px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
+    <Link
+      href="https://drive.google.com/drive/folders/1H-PjDk9Qu6x3JkYJ1ELCYvSD1ud_MaVC?usp=share_link" 
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+     🌟 Hall of Fame, Our Proud Achievers. Click here!
+    </Link>
+  </p>
   
   <p className="text-yellow-400 font-bold text-xl animate-pulse bg-black px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
     <Link
