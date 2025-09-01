@@ -34,7 +34,8 @@ export default function Home() {
       <Header className="fixed top-0 left-0 right-0 z-10" />
 
       <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center mt-20">
-<p className="text-sky-200 font-bold text-xl animate-pulse bg-stone-900 px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
+ 
+      <p className="text-sky-200 font-bold text-xl animate-pulse bg-stone-900 px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
     <Link
       href="https://drive.google.com/drive/folders/1H-PjDk9Qu6x3JkYJ1ELCYvSD1ud_MaVC?usp=share_link" 
       target="_blank"
@@ -138,17 +139,18 @@ export default function Home() {
       <section className="flex flex-col lg:flex-row py-16 px-4 bg-black text-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-5xl font-extrabold mb-8 lg:text-8xl text-center">
-            Why Khan&apos;s PG? <br className="hidden lg:block" /> 
+            Why Choose Khan&apos;s PG? <br className="hidden lg:block" /> 
            
            </h2>
-          <p className="text-lg mb-8 max-w-3xl">
+          <p className="text-lg mb-8 max-w-3xl mx-auto text-center " >
              It&apos;s about more than just a bed. Khan&apos;s PG is your city
-             host, offering lovingly put-together breakfast variations,as well as
-             events on a regular basis. </p>
+             host, offering lovingly hostel and mess facilty,as well as
+             events on a regular basis.
+             <span className="block mt-1 font-extrabold text-yellow-300">We also provide optional Mess Facility<br></br>Mess charges are at additional ₹2,500/month</span> </p>
           
         </div>
         {/*<div className="w-full md:w-1/2 lg:w-1/3 ">
-          <Carousel items={carouselItems} />
+          <Carousel items={carouselItems} />  Remove the AI generated Carousel
     </div> */}
       </section>
 
