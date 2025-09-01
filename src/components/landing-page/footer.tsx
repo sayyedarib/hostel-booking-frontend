@@ -21,9 +21,7 @@ export default function Footer() {
             <Link href="/gallery" className="hover:underline">
               gallery
             </Link>
-            <Link href="/wombar" className="hover:underline">
-              wombar
-            </Link>
+            
             <Link href="/room-types" className="hover:underline">
               room types
             </Link>
@@ -33,9 +31,7 @@ export default function Footer() {
             <Link href="/your-hosts" className="hover:underline">
               your hosts
             </Link>
-            <Link href="/guest-kitchen" className="hover:underline">
-              guest kitchen
-            </Link>
+            
             <Link href="/covid19" className="hover:underline">
               covid19 & hygiene
             </Link>
