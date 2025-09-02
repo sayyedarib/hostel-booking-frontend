@@ -53,6 +53,16 @@ export default function Home() {
       We also provide full scholarship to deserving and meritorious students. Click here!
     </Link>
   </p>
+        
+<p className="text-green-500 font-bold text-xl bg-black px-4 py-2 rounded-xl shadow-lg inline-block mb-4">
+  <Link
+    href="https://tally.so/r/wvZZ9X"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    Registration Form is live! Please, Register here
+  </Link>
+</p>
 
   <p className="bg-emerald-800 text-white animate-pulse font-bold text-xl px-4 py-2 rounded-xl shadow-lg inline-block mb-4 hover:bg-emerald-600 transition">
     <Link
