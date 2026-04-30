@@ -1,6 +1,81 @@
+# Khan Group of PG
+
 ## Demo
 
 https://github.com/user-attachments/assets/602bd55c-917c-45b2-b371-ee60dff9ccc7
+
+---
+
+## Overview
+
+Khan Group of PG is a modern hostel and PG management platform built to simplify room discovery, availability tracking, and administrative operations.
+
+The platform is **currently being actively used by users** to check room availability and explore accommodation options.
+
+At present:
+
+- **Bookings are handled manually** by the admin team.
+- **Room availability is updated through the Admin Dashboard** after every booking or vacancy update.
+- Users can view the latest available rooms without needing to call or message manually.
+
+---
+
+## Current Workflow
+
+1. Users visit the platform and explore rooms.
+2. Users check current room availability.
+3. Admin manually confirms bookings through direct communication.
+4. Admin updates room availability from the dashboard.
+5. Users always see the latest room status.
+
+---
+
+## Features
+
+- Real-time Room Availability Updates
+- Admin Dashboard for managing rooms
+- User Dashboard
+- Manual Booking Management
+- Invoice Generation
+- Email Notifications with Nodemailer
+- Responsive UI
+- Authentication System
+
+---
+
+## Future Scope
+
+- Fully Automated Booking System
+- Online Payments Integration
+- Digital Agreement Automation
+- Booking Analytics Dashboard
+- WhatsApp Notifications
+- Customer Support Chat
+
+---
+
+## Tech Stack
+
+- **Next.js**
+- **Supabase**
+- **Drizzle ORM**
+- **shadcn/ui**
+- **Tailwind CSS**
+- **Clerk Authentication**
+- **Nodemailer**
+
+---
+
+## Design Inspiration & Credits
+
+The design of this website, especially the **landing page**, is inspired by:
+
+**Wombat's City Hostels**  
+https://www.wombats-hostels.com/
+
+Their clean UI, modern hostel-booking experience, and strong visual presentation were used as inspiration during development.
+
+---
 
 ## Getting Started
 
@@ -14,63 +89,3 @@ yarn dev
 pnpm dev
 # or
 bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Additional Features
-
-- **Admin Dashboard** and **User Dashboard** for managing rooms, bookings, and user accounts.
-- **Invoice Generation**: Create and export invoices.
-- **Email Notifications**: Powered by Nodemailer.
-
-## Tech Stack
-
-- **Next.js**
-- **Supabase** with **Drizzle**
-- **shadcn UI**
-- **Tailwind CSS**
-
-## Environment Variables
-
-Create or update a `.env.local` file to include keys such as:
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL="<your-supabase-url>"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="<your-supabase-anon-key>"
-PASSWORD="<your-database-password>"
-NEXT_PUBLIC_DATABASE_URL="<your-database-url>"
-
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="<publishable-key>"
-CLERK_SECRET_KEY="<secret-key>"
-
-NEXT_PUBLIC_CLERK_SIGN_IN_URL="/sign-in"
-NEXT_PUBLIC_CLERK_SIGN_UP_URL="/sign-up"
-NEXT_PUBLIC_CLERK_WEBHOOK_SECRET="<your-webhook-secret>"
-
-NEXT_PUBLIC_EMAIL_USR="support@aligarhhostel.com"
-NEXT_PUBLIC_EMAIL_PWD="<your-email-password>"
-
-NEXT_PUBLIC_FRONTEND_URL="http://localhost:3000"
-
-NODE_ENV="development"
-```
-
-Use these variables to connect to Supabase, Clerk, and to manage emails and authentication.
-
-## Learn More
-
-To learn more about Next.js, take a look at:
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Learn Next.js](https://nextjs.org/learn)
-
-Check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) as well.
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is with [Vercel](https://vercel.com/). See [Next.js deployment](https://nextjs.org/docs/deployment) for more details.
