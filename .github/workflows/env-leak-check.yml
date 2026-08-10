@@ -1,0 +1,24 @@
+name: Env leak check
+
+# Fails a PR if a server-only env var (see .env.example) can reach the browser
+# bundle. The checker is dependency-free, so no install or build step is needed
+# and no real credentials are ever present in CI.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check-env-leaks:
+    name: Server-only env vars stay on the server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check for leaked env vars
+        run: node scripts/check-env-leaks.mjs
