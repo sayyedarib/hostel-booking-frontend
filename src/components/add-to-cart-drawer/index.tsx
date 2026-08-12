@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
+import { Loader2 } from "lucide-react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { useAuth } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
@@ -12,10 +14,37 @@ import {
 } from "@tanstack/react-query";
 
 import { AddToCartStep1 } from "@/components/add-to-cart-drawer/step1";
-import { AddToCartStep2 } from "@/components/add-to-cart-drawer/step2";
-import { AddToCartStep3 } from "@/components/add-to-cart-drawer/step3";
-import { AddToCartStep4 } from "@/components/add-to-cart-drawer/step4";
-import { AddToCartStep5 } from "@/components/add-to-cart-drawer/step5";
+
+/*
+ * Steps 2-5 are loaded on demand.
+ *
+ * Between them they pull in the date picker, date-fns and lottie-react, and a
+ * static import meant every visitor to /rooms downloaded the entire booking
+ * flow for all 17 room cards before deciding to book anything. They only
+ * render once the drawer is open and the guest has moved past step 1.
+ */
+const stepFallback = (
+  <div className="flex h-64 items-center justify-center">
+    <Loader2 className="h-5 w-5 animate-spin" aria-label="Loading" />
+  </div>
+);
+
+const AddToCartStep2 = dynamic(
+  () => import("@/components/add-to-cart-drawer/step2").then((m) => m.AddToCartStep2),
+  { loading: () => stepFallback, ssr: false },
+);
+const AddToCartStep3 = dynamic(
+  () => import("@/components/add-to-cart-drawer/step3").then((m) => m.AddToCartStep3),
+  { loading: () => stepFallback, ssr: false },
+);
+const AddToCartStep4 = dynamic(
+  () => import("@/components/add-to-cart-drawer/step4").then((m) => m.AddToCartStep4),
+  { loading: () => stepFallback, ssr: false },
+);
+const AddToCartStep5 = dynamic(
+  () => import("@/components/add-to-cart-drawer/step5").then((m) => m.AddToCartStep5),
+  { loading: () => stepFallback, ssr: false },
+);
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import {

@@ -1,7 +1,9 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
-import Lottie from "lottie-react";
+// Lottie ships its own renderer; load it only when the animation shows.
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { IndianRupee, Trash2, Loader2 } from "lucide-react";
