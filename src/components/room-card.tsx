@@ -1,57 +1,69 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
-import React from "react";
-import { Star, AlertCircle } from "lucide-react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
+import { AlertCircle, BedDouble, Users } from "lucide-react";
 
-import { RoomCard } from "@/interface";
+import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { FALLBACK_ROOM_IMAGE } from "@/constant";
+import type { RoomCard } from "@/interface";
+
 import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
-  const availableBeds = roomData.bedCount - roomData.occupiedCount;
-  console.log("roomData", roomData);
-  return (
-    <Card className="w-full p-2 md:w-[25rem] h-auto rounded-xl shadow-lg hover:shadow-2xl space-y-3">
-      <Image
-        src={roomData.imageUrls[0]}
-        height="1000"
-        width="1000"
-        className="h-64 w-full object-cover rounded-xl"
-        alt="thumbnail"
-        quality={75}
-        priority={false}
-      />
+  const availableBeds = Math.max(roomData.bedCount - roomData.occupiedCount, 0);
+  // `availableForBooking` is an admin toggle; a room with no free bed must not
+  // be bookable even when the toggle is still on.
+  const isBookable = Boolean(roomData.availableForBooking) && availableBeds > 0;
+  const thumbnail = roomData.imageUrls?.[0] || FALLBACK_ROOM_IMAGE;
 
-      <div className="flex items-center justify-between">
-        <CardTitle className="text-lg font-semibold">
-          {roomData.buildingName}
-        </CardTitle>
-        <div className="flex items-center space-x-2 text-yellow-500">
-          <Star fill="currentColor" size={16} />
-          <span>4.{Math.floor(Math.random() * 10)}</span>
+  return (
+    <Card className="flex h-full w-full flex-col overflow-hidden rounded-xl shadow-lg transition-shadow hover:shadow-2xl">
+      <div className="relative aspect-[4/3] w-full bg-gray-100">
+        <Image
+          src={thumbnail}
+          alt={`Room ${roomData.roomCode} at ${roomData.buildingName}`}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          className="object-cover"
+          quality={70}
+        />
+      </div>
+
+      <div className="flex flex-1 flex-col gap-3 p-4">
+        <div className="flex items-start justify-between gap-2">
+          <CardTitle className="text-lg font-semibold">
+            {roomData.buildingName}
+          </CardTitle>
+          <span className="shrink-0 rounded-full bg-gray-100 px-2 py-1 text-xs font-medium capitalize text-gray-700">
+            {roomData.gender}
+          </span>
+        </div>
+
+        <CardDescription className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-600">
+          <span className="font-medium text-gray-800">
+            Room {roomData.roomCode}
+          </span>
+          <span className="flex items-center gap-1">
+            <Users size={14} aria-hidden="true" />
+            {roomData.bedCount} max
+          </span>
+          <span className="flex items-center gap-1">
+            <BedDouble size={14} aria-hidden="true" />
+            {availableBeds} available
+          </span>
+        </CardDescription>
+
+        <div className="mt-auto pt-1">
+          {isBookable ? (
+            <AddToCartDrawer roomId={Number(roomData.id)} />
+          ) : (
+            <p className="flex items-center justify-center gap-2 rounded-md bg-red-50 p-2 font-semibold text-red-600">
+              <AlertCircle size={18} aria-hidden="true" />
+              No Space Available
+            </p>
+          )}
         </div>
       </div>
-      <CardDescription className="text-sm text-gray-600">
-        Room: {roomData.roomCode} | Max Persons: {roomData.bedCount} | Available
-        Beds: {availableBeds}
-      </CardDescription>
-      {roomData.availableForBooking ? (
-        <AddToCartDrawer roomId={Number(roomData.id)} />
-      ) : (
-        <div className="flex items-center justify-center p-2 bg-red-100 text-red-600 rounded-md">
-          <AlertCircle size={18} className="mr-2" />
-          <p className="font-semibold">No Space Available</p>
-        </div>
-      )}
     </Card>
   );
 }

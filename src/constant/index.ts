@@ -1,3 +1,6 @@
+/** Shown when a room has no uploaded photos yet. */
+export const FALLBACK_ROOM_IMAGE = "/img/fall_back_room.png";
+
 export const services = [
   {
     title: "Tiffin Service",

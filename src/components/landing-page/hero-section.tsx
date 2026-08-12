@@ -1,23 +1,23 @@
-"use client";
-
-import React from "react";
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 
 export default function HeroSection() {
   return (
-    <div className="flex flex-col items-center justify-center text-center">
-      <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-[#212529]">
-        Experience Premium PG Living <br /> Designed for Your
-        Children&apos;s Success
+    <section className="flex min-h-[80vh] flex-col items-center justify-center gap-6 px-6 pb-16 pt-32 text-center md:min-h-[85vh] md:pt-36">
+      <h1 className="max-w-4xl text-3xl font-extrabold leading-tight text-[#212529] md:text-5xl lg:text-6xl">
+        Experience Premium PG Living <br className="hidden sm:block" /> Designed
+        for Your Children&apos;s Success
       </h1>
-      <p className="text-xl md:text-2xl lg:text-3xl text-gray-600 mb-8">
+      <p className="max-w-2xl text-lg text-gray-600 md:text-2xl">
         Your children are our responsibility. We provide a home away from home.
       </p>
-      <Button className="bg-primary font-semibold py-8 px-11 rounded-full text-black text-2xl border-4 border-black">
+      <Button
+        asChild
+        className="h-auto rounded-full border-4 border-black bg-primary px-11 py-5 text-xl font-semibold text-black hover:bg-primary/85 md:text-2xl"
+      >
         <Link href="/rooms">Book Now</Link>
       </Button>
-    </div>
+    </section>
   );
 }
