@@ -23,7 +23,10 @@ const PrintableForm: React.ForwardRefRenderFunction<
   >
     <header className="bg-white h-52">
       <div className="flex justify-between items-center">
-        <img src="/logo.png" className="w-32 h-32" alt="Logo" />
+        {/* A plain <img> on purpose: this form is rasterised by html2pdf,
+            which cannot resolve next/image's optimizer URLs. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" className="w-32 h-32" alt="Khan Group of PG logo" />
         <div className="text-right">
           <p className="font-bold text-lg">Campus View Apartment</p>
           <p>Shamshad Market, Aligarh, 202001</p>

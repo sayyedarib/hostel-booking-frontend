@@ -26,7 +26,7 @@ export default function Step4({ handlePrev }: Step4Props) {
     return () => {
       clearInterval(countdownTimer);
     };
-  }, []);
+  }, [router]);
 
   return (
     <div className="flex flex-col items-center justify-center h-screen lg:w-1/2 mx-auto md:w-2/3 w-full">
