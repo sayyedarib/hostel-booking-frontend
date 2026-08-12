@@ -2143,3 +2143,31 @@ export const getRevenueAndBookingsData = async (
     return { status: "error", data: null };
   }
 };
+
+export const getTransactionsAdmin = async () => {
+  try {
+    await requireAdmin();
+    const transactions = await db
+      .select({
+        id: TransactionTable.id,
+        createdAt: TransactionTable.createdAt,
+        userName: UserTable.name,
+        userEmail: UserTable.email,
+        rentAmount: TransactionTable.rentAmount,
+        securityDeposit: TransactionTable.securityDeposit,
+        additionalCharges: TransactionTable.additionalCharges,
+        discount: TransactionTable.discount,
+        totalAmount: TransactionTable.totalAmount,
+        verified: TransactionTable.verified,
+        invoiceUrl: TransactionTable.invoiceUrl,
+      })
+      .from(TransactionTable)
+      .innerJoin(UserTable, eq(TransactionTable.userId, UserTable.id))
+      .orderBy(sql`${TransactionTable.createdAt} DESC`);
+
+    return { status: "success", data: transactions };
+  } catch (error) {
+    logger("error", "Error fetching transactions", { error });
+    return { status: "error", data: null };
+  }
+};

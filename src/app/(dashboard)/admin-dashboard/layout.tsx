@@ -19,7 +19,6 @@ const navLinks = [
   { href: "/admin-dashboard/users", label: "Users" },
   { href: "/admin-dashboard/guests", label: "Guests" },
   { href: "/admin-dashboard/transactions", label: "Transactions" },
-  { href: "/admin-dashboard/analytics", label: "Analytics" },
 ];
 
 export default async function AdminDashboardLayout({
