@@ -1203,37 +1203,28 @@ export const updateUserPersonalDetails = async (
 export const getAnalyticsData = async () => {
   try {
     await requireAdmin();
-    const totalRevenue = await db
-      .select({
-        total: sql<number>`SUM(${TransactionTable.totalAmount})`,
-      })
-      .from(TransactionTable);
 
-    const totalBookings = await db
-      .select({
-        count: sql<number>`COUNT(*)`,
-      })
-      .from(BookingTable);
-
-    const totalUsers = await db
-      .select({
-        count: sql<number>`COUNT(*)`,
-      })
-      .from(UserTable);
-
-    const totalGuests = await db
-      .select({
-        count: sql<number>`COUNT(*)`,
-      })
-      .from(GuestTable);
+    // Four independent aggregates — run them concurrently rather than in
+    // series, so the dashboard waits one round trip instead of four.
+    const [totalRevenue, totalBookings, totalUsers, totalGuests] =
+      await Promise.all([
+        db
+          .select({
+            total: sql<number>`COALESCE(SUM(${TransactionTable.totalAmount}), 0)::float`,
+          })
+          .from(TransactionTable),
+        db.select({ count: count() }).from(BookingTable),
+        db.select({ count: count() }).from(UserTable),
+        db.select({ count: count() }).from(GuestTable),
+      ]);
 
     return {
       status: "success",
       data: {
-        totalRevenue: totalRevenue[0].total,
-        totalBookings: totalBookings[0].count,
-        totalUsers: totalUsers[0].count,
-        totalGuests: totalGuests[0].count,
+        totalRevenue: Number(totalRevenue[0].total),
+        totalBookings: Number(totalBookings[0].count),
+        totalUsers: Number(totalUsers[0].count),
+        totalGuests: Number(totalGuests[0].count),
       },
     };
   } catch (error) {
@@ -2092,36 +2083,53 @@ export const getRevenueAndBookingsData = async (
       startDate,
       endDate,
     });
-    const revenueAndBookings = await db
-      .select({
-        month: sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`,
-        revenue: sql<number>`sum(${TransactionTable.totalAmount})`,
-        bookings: count(BookingTable.id),
-      })
-      .from(TransactionTable)
-      .innerJoin(
-        BookingTable,
-        eq(TransactionTable.id, BookingTable.transactionId),
-      )
-      .innerJoin(
-        BedBookingTable,
-        and(
-          eq(BookingTable.id, BedBookingTable.bookingId),
-          inArray(BedBookingTable.status, ["checked_in", "checked_out"]),
-        ),
-      )
-      .where(
-        and(
-          gte(TransactionTable.createdAt, startDate),
-          lte(TransactionTable.createdAt, endDate),
-        ),
-      )
-      .groupBy(sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`)
-      .orderBy(sql<string>`to_char(${TransactionTable.createdAt}, 'Month')`);
+    /*
+     * Three bugs made this chart wrong or permanently empty:
+     *
+     * 1. Buckets came from `to_char(created_at, 'Month')`, so July 2025 and
+     *    July 2026 collapsed into one "July" and the series sorted
+     *    alphabetically (April, August, December…). Now grouped and ordered by
+     *    `date_trunc`.
+     * 2. It required a bed booking with status checked_in/checked_out. Every
+     *    bed booking in production is still 'booked', so the join discarded
+     *    100% of rows. Revenue is recognised when the transaction is recorded,
+     *    so booking status is not a revenue filter.
+     * 3. Joining bookings multiplied each transaction row per booking, so the
+     *    revenue sum double-counted. Amounts are now totalled per transaction
+     *    in the inner query before being summed per month.
+     */
+    const rows = await db.execute<{
+      month: string;
+      revenue: number;
+      bookings: number;
+    }>(sql`
+      SELECT
+        month,
+        SUM(total_amount)::float AS revenue,
+        SUM(booking_count)::int  AS bookings
+      FROM (
+        SELECT
+          date_trunc('month', ${TransactionTable.createdAt}) AS month,
+          ${TransactionTable.id}                             AS transaction_id,
+          MAX(${TransactionTable.totalAmount})               AS total_amount,
+          COUNT(${BookingTable.id})                          AS booking_count
+        FROM ${TransactionTable}
+        LEFT JOIN ${BookingTable}
+          ON ${BookingTable.transactionId} = ${TransactionTable.id}
+        -- Bound as ISO strings: a raw execute() passes a JS Date straight to
+        -- the driver, which cannot serialise it without column type info.
+        WHERE ${TransactionTable.createdAt} >= ${startDate.toISOString()}::timestamp
+          AND ${TransactionTable.createdAt} <= ${endDate.toISOString()}::timestamp
+        GROUP BY 1, 2
+      ) per_transaction
+      GROUP BY month
+      ORDER BY month
+    `);
 
-    const formattedData = revenueAndBookings.map((item) => ({
-      month: item.month,
-      revenue: item.revenue,
+    const formattedData = Array.from(rows).map((item) => ({
+      /** ISO timestamp of the first day of the month. */
+      month: new Date(item.month).toISOString(),
+      revenue: Number(item.revenue),
       bookings: Number(item.bookings),
     }));
 

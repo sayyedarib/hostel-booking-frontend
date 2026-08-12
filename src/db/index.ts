@@ -6,16 +6,21 @@ import postgres from "postgres";
 import { env } from "@/env";
 
 /**
- * Serverless-friendly pool settings.
+ * Pool settings tuned for serverless on Supabase's free tier.
  *
- * Every Vercel lambda instance opens its own pool, so a large `max` multiplies
- * quickly and exhausts the connection limit on Supabase's free tier. One
- * connection per instance with a short idle timeout keeps usage flat, and
+ * Every Vercel instance opens its own pool, so an unbounded `max` multiplies
+ * across instances and exhausts the connection limit. `idle_timeout` returns
+ * connections promptly so idle instances stop holding them.
+ *
+ * `max` must stay above 1: with a single connection, concurrent queries — such
+ * as the four aggregates the dashboard issues via `Promise.all` — deadlock
+ * rather than queue, and the request hangs indefinitely.
+ *
  * `prepare: false` is required when talking to Supabase's transaction pooler.
  */
 const client = postgres(env.DATABASE_URL, {
   prepare: false,
-  max: 1,
+  max: 5,
   idle_timeout: 20,
   connect_timeout: 10,
 });
