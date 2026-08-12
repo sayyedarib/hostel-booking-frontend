@@ -109,29 +109,31 @@ export default function CartPage() {
     <>
       <Header className="sticky top-0 z-50" />
       {fetching ? (
-        <div className="min-h-[80vh] min-w-screen flex justify-center items-center">
-          <Image
-            src="/Loading.gif"
-            width={100}
-            height={100}
-            alt="loading"
-            unoptimized={true}
+        <div className="flex min-h-[80vh] w-full flex-col items-center justify-center gap-3">
+          <Loader2
+            className="h-8 w-8 animate-spin text-gray-400"
+            aria-hidden="true"
           />
+          <p className="text-gray-500">Loading your cart…</p>
         </div>
       ) : cartItems?.length === 0 ? (
-        <div className="min-h-[80vh] min-w-screen flex flex-col justify-center items-center">
+        <main
+          id="main-content"
+          className="flex min-h-[80vh] w-full flex-col items-center justify-center px-4 text-center"
+        >
           <Lottie
             animationData={emptyCartAnimation}
             style={{ width: 300, height: 300 }}
+            aria-hidden="true"
           />
-          <h2 className="text-2xl font-semibold mt-4">Your cart is empty</h2>
-          <p className="text-gray-500 mt-2">
-            Add some items to your cart to get started!
+          <h1 className="mt-4 text-2xl font-semibold">Your cart is empty</h1>
+          <p className="mt-2 text-gray-500">
+            Pick a bed from an available room to start your booking.
           </p>
           <Button onClick={() => router.push("/rooms")} className="mt-6">
-            Continue Booking
+            Browse rooms
           </Button>
-        </div>
+        </main>
       ) : (
         <div className="container mx-auto p-4 sm:p-6">
           <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
