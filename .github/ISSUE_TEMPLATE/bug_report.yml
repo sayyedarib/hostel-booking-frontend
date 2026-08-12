@@ -1,0 +1,61 @@
+name: Bug report
+description: Something on the site does not work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please do not report security problems here — email
+        support@aligarhhostel.com instead.
+
+  - type: input
+    id: route
+    attributes:
+      label: Where
+      description: The page or route, e.g. `/rooms` or `/admin-dashboard/guests`
+      placeholder: /rooms
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: Include console or server-log output if you have it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to /rooms
+        2. Click "Add Bed to Cart" on room G2-105
+        3. …
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Where did you see it
+      options:
+        - Production (aligarhhostel.com)
+        - Local development
+        - Both
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Chrome 130 on Android
