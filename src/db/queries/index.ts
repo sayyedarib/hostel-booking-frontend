@@ -35,6 +35,15 @@ const getClerkId = () => {
   return auth().userId;
 };
 
+/**
+ * How far ahead a booking makes a bed unavailable.
+ *
+ * A bed booked to start within this window cannot be taken by someone else,
+ * because the incoming resident needs it prepared. Room cards and the booking
+ * drawer must agree on this number or the two views contradict each other.
+ */
+const BOOKING_LEAD_DAYS = 15;
+
 
 
 export const getUserId = async () => {
@@ -259,7 +268,22 @@ export const markRoomAsAvailable = async (roomId: number) => {
 export const getAllRoomCards = async () => {
   try {
     logger("info", "Fetching all room cards");
-    const currentDate = new Date().toISOString();
+
+    /*
+     * A bed counts as unavailable when either
+     *   - an admin has flagged it unavailable (`bed.available = false`), or
+     *   - it is booked at any point in the next BOOKING_LEAD_DAYS.
+     *
+     * Both conditions have to match `getBedData`, which is what the booking
+     * drawer renders. They previously disagreed on both counts: this query
+     * ignored the admin flag entirely and only looked at bookings covering
+     * today, so a room with every bed flagged unavailable still advertised
+     * "2 available" and an enabled "Add Bed to Cart" — and the drawer then
+     * showed both beds greyed out, leaving the guest at a dead end.
+     *
+     * COUNT(DISTINCT …) because the join to bookings repeats a bed row once
+     * per booking it has.
+     */
     const rooms = await db
       .select({
         id: RoomTable.id,
@@ -267,17 +291,23 @@ export const getAllRoomCards = async () => {
         roomCode: RoomTable.roomCode,
         imageUrls: RoomTable.imageUrls,
         gender: RoomTable.gender,
-        bedCount: sql<number>`COUNT(${BedTable.id})::int`,
+        bedCount: sql<number>`COUNT(DISTINCT ${BedTable.id})::int`,
         availableForBooking: RoomTable.available,
         occupiedCount: sql<number>`
-          COUNT(CASE WHEN ${BedBookingTable.checkIn} <= ${currentDate} AND ${BedBookingTable.checkOut} >= ${currentDate} THEN 1 END)::int
+          COUNT(DISTINCT CASE
+            WHEN ${BedTable.available} = false THEN ${BedTable.id}
+            WHEN ${BedBookingTable.checkIn} <= NOW() + (${BOOKING_LEAD_DAYS} || ' days')::interval
+             AND ${BedBookingTable.checkOut} >= NOW() THEN ${BedTable.id}
+          END)::int
         `,
       })
       .from(RoomTable)
       .innerJoin(PropertyTable, eq(RoomTable.propertyId, PropertyTable.id))
       .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
       .leftJoin(BedBookingTable, eq(BedTable.id, BedBookingTable.bedId))
-      .groupBy(RoomTable.id, PropertyTable.name);
+      .groupBy(RoomTable.id, PropertyTable.name)
+      .orderBy(RoomTable.roomCode);
+
     logger("info", "Fetched all room cards");
     return { status: "success", data: rooms };
   } catch (error) {
@@ -292,7 +322,7 @@ export const getBedData = async (roomId: number) => {
     logger("info", "Fetching bed info", { roomId });
     const currentDate = new Date();
     const fifteenDaysLater = new Date(
-      currentDate.getTime() + 15 * 24 * 60 * 60 * 1000,
+      currentDate.getTime() + BOOKING_LEAD_DAYS * 24 * 60 * 60 * 1000,
     );
 
     const bedInfo = await db
@@ -765,7 +795,7 @@ export const getRoomData = async (roomId: number) => {
 
     return { status: "success", data: { ...roomData[0], reviews } };
   } catch (error) {
-    console.error("Error fetching room data:", error);
+    logger("error", "Error fetching room data", { error: error });
     return { status: "error", data: null };
   }
 };
@@ -1320,7 +1350,6 @@ export const getInvoiceDetails = async (
       and(eq(BookingTable.id, bookingId), eq(BookingTable.userId, userId)),
     );
 
-  console.log("invoiceDetails", invoiceDetails);
 
   const bedDetails = await db
     .select({
@@ -1337,7 +1366,6 @@ export const getInvoiceDetails = async (
     .innerJoin(RoomTable, eq(BedTable.roomId, RoomTable.id))
     .where(eq(BookingTable.id, bookingId));
 
-  console.log("bedDetails", bedDetails);
 
   const invoiceDetailsWithBeds = { ...invoiceDetails[0], beds: bedDetails };
   return { status: "success", data: invoiceDetailsWithBeds };
@@ -1439,10 +1467,7 @@ export const createBooking = async ({
 
         logger("info", "Booking created successfully");
       } catch (error) {
-        console.error(
-          `[ERROR] ${new Date().toISOString()} - Error in transaction:`,
-          error,
-        );
+        logger("error", "Booking transaction failed, rolling back", { error });
         throw error;
       }
     });
@@ -1548,12 +1573,7 @@ export async function generateInvoiceAndUpdateTransaction(
     //   .where(eq(TransactionTable.id, transactionId));
 
     // logger("info", "Invoice generated and transaction updated successfully");
-    console.log("bookingId", bookingId);
-    console.log("userId", userId);
-    console.log("transactionId", transactionId);
-    console.log("token", token);
 
-    console.log("fetching user details");
     const userDetails = await db
       .select({
         name: UserTable.name,
@@ -1564,7 +1584,6 @@ export async function generateInvoiceAndUpdateTransaction(
       .where(eq(UserTable.id, userId))
       .limit(1);
 
-    console.log("userDetails", userDetails);
 
     if (userDetails.length === 0) {
       logger("error", "User details not found");
@@ -1577,9 +1596,6 @@ export async function generateInvoiceAndUpdateTransaction(
       phone: userPhone,
     } = userDetails[0];
 
-    console.log("userName", userName);
-    console.log("userEmail", userEmail);
-    console.log("userPhone", userPhone);
 
     const transaction = await db
       .select({
@@ -1595,7 +1611,6 @@ export async function generateInvoiceAndUpdateTransaction(
     }
 
     const amount = transaction[0].totalAmount;
-    console.log("transaction", transaction);
 
     try {
       logger("info", "sending email", { userEmail });
@@ -2139,7 +2154,7 @@ export const getRevenueAndBookingsData = async (
 
     return { status: "success", data: formattedData };
   } catch (error) {
-    console.error("Error fetching revenue and bookings data:", error);
+    logger("error", "Error fetching revenue and bookings data", { error: error });
     return { status: "error", data: null };
   }
 };

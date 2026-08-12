@@ -9,6 +9,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { updateAddressAndGuardian } from "@/db/queries";
 
 import { DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
+import { logger } from "@/lib/utils";
 
 export const AddToCartStep3 = ({
   handleNext,
@@ -47,7 +48,7 @@ export const AddToCartStep3 = ({
     },
     onError: (error) => {
       setLoading(false);
-      console.error("Error creating guest:", error);
+      logger("error", "Error creating guest", { error: error });
       toast({
         variant: "destructive",
         title: "Error creating guest",

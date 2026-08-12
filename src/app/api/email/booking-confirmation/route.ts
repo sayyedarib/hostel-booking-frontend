@@ -75,7 +75,6 @@ export async function POST(request: NextRequest) {
         html: mailContent,
       });
     } catch (error) {
-      console.log("error in sending email ", error);
       logger("error", "Error sending emails to owner", error as Error);
       return NextResponse.json(
         { message: "COULD NOT SEND MESSAGES TO OWNER" },

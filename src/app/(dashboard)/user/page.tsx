@@ -32,6 +32,7 @@ import {
 } from "@/db/queries";
 import { createClient } from "@/lib/supabase/client";
 import Header from "@/components/header";
+import { logger } from "@/lib/utils";
 
 export default function UserProfilePage() {
   const supabase = createClient();
@@ -75,9 +76,8 @@ export default function UserProfilePage() {
         .from("user_photo")
         .upload(fileName, file);
       if (error) {
-        console.error("Error uploading photo:", error);
+        logger("error", "Error uploading photo", { error: error });
       } else {
-        console.log("Photo uploaded successfully:", data);
         const { data: publicUrlData } = supabase.storage
           .from("user_photo")
           .getPublicUrl(fileName);
@@ -133,7 +133,6 @@ export default function UserProfilePage() {
                           e.preventDefault();
                           setIsSaving(true);
                           const formData = new FormData(e.currentTarget);
-                          console.log("phone: ", formData.get("phone"));
                           updateUserDetails(formData);
                         }}
                         className="grid md:grid-cols-2 gap-4"

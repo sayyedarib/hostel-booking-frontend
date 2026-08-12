@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { updateBedDetails } from "@/db/queries";
+import { logger } from "@/lib/utils";
 
 const EditBedDialog = ({
   bed,
@@ -33,7 +34,7 @@ const EditBedDialog = ({
     setIsLoading(true);
 
     if (!bed) {
-      console.error("Bed not found");
+      logger("error", "Bed not found");
       setIsLoading(false);
       return;
     }
@@ -46,10 +47,9 @@ const EditBedDialog = ({
     );
     setIsLoading(false);
     if (response.status === "success") {
-      console.log("Bed updated successfully");
       setIsOpen(false);
     } else {
-      console.error("Error updating bed");
+      logger("error", "Error updating bed");
     }
   };
 

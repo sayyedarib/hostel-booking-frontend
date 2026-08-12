@@ -99,7 +99,7 @@ export async function POST(request: NextRequest) {
 
       logger("info", "Payment verification email sent to user");
     } catch (emailError) {
-      console.error("Error sending email:", emailError);
+      logger("error", "Error sending email", { error: emailError });
       logger(
         "error",
         "Error sending payment verification email to user",
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       message: "Payment verified and email sent successfully",
     });
   } catch (error) {
-    console.error("Error in payment verification process:", error);
+    logger("error", "Error in payment verification process", { error: error });
     logger("error", "Error in payment verification process", error as Error);
     return NextResponse.json(
       { error: "An error occurred during payment verification" },

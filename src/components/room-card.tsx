@@ -11,9 +11,17 @@ import AddToCartDrawer from "./add-to-cart-drawer";
 
 export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
   const availableBeds = Math.max(roomData.bedCount - roomData.occupiedCount, 0);
-  // `availableForBooking` is an admin toggle; a room with no free bed must not
-  // be bookable even when the toggle is still on.
-  const isBookable = Boolean(roomData.availableForBooking) && availableBeds > 0;
+  // `availableForBooking` is an admin toggle that closes the whole room; a room
+  // with no free bed must not be bookable even when the toggle is still on.
+  const isRoomOpen = Boolean(roomData.availableForBooking);
+  const isBookable = isRoomOpen && availableBeds > 0;
+
+  // Saying "2 available" next to "No Space Available" reads as a contradiction,
+  // so a closed room reports why instead of quoting a bed count.
+  const unavailableReason = !isRoomOpen
+    ? "Not accepting bookings"
+    : "No beds available";
+
   const thumbnail = roomData.imageUrls?.[0] || FALLBACK_ROOM_IMAGE;
 
   return (
@@ -47,10 +55,12 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
             <Users size={14} aria-hidden="true" />
             {roomData.bedCount} max
           </span>
-          <span className="flex items-center gap-1">
-            <BedDouble size={14} aria-hidden="true" />
-            {availableBeds} available
-          </span>
+          {isRoomOpen && (
+            <span className="flex items-center gap-1">
+              <BedDouble size={14} aria-hidden="true" />
+              {availableBeds} available
+            </span>
+          )}
         </CardDescription>
 
         <div className="mt-auto pt-1">
@@ -59,7 +69,7 @@ export function RoomCardComponent({ roomData }: { roomData: RoomCard }) {
           ) : (
             <p className="flex items-center justify-center gap-2 rounded-md bg-red-50 p-2 font-semibold text-red-600">
               <AlertCircle size={18} aria-hidden="true" />
-              No Space Available
+              {unavailableReason}
             </p>
           )}
         </div>

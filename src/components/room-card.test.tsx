@@ -52,18 +52,26 @@ describe("RoomCardComponent", () => {
   // an enabled "Add Bed to Cart" button next to "Available Beds: 0".
   it("refuses booking when every bed is occupied, even if flagged available", () => {
     renderRoom({ bedCount: 4, occupiedCount: 4, availableForBooking: true });
-    expect(screen.getByText(/No Space Available/)).toBeInTheDocument();
+    expect(screen.getByText(/No beds available/)).toBeInTheDocument();
     expect(screen.queryByTestId("add-to-cart")).not.toBeInTheDocument();
   });
 
   it("refuses booking when the admin has closed the room", () => {
     renderRoom({ availableForBooking: false });
-    expect(screen.getByText(/No Space Available/)).toBeInTheDocument();
+    expect(screen.getByText(/Not accepting bookings/)).toBeInTheDocument();
   });
 
   it("treats a null availability flag as closed", () => {
     renderRoom({ availableForBooking: null });
-    expect(screen.getByText(/No Space Available/)).toBeInTheDocument();
+    expect(screen.getByText(/Not accepting bookings/)).toBeInTheDocument();
+  });
+
+  // Regression: a closed room showed "2 available" directly above
+  // "No Space Available", which reads as a contradiction.
+  it("does not quote a bed count for a closed room", () => {
+    renderRoom({ availableForBooking: false, bedCount: 4, occupiedCount: 2 });
+    expect(screen.queryByText(/available$/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Not accepting bookings/)).toBeInTheDocument();
   });
 
   it("never reports a negative bed count when data is inconsistent", () => {

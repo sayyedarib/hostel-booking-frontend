@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import { TransactionTable } from "@/db/schema";
+import { logger } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,7 +17,6 @@ export async function GET(request: NextRequest) {
     //   return NextResponse.json({ error: "Token is required" }, { status: 400 });
     // }
 
-    console.log("updating payment table...");
     try {
       // await db
       //   .update(paymentTable)
@@ -67,14 +67,14 @@ export async function GET(request: NextRequest) {
         { headers: { "Content-Type": "text/html" } },
       );
     } catch (dbError) {
-      console.error("Error updating payment table", dbError);
+      logger("error", "Error updating payment table", { error: dbError });
       return NextResponse.json(
         { error: "Error updating payment table" },
         { status: 400 },
       );
     }
   } catch (error) {
-    console.error("Got some error :(", error);
+    logger("error", "Got some error :(", { error: error });
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 }

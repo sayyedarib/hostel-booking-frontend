@@ -41,10 +41,9 @@ const ContactPage = () => {
         throw new Error("Failed to send message");
       }
 
-      console.log("Message sent successfully");
       // Add user feedback for success
     } catch (error) {
-      console.error("Error sending message:", error);
+      logger("error", "Error sending message", { error: error });
       // Add user feedback for error
     } finally {
       setLoading(false);

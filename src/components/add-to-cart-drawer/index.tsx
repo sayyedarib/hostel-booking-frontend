@@ -35,7 +35,6 @@ export default function AddToCartDrawer({
   roomId: number;
   className?: string;
 }) {
-  console.log("roomId", roomId);
   const { userId } = useAuth();
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -177,6 +176,7 @@ export default function AddToCartDrawer({
           <AddToCartStep1
             cartData={cartData || []}
             bedData={bedDataRoomId || []}
+            selectedBedId={bedId}
             handleBedSelect={handleBedSelect}
             handleNext={handleNext}
             handleBack={handleBack}
