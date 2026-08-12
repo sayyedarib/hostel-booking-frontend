@@ -809,11 +809,14 @@ export const getAdminRoomData = async () => {
         roomCode: RoomTable.roomCode,
         floor: RoomTable.floor,
         gender: RoomTable.gender,
-        bedCount: sql<number>`count(${BedTable.id})`,
+        bedCount: sql<number>`COUNT(${BedTable.id})::int`,
+        availableBedCount: sql<number>`COUNT(CASE WHEN ${BedTable.available} THEN 1 END)::int`,
+        isOpen: RoomTable.available,
       })
       .from(RoomTable)
       .leftJoin(BedTable, eq(RoomTable.id, BedTable.roomId))
-      .groupBy(RoomTable.id);
+      .groupBy(RoomTable.id)
+      .orderBy(RoomTable.roomCode);
 
     return { status: "success", data: rooms };
   } catch (error) {
@@ -1071,9 +1074,12 @@ export const getUsersData = async () => {
         name: UserTable.name,
         email: UserTable.email,
         phone: UserTable.phone,
-        // Add more columns as needed
+        role: UserTable.role,
+        onboarded: UserTable.onboarded,
+        createdAt: UserTable.createdAt,
       })
-      .from(UserTable);
+      .from(UserTable)
+      .orderBy(sql`${UserTable.createdAt} DESC`);
 
     return { status: "success", data: users };
   } catch (error) {
