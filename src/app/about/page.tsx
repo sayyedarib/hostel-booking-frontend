@@ -143,13 +143,13 @@ const facilities = [
     title: "Food Services",
     description:
       "Nutritious and delicious meals prepared by our in-house chefs. We care about your health! and time",
-    image: "/food-service.png",
+    image: "/icons/food-service.png",
   },
   {
     title: "Safe Environment for Girls",
     description:
       "We provide a safe, secure and isolated environment for girls.",
-    image: "/girls-env.png",
+    image: "/icons/girls-env.png",
   },
 ];
 
