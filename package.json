@@ -7,7 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "check:env": "node scripts/check-env-leaks.mjs"
+    "typecheck": "tsc --noEmit",
+    "check:env": "node scripts/check-env-leaks.mjs",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "node scripts/migrate.mjs",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.8",
@@ -67,6 +71,7 @@
     "react-signature-canvas": "^1.0.6",
     "react-to-print": "^2.15.1",
     "recharts": "^2.12.7",
+    "server-only": "^0.0.1",
     "svix": "^1.26.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
@@ -77,10 +82,12 @@
     "@tanstack/eslint-plugin-query": "^5.56.1",
     "@tanstack/react-query-devtools": "^5.56.2",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.1",
     "@types/number-to-words": "^1.2.3",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-signature-canvas": "^1.0.5",
+    "dotenv": "^17.4.2",
     "drizzle-kit": "^0.23.0",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",

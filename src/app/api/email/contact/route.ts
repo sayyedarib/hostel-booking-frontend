@@ -4,6 +4,7 @@ import { sendEmail } from "@/lib/server-utils";
 import { NextRequest, NextResponse } from "next/server";
 
 import { logger } from "@/lib/utils";
+import { siteConfig } from "@/config/site";
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(request: NextRequest) {
 
       // Send email to the admin
       await sendEmail({
-        to: "support@aligarhhostel.com",
+        to: [...siteConfig.contact.notificationRecipients],
         subject: "New Contact Form Submission",
         text: `Name: ${data.name}\nEmail: ${data.email}\nMessage: ${data.message}`,
         html: `<p><strong>Name:</strong> ${data.name}</p><p><strong>Email:</strong> ${data.email}</p><p><strong>Message:</strong> ${data.message}</p>`,

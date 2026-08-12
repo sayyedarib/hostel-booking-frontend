@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { TransactionTable, UserTable, BookingTable } from "@/db/schema";
-import { transporter } from "@/lib/server-utils";
+import { sendEmail } from "@/lib/server-utils";
 import { logger } from "@/lib/utils";
 import axios from "axios";
 
@@ -85,8 +85,7 @@ export async function POST(request: NextRequest) {
         to: user[0].email,
         invoiceUrl: booking[0].invoiceUrl,
       });
-      await transporter.sendMail({
-        from: "support@aligarhhostel.com",
+      await sendEmail({
         to: user[0].email,
         subject: "Payment Confirmation and Invoice",
         html: mailContent,

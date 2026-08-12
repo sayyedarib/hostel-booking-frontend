@@ -11,7 +11,6 @@ import {
   pgEnum,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
-import { stat } from "fs";
 
 export const PropertyOwnerTable = pgTable("property_owner", {
   id: serial("id").primaryKey(),
@@ -67,10 +66,12 @@ export const RoomTable = pgTable("room", {
   roomCode: text("code").notNull(),
   floor: integer("floor").notNull().default(0),
   gender: text("gender").notNull().default("male"),
+  // Declared with a raw `sql` default: drizzle-kit emits an unquoted literal
+  // for `.default([...])` on an array column, which is invalid SQL.
   imageUrls: text("image_urls")
     .array()
     .notNull()
-    .default(["/img/fall_back_room.png"]),
+    .default(sql`ARRAY['/img/fall_back_room.png'::text]`),
   available: boolean("available").default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at")
@@ -94,9 +95,13 @@ export const BedTable = pgTable("bed", {
     .$onUpdate(() => new Date()),
 });
 
+/** Authorization roles. `admin` unlocks the admin dashboard and its actions. */
+export const userRoleEnum = pgEnum("user_role", ["guest", "admin"]);
+
 export const UserTable = pgTable("user", {
   id: serial("id").primaryKey(),
   clerkId: text("clerk_id").notNull(),
+  role: userRoleEnum("role").notNull().default("guest"),
   addressId: integer("address_id").references(() => AddressBookTable.id),
   name: text("name").notNull(),
   phone: text("phone").notNull(),

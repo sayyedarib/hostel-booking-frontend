@@ -1,75 +1,74 @@
-import { Webhook } from "svix";
-
 import { headers } from "next/headers";
-import { UserJSON, WebhookEvent } from "@clerk/nextjs/server";
+import { Webhook } from "svix";
+import type { UserJSON, WebhookEvent } from "@clerk/nextjs/server";
 
-import { checkUserExists, createUser } from "@/db/queries";
+import { provisionUser } from "@/db/internal/users";
+import { env } from "@/env";
+import { logger } from "@/lib/utils";
 
+/**
+ * Clerk webhook receiver. Creates the local user record when a Clerk account is
+ * created.
+ *
+ * The payload is only trusted after the Svix signature verifies — the previous
+ * implementation logged the signing secret and the full request body, both of
+ * which end up in the hosting provider's log store.
+ */
 export async function POST(req: Request) {
-  // You can find this in the Clerk Dashboard -> Webhooks -> choose the endpoint
-  const CLERK_WEBHOOK_SECRET = process.env.NEXT_PUBLIC_CLERK_WEBHOOK_SECRET;
-  console.log("CLERK_WEBHOOK_SECRET", CLERK_WEBHOOK_SECRET);
-  if (!CLERK_WEBHOOK_SECRET) {
-    throw new Error(
-      "Please add CLERK_WEBHOOK_SECRET from Clerk Dashboard to .env or .env.local",
-    );
+  const signingSecret = env.CLERK_WEBHOOK_SECRET;
+
+  if (!signingSecret) {
+    logger("error", "CLERK_WEBHOOK_SECRET is not configured");
+    return new Response("Webhook not configured", { status: 500 });
   }
 
-  // Get the headers
   const headerPayload = headers();
-  const svix_id = headerPayload.get("svix-id");
-  const svix_timestamp = headerPayload.get("svix-timestamp");
-  const svix_signature = headerPayload.get("svix-signature");
+  const svixId = headerPayload.get("svix-id");
+  const svixTimestamp = headerPayload.get("svix-timestamp");
+  const svixSignature = headerPayload.get("svix-signature");
 
-  // If there are no headers, error out
-  if (!svix_id || !svix_timestamp || !svix_signature) {
-    return new Response("Error occured -- no svix headers", {
-      status: 400,
-    });
+  if (!svixId || !svixTimestamp || !svixSignature) {
+    return new Response("Missing svix headers", { status: 400 });
   }
 
-  // Get the body
-  const payload = await req.json();
-  const body = JSON.stringify(payload);
+  const body = await req.text();
 
-  // Create a new Svix instance with your secret.
-  const wh = new Webhook(CLERK_WEBHOOK_SECRET);
-
-  let evt: WebhookEvent;
-
-  // Verify the payload with the headers
+  let event: WebhookEvent;
   try {
-    evt = wh.verify(body, {
-      "svix-id": svix_id,
-      "svix-timestamp": svix_timestamp,
-      "svix-signature": svix_signature,
+    event = new Webhook(signingSecret).verify(body, {
+      "svix-id": svixId,
+      "svix-timestamp": svixTimestamp,
+      "svix-signature": svixSignature,
     }) as WebhookEvent;
-  } catch (err) {
-    console.error("Error verifying webhook:", err);
-    return new Response("Error occured", {
-      status: 400,
-    });
+  } catch (error) {
+    logger("error", "Clerk webhook signature verification failed", { error });
+    return new Response("Invalid signature", { status: 400 });
   }
 
-  // Do something with the payload
-  // For this guide, you simply log the payload to the console
-  const eventType = evt.type;
-  console.log("clerk webhook body:", body);
+  if (event.type !== "user.created") {
+    // Acknowledge everything else so Clerk does not retry.
+    return new Response("", { status: 200 });
+  }
 
   const { id, first_name, last_name, email_addresses, image_url } =
-    evt.data as UserJSON;
+    event.data as UserJSON;
 
-  let userInfo = await checkUserExists(id);
-  console.log("userInfo", userInfo);
-  if (eventType === "user.created") {
-    console.log("creating user....");
-    const newUser = {
-      clerkId: id,
-      name: first_name + " " + last_name,
-      email: email_addresses[0]?.email_address as string,
-      imageUrl: image_url,
-    };
-    userInfo = await createUser(newUser);
+  const email = email_addresses[0]?.email_address;
+  if (!email) {
+    logger("error", "Clerk user.created without an email address", { id });
+    return new Response("Missing email address", { status: 400 });
+  }
+
+  const userId = await provisionUser({
+    clerkId: id,
+    name: [first_name, last_name].filter(Boolean).join(" ").trim() || "Guest",
+    email,
+    imageUrl: image_url,
+  });
+
+  if (userId === null) {
+    // Signal failure so Clerk retries the delivery.
+    return new Response("Failed to provision user", { status: 500 });
   }
 
   return new Response("", { status: 200 });

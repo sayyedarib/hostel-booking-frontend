@@ -28,6 +28,11 @@ export const siteConfig = {
   locale: "en_IN",
   contact: {
     email: "support@aligarhhostel.com",
+    /** Inboxes that receive booking and contact-form notifications. */
+    notificationRecipients: [
+      "support@aligarhhostel.com",
+      "sayyedaribhussain4321@gmail.com",
+    ],
     phone: "+91 879147673",
     address: {
       street:

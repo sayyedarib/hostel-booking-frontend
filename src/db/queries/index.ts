@@ -29,53 +29,13 @@ import {
 
 import { auth } from "@clerk/nextjs/server";
 import { generateToken } from "@/lib/utils";
+import { requireAdmin, requireUser, resolveTargetUserId } from "@/lib/auth";
 
 const getClerkId = () => {
   return auth().userId;
 };
 
-export const createUser = async ({
-  clerkId,
-  name,
-  phone = "",
-  email,
-  imageUrl,
-}: CreateUser) => {
-  try {
-    logger("info", "Creating user", { clerkId, name, phone, email });
-    const user = await db
-      .insert(UserTable)
-      .values({
-        clerkId,
-        name,
-        phone,
-        email,
-        imageUrl,
-      })
-      .returning();
-    logger("info", "User created successfully");
-    return { status: "success", data: user[0].id };
-  } catch (error) {
-    logger("error", "Error in creating user", { error });
 
-    return { status: "error", data: null };
-  }
-};
-
-export const checkUserExists = async (clerkId: string) => {
-  try {
-    logger("info", "Checking if user exists", { clerkId });
-    const user = await db
-      .select()
-      .from(UserTable)
-      .where(eq(UserTable.clerkId, clerkId));
-    logger("info", "User exists", { clerkId });
-    return { status: "success", data: user[0].id };
-  } catch (error) {
-    logger("error", "Error in checking user exists", { error });
-    return { status: "error", data: null };
-  }
-};
 
 export const getUserId = async () => {
   try {
@@ -164,6 +124,7 @@ export const createAddress = async ({
   pin,
 }: CreateAddress) => {
   try {
+    await requireUser();
     logger("info", "Creating address", { address, city, state, pin });
     const addressId = await db
       .insert(AddressBookTable)
@@ -268,6 +229,7 @@ export const updateUserSignature = async ({
 
 export const markRoomAsOccupied = async (roomId: number) => {
   try {
+    await requireAdmin();
     logger("info", "Marking room as occupied", { roomId });
     await db
       .update(RoomTable)
@@ -281,6 +243,7 @@ export const markRoomAsOccupied = async (roomId: number) => {
 };
 export const markRoomAsAvailable = async (roomId: number) => {
   try {
+    await requireAdmin();
     logger("info", "Marking room as occupied", { roomId });
     await db
       .update(RoomTable)
@@ -434,29 +397,6 @@ export const getBedsInCart = async () => {
   }
 };
 
-export const getOccupancyOfBed = async (bedId: number) => {
-  try {
-    logger("info", "Fetching occupancy of bed", { bedId });
-    const occupancy = await db
-      .select({
-        startDate: BedBookingTable.checkIn,
-        endDate: BedBookingTable.checkOut,
-      })
-      .from(BedBookingTable)
-      .where(eq(BedBookingTable.bedId, bedId));
-
-    logger("info", "Fetched occupancy dates");
-    return { status: "success", data: occupancy };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-    logger("error", "Error fetching occupancy of bed", {
-      bedId,
-      error: errorMessage,
-    });
-    return { status: "error", data: null };
-  }
-};
 
 export const getGuests = async () => {
   try {
@@ -766,6 +706,7 @@ export const getCartItems = async () => {
 
 export const getCheckoutData = async () => {
   try {
+    await requireUser();
     const checkoutData = await db
       .select({
         id: CartTable.id,
@@ -831,6 +772,7 @@ export const getRoomData = async (roomId: number) => {
 
 export const getAdminRoomData = async () => {
   try {
+    await requireAdmin();
     const rooms = await db
       .select({
         id: RoomTable.id,
@@ -1011,17 +953,10 @@ export const getAgreementFormData = async () => {
   }
 };
 
-export const getUserTransactions = async (userId?: number | null) => {
+export const getUserTransactions = async (requestedUserId?: number | null) => {
   try {
-    if (!userId) {
-      const { data } = await getUserId();
-      userId = data;
-    }
-
-    if (!userId) {
-      logger("error", "User not found");
-      return { status: "error", data: null };
-    }
+    // Only an admin may read somebody else's transactions.
+    const userId = await resolveTargetUserId(requestedUserId);
 
     const transactions = await db
       .select({
@@ -1043,6 +978,7 @@ export const getUserTransactions = async (userId?: number | null) => {
 
 export const getGuestBookings = async (guestId: number) => {
   try {
+    await requireAdmin();
     const bookings = await db
       .select({
         id: BedBookingTable.id,
@@ -1070,6 +1006,7 @@ export const getGuestBookings = async (guestId: number) => {
 
 export const getGuest = async (guestId: number) => {
   try {
+    await requireAdmin();
     const guest = await db
       .select({
         id: GuestTable.id,
@@ -1097,6 +1034,7 @@ export const getGuest = async (guestId: number) => {
 
 export const getUsersData = async () => {
   try {
+    await requireAdmin();
     const users = await db
       .select({
         id: UserTable.id,
@@ -1114,17 +1052,11 @@ export const getUsersData = async () => {
   }
 };
 
-export const getUserDataById = async (userId?: number | null) => {
+export const getUserDataById = async (requestedUserId?: number | null) => {
   try {
-    if (!userId) {
-      const { data } = await getUserId();
-      userId = data;
-    }
-
-    if (!userId) {
-      logger("error", "User not found");
-      return { status: "error", data: null };
-    }
+    // This row carries ID-document URLs and a signature; only the owner or an
+    // admin may read it.
+    const userId = await resolveTargetUserId(requestedUserId);
 
     const user = await db
       .select({
@@ -1270,6 +1202,7 @@ export const updateUserPersonalDetails = async (
 
 export const getAnalyticsData = async () => {
   try {
+    await requireAdmin();
     const totalRevenue = await db
       .select({
         total: sql<number>`SUM(${TransactionTable.totalAmount})`,
@@ -1311,6 +1244,7 @@ export const getAnalyticsData = async () => {
 
 export const getGuestsAdmin = async () => {
   try {
+    await requireAdmin();
     logger("info", "Fetching guests");
     const guests = await db
       .select({
@@ -1335,6 +1269,7 @@ export const getGuestsAdmin = async () => {
 
 export const deleteGuest = async (guestId: number) => {
   try {
+    await requireAdmin();
     logger("info", "Deleting guest", { guestId });
     await db.delete(GuestTable).where(eq(GuestTable.id, guestId)).execute();
     logger("info", "Guest deleted successfully");
@@ -1345,60 +1280,16 @@ export const deleteGuest = async (guestId: number) => {
   }
 };
 
-export const getAvailableRooms = async () => {
-  try {
-    const rooms = await db.select().from(RoomTable);
-    return { status: "success", data: rooms };
-  } catch (error) {
-    return { status: "error", data: null };
-  }
-};
 
-export const getAvailableBeds = async (roomId: number) => {
-  try {
-    const beds = await db
-      .select()
-      .from(BedTable)
-      .where(eq(BedTable.roomId, roomId));
-    return { status: "success", data: beds };
-  } catch (error) {
-    return { status: "error", data: null };
-  }
-};
 
-export const checkOccupiedRange = async (
-  bedId: number,
-  checkIn: Date,
-  checkOut: Date,
+
+export const getInvoiceDetails = async (
+  bookingId: number,
+  requestedUserId: number,
 ) => {
-  try {
-    const occupiedRanges = await db
-      .select()
-      .from(BedBookingTable)
-      .where(
-        and(
-          eq(BedBookingTable.bedId, bedId),
-          or(
-            and(
-              gte(BedBookingTable.checkIn, checkIn.toISOString()),
-              lte(BedBookingTable.checkIn, checkOut.toISOString()),
-            ),
-            and(
-              gte(BedBookingTable.checkOut, checkIn.toISOString()),
-              lte(BedBookingTable.checkOut, checkOut.toISOString()),
-            ),
-          ),
-        ),
-      );
-    return occupiedRanges.length > 0;
-  } catch (error) {
-    return true;
-  }
-};
-
-export const getInvoiceDetails = async (bookingId: number, userId: number) => {
-  console.log("userId in invoice details query: ", userId);
-  console.log("bookingId in invoice details query: ", bookingId);
+  // An invoice exposes billing and address data; scope it to the owner unless
+  // the caller is an admin.
+  const userId = await resolveTargetUserId(requestedUserId);
 
   const invoiceDetails = await db
     .select({
@@ -1769,6 +1660,7 @@ async function generateInvoice(bookingId: number, userId: number) {
 
 export const getBookingDetails = async (bookingId: number) => {
   try {
+    await requireAdmin();
     logger("info", "fetching booking details of: ", { bookingId: bookingId });
     const bookingDetails = await db
       .select({
@@ -1819,126 +1711,79 @@ export const getBookingDetails = async (bookingId: number) => {
   }
 };
 
-export const updateUserData = async (
-  userId: number,
-  field: string,
-  value: string,
+/**
+ * Columns a user is allowed to set on their own record by uploading a file.
+ *
+ * The previous `updateUserData(userId, field, value)` accepted an arbitrary
+ * column name straight from the caller, letting anyone write to any column on
+ * any row. Restricting writes to this map removes that mass-assignment hole.
+ */
+const UPLOADABLE_DOCUMENT_COLUMNS = {
+  signature: UserTable.signature,
+  idUrl: UserTable.idUrl,
+  guardianIdUrl: UserTable.guardianIdUrl,
+  guardianPhoto: UserTable.guardianPhoto,
+  imageUrl: UserTable.imageUrl,
+} as const;
+
+type UploadableDocument = keyof typeof UPLOADABLE_DOCUMENT_COLUMNS;
+
+/**
+ * Stores the URL of an uploaded document against a user record. The row is
+ * always resolved through {@link resolveTargetUserId}, so a caller can only
+ * write to their own record unless they are an admin.
+ */
+const updateUserDocument = async (
+  document: UploadableDocument,
+  url: string,
+  requestedUserId?: number | null,
 ) => {
   try {
-    logger("info", "Updating user data", { userId, field, value });
-    await db.transaction(async (trx) => {
-      await trx
-        .update(UserTable)
-        .set({ [field]: value })
-        .where(eq(UserTable.id, userId));
-    });
+    const userId = await resolveTargetUserId(requestedUserId);
+
+    if (!(document in UPLOADABLE_DOCUMENT_COLUMNS)) {
+      logger("error", "Rejected write to non-uploadable column", { document });
+      return { status: "error", data: null };
+    }
+
+    const result = await db
+      .update(UserTable)
+      .set({ [document]: url })
+      .where(eq(UserTable.id, userId))
+      .returning({ id: UserTable.id });
+
+    if (result.length === 0) {
+      logger("error", "User not found", { userId });
+      return { status: "error", data: null };
+    }
+
+    logger("info", "Updated user document", { userId, document });
+    return { status: "success", data: null };
   } catch (error) {
-    logger("error", "Error updating user data", { error });
+    logger("error", "Error updating user document", { document, error });
+    return { status: "error", data: null };
   }
 };
 
 export const updateUserSignatureByUserId = async (
   userId: number,
   signatureUrl: string,
-) => {
-  try {
-    logger("info", "Updating user signature", { userId, signatureUrl });
-    const result = await db
-      .update(UserTable)
-      .set({ signature: signatureUrl })
-      .where(eq(UserTable.id, userId))
-      .returning();
-
-    if (result.length === 0) {
-      logger("error", "User not found", { userId });
-      return { status: "error", data: null };
-    }
-
-    logger("info", "User signature updated successfully");
-    return { status: "success" };
-  } catch (error) {
-    logger("error", "Error updating user signature", { error });
-    return { status: "error", data: null };
-  }
-};
+) => updateUserDocument("signature", signatureUrl, userId);
 
 export const updateGuardianIdImage = async (
   userId: number,
   guardianIdImageUrl: string,
-) => {
-  try {
-    logger("info", "Updating guardian ID image", {
-      userId,
-      guardianIdImageUrl,
-    });
-    const result = await db
-      .update(UserTable)
-      .set({ guardianIdUrl: guardianIdImageUrl })
-      .where(eq(UserTable.id, userId))
-      .returning();
-
-    if (result.length === 0) {
-      logger("error", "User not found", { userId });
-      return { status: "error", data: null };
-    }
-
-    logger("info", "Guardian ID image updated successfully");
-    return { status: "success" };
-  } catch (error) {
-    logger("error", "Error updating guardian ID image", { error });
-    return { status: "error", data: null };
-  }
-};
+) => updateUserDocument("guardianIdUrl", guardianIdImageUrl, userId);
 
 export const updateUserIdImage = async (
   userId: number,
   userIdImageUrl: string,
-) => {
-  try {
-    logger("info", "Updating user ID image", { userId, userIdImageUrl });
-    const result = await db
-      .update(UserTable)
-      .set({ idUrl: userIdImageUrl })
-      .where(eq(UserTable.id, userId))
-      .returning();
-
-    if (result.length === 0) {
-      logger("error", "User not found", { userId });
-      return { status: "error", data: null };
-    }
-
-    logger("info", "User ID image updated successfully");
-    return { status: "success" };
-  } catch (error) {
-    logger("error", "Error updating user ID image", { error });
-    return { status: "error", data: null };
-  }
-};
+) => updateUserDocument("idUrl", userIdImageUrl, userId);
 
 export const updateGuardianPhoto = async (
   userId: number,
   guardianPhotoUrl: string,
-) => {
-  try {
-    logger("info", "Updating guardian photo", { userId, guardianPhotoUrl });
-    const result = await db
-      .update(UserTable)
-      .set({ guardianPhoto: guardianPhotoUrl })
-      .where(eq(UserTable.id, userId))
-      .returning();
-
-    if (result.length === 0) {
-      logger("error", "User not found", { userId });
-      return { status: "error", data: null };
-    }
-
-    logger("info", "Guardian photo updated successfully");
-    return { status: "success" };
-  } catch (error) {
-    logger("error", "Error updating guardian photo", { error });
-    return { status: "error", data: null };
-  }
-};
+) => updateUserDocument("guardianPhoto", guardianPhotoUrl, userId);
 
 export const updateUserImageUrl = async ({
   userId,
@@ -1946,38 +1791,11 @@ export const updateUserImageUrl = async ({
 }: {
   userId?: number | null;
   imageUrl: string;
-}) => {
-  try {
-    logger("info", "Updating user image URL", { userId, imageUrl });
-
-    logger("info", "Updating user image URL", { imageUrl });
-
-    if (!userId) {
-      const { data } = await getUserId();
-      userId = data;
-    }
-
-    const result = await db
-      .update(UserTable)
-      .set({ imageUrl })
-      .where(eq(UserTable.id, userId!))
-      .returning();
-
-    if (result.length === 0) {
-      logger("error", "User not found", { userId });
-      return { status: "error", data: null };
-    }
-
-    logger("info", "User image URL updated successfully");
-    return { status: "success" };
-  } catch (error) {
-    logger("error", "Error updating user image URL", { error });
-    return { status: "error", data: null };
-  }
-};
+}) => updateUserDocument("imageUrl", imageUrl, userId);
 
 export const getRoomById = async (roomId: number) => {
   try {
+    await requireAdmin();
     logger("info", "Fetching room by ID", { roomId });
     const room = await db
       .select({
@@ -2025,6 +1843,7 @@ export const addBedToRoom = async (
   dailyRent: number,
 ) => {
   try {
+    await requireAdmin();
     logger("info", "Adding bed to room", {
       roomId,
       bedCode,
@@ -2059,6 +1878,7 @@ export const updateRoomDetails = async (
   gender: string,
 ) => {
   try {
+    await requireAdmin();
     logger("info", "Updating room details", {
       roomId,
       roomCode,
@@ -2100,6 +1920,7 @@ export const updateBedDetails = async (
   monthlyRent: number,
 ) => {
   try {
+    await requireAdmin();
     logger("info", "Updating bed details", {
       bedId,
       bedCode,
@@ -2136,6 +1957,7 @@ export const updateBedDetails = async (
 
 export const updateBedStatus = async (bedId: number, available: boolean) => {
   try {
+    await requireAdmin();
     logger("info", "Updating bed status", { bedId, available });
 
     const updatedBed = await db
@@ -2163,6 +1985,7 @@ export const updateBedStatus = async (bedId: number, available: boolean) => {
 
 export const addRoomImage = async (roomId: number, imageUrl: string) => {
   try {
+    await requireAdmin();
     logger("info", "Adding image to room", { roomId, imageUrl });
 
     const insertedImage = await db
@@ -2191,6 +2014,7 @@ export const addRoomImage = async (roomId: number, imageUrl: string) => {
 
 export const deleteImage = async (roomId: number, imageUrl: string) => {
   try {
+    await requireAdmin();
     logger("info", "Deleting image from room", { roomId, imageUrl });
     const updatedRoom = await db
       .update(RoomTable)
@@ -2227,6 +2051,7 @@ export const createRoom = async (
   propertyId: number,
 ) => {
   try {
+    await requireAdmin();
     logger("info", "Creating room", { roomCode, floor, gender, propertyId });
 
     const newRoom = await db
@@ -2262,6 +2087,7 @@ export const getRevenueAndBookingsData = async (
   endDate: Date,
 ) => {
   try {
+    await requireAdmin();
     logger("info", "Fetching revenue and bookings data", {
       startDate,
       endDate,

@@ -39,3 +39,6 @@ next-env.d.ts
 
 # playwright-mcp scratch output
 /.playwright-mcp/
+
+# local env backups
+.env.backup-*
