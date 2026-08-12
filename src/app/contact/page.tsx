@@ -1,154 +1,189 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { useState } from "react";
+import { Loader2, Mail, MapPin, Phone } from "lucide-react";
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import Header from "@/components/header";
+import Footer from "@/components/landing-page/footer";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { siteConfig } from "@/config/site";
 import { logger } from "@/lib/utils";
 
-const ContactPage = () => {
-  const [loading, setLoading] = useState(false);
-  const nameRef = useRef<HTMLInputElement>(null);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const messageRef = useRef<HTMLTextAreaElement>(null);
+const { address, email, phone, mapUrl } = siteConfig.contact;
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    logger("info", "submitting contact form...");
-    setLoading(true);
+export default function ContactPage() {
+  const [isSending, setIsSending] = useState(false);
+  const { toast } = useToast();
 
-    const formData = {
-      name: nameRef.current?.value,
-      email: emailRef.current?.value,
-      message: messageRef.current?.value,
-    };
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = Object.fromEntries(new FormData(form));
 
-    logger("info", "form data", formData);
-
+    setIsSending(true);
     try {
       const response = await fetch("/api/email/contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to send message");
-      }
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
 
-      // Add user feedback for success
+      // The outcome used to be a TODO on both branches, so a visitor got no
+      // signal at all — the form just sat there whether it worked or not.
+      toast({
+        title: "Message sent",
+        description: "Thanks for getting in touch. We'll reply shortly.",
+      });
+      form.reset();
     } catch (error) {
-      logger("error", "Error sending message", { error: error });
-      // Add user feedback for error
+      logger("error", "Contact form submission failed", { error });
+      toast({
+        variant: "destructive",
+        title: "Message not sent",
+        description: `Please try again, or call us on ${phone}.`,
+      });
     } finally {
-      setLoading(false);
+      setIsSending(false);
     }
   };
 
   return (
-    <section className="bg-white">
-      <div
-        id="map"
-        className="relative overflow-hidden bg-cover bg-[50%] bg-no-repeat"
-      >
-        <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3525.6832432481247!2d78.06761257621882!3d27.911692216447786!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3974a541ade61277%3A0xfce35e0d6df25523!2sKHAN%20GROUP%20OF%20PG%20(Boys%20%26%20Girls)!5e0!3m2!1sen!2sin!4v1721985887604!5m2!1sen!2sin"
-          width="100%"
-          height="480"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-      </div>
-      <div className="container px-6 md:px-12">
-        <div className="block rounded-lg px-6 py-12 backdrop-blur-3xl md:py-16 md:px-12 -mt-[100px]">
-          <div className="flex flex-wrap">
-            <div className="mb-12 w-full shrink-0 grow-0 basis-auto md:px-3 lg:mb-0 lg:w-5/12 lg:px-6 text-black">
-              <form onSubmit={handleSubmit}>
-                <div className="relative">
-                  <Label htmlFor="name">Name</Label>
-                  <Input type="text" id="name" ref={nameRef} />
-                </div>
-                <div className="relative">
-                  <Label htmlFor="email">Email address</Label>
-                  <Input type="email" id="email" ref={emailRef} />
-                </div>
-                <div className="relative">
-                  <Label htmlFor="message">Message</Label>
-                  <Textarea id="message" rows={3} ref={messageRef} />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full rounded bg-blue-500 mt-4 text-white px-6 py-2.5 text-xs font-medium uppercase leading-normal transition duration-200 ease-in-out hover:bg-sky-600 focus:bg-sky-700"
-                >
-                  Send
-                </Button>
-              </form>
-            </div>
-            <ContactInfoSection />
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
+    <>
+      <Header className="fixed left-0 right-0 top-0 z-30" />
 
-export default ContactPage;
-
-const ContactInfoSection = () => {
-  return (
-    <div className="w-full shrink-0 grow-0 basis-auto lg:w-7/12">
-      <div className="flex flex-wrap">
-        <ContactInfo
-          icon={<Mail className="h-6 w-6" />}
-          title="Email"
-          details={["support@aligarhhostel.com"]}
-        />
-        <ContactInfo
-          icon={<Phone className="h-6 w-6" />}
-          title="Phone"
-          details={["+91 879147673"]}
-        />
-        <ContactInfo
-          icon={<MapPin className="h-6 w-6" />}
-          title="Address"
-          details={[
-            "Khan Group of PG and Hostels (Boys & Girls), Campus View Appartment, Near Sultan Jahan Coaching Center, beside Wings Academy, Shamshad Market, Aligarh, Uttar Pradesh 202002",
-          ]}
-        />
-        {/* Add other contact information sections here */}
-      </div>
-    </div>
-  );
-};
-
-const ContactInfo = ({
-  icon,
-  title,
-  details,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  details: string[];
-}) => (
-  <div className="mb-12 w-full shrink-0 grow-0 basis-auto md:w-6/12 md:px-3 lg:w-full lg:px-6 xl:w-6/12 text-black">
-    <div className="flex items-start">
-      <div className="shrink-0">
-        <div className="inline-block rounded-md bg-blue-500 p-4">{icon}</div>
-      </div>
-      <div className="ml-6 grow">
-        <p className="mb-2 font-bold">{title}</p>
-        {details.map((detail, index) => (
-          <p key={index} className="text-sm text-neutral-500">
-            {detail}
+      <main id="main-content" className="bg-white">
+        <section className="px-4 pb-8 pt-28 text-center md:pt-36">
+          <h1 className="text-3xl font-extrabold text-[#212529] md:text-4xl">
+            Contact us
+          </h1>
+          <p className="mx-auto mt-3 max-w-2xl text-gray-600">
+            Questions about rooms, rent or moving in? Send us a message, or come
+            and see the place — parents are always welcome to visit.
           </p>
-        ))}
-      </div>
-    </div>
-  </div>
-);
+        </section>
+
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 pb-16 lg:grid-cols-2 lg:px-8">
+          <section aria-labelledby="form-heading">
+            <h2 id="form-heading" className="mb-4 text-xl font-bold">
+              Send a message
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="name">Name</Label>
+                <Input id="name" name="name" required autoComplete="name" />
+              </div>
+              <div>
+                <Label htmlFor="email">Email address</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                />
+              </div>
+              <div>
+                <Label htmlFor="phone">Phone (optional)</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  inputMode="tel"
+                />
+              </div>
+              <div>
+                <Label htmlFor="message">Message</Label>
+                <Textarea id="message" name="message" rows={5} required />
+              </div>
+              <Button
+                type="submit"
+                disabled={isSending}
+                className="w-full rounded-full py-3 font-bold"
+              >
+                {isSending ? (
+                  <>
+                    <Loader2
+                      className="mr-2 h-4 w-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                    Sending…
+                  </>
+                ) : (
+                  "Send message"
+                )}
+              </Button>
+            </form>
+          </section>
+
+          <section aria-labelledby="details-heading">
+            <h2 id="details-heading" className="mb-4 text-xl font-bold">
+              Visit or call
+            </h2>
+            <ul className="mb-6 space-y-4">
+              <li className="flex items-start gap-3">
+                <span className="rounded-lg bg-primary/20 p-2">
+                  <Phone className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-semibold">Phone</p>
+                  <a
+                    href={`tel:${phone.replace(/\s/g, "")}`}
+                    className="text-gray-600 hover:underline"
+                  >
+                    {phone}
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="rounded-lg bg-primary/20 p-2">
+                  <Mail className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-semibold">Email</p>
+                  <a
+                    href={`mailto:${email}`}
+                    className="break-all text-gray-600 hover:underline"
+                  >
+                    {email}
+                  </a>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="rounded-lg bg-primary/20 p-2">
+                  <MapPin className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="font-semibold">Address</p>
+                  <address className="not-italic text-gray-600">
+                    {address.street}
+                    <br />
+                    {address.locality}, {address.region} {address.postalCode}
+                  </address>
+                </div>
+              </li>
+            </ul>
+
+            <iframe
+              src={mapUrl}
+              title={`Map showing ${siteConfig.name} in ${address.locality}`}
+              width="100%"
+              height="320"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="rounded-xl border-0"
+            />
+          </section>
+        </div>
+      </main>
+
+      <Footer />
+    </>
+  );
+}
