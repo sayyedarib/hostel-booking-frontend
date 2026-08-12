@@ -1,4 +1,12 @@
-"use server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Terms of Service",
+  description:
+    "The terms that apply to booking and staying at Khan Group of PG, Aligarh.",
+  alternates: { canonical: "/terms-of-service" },
+};
+
 import { Check } from "lucide-react";
 
 const services = [

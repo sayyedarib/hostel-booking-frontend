@@ -1,4 +1,12 @@
-"use server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "About Us",
+  description:
+    "Khan Group of PG has housed students in Aligarh since 2019, with a focus on a safe, study-friendly environment for those preparing for AMUEEE, NEET and JEE.",
+  alternates: { canonical: "/about" },
+};
+
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";

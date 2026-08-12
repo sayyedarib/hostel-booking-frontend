@@ -26,6 +26,12 @@ export const publicRoutes: PublicRoute[] = [
     priority: 0.8,
     changeFrequency: "monthly",
   },
+  {
+    path: "/seo",
+    label: "Rent & Amenities",
+    priority: 0.8,
+    changeFrequency: "monthly",
+  },
   { path: "/about", label: "About", priority: 0.7, changeFrequency: "monthly" },
   {
     path: "/contact",
