@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -101,12 +102,21 @@ export default function UserProfilePage() {
               <Avatar className="w-28 h-28">
                 <AvatarImage
                   src={previewUrl || user?.data?.[0]?.applicantPhoto}
-                  alt="Avatar"
+                  alt=""
                 />
-                <AvatarFallback>JD</AvatarFallback>
+                <AvatarFallback>
+                  {(user?.data?.[0]?.name ?? "?")
+                    .split(" ")
+                    .map((part: string) => part[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="space-y-2">
-                <CardTitle>{user?.data?.[0]?.name}</CardTitle>
+                <h1 className="text-2xl font-semibold leading-none tracking-tight">
+                  {user?.data?.[0]?.name ?? "Your profile"}
+                </h1>
                 <Button onClick={() => inputRef.current?.click()}>
                   Upload Photo
                 </Button>
@@ -114,6 +124,8 @@ export default function UserProfilePage() {
               <input
                 ref={inputRef}
                 type="file"
+                accept="image/*"
+                aria-label="Upload profile photo"
                 className="hidden"
                 onChange={handleUploadPhoto}
               />
@@ -138,41 +150,41 @@ export default function UserProfilePage() {
                         className="grid md:grid-cols-2 gap-4"
                       >
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            Full Name
-                          </h3>
-                          <Input
-                            name="name"
+                          <Label htmlFor="name" className="text-sm font-medium text-gray-500">
+  Full Name
+</Label>
+<Input
+                            id="name" name="name"
                             className="mt-1"
                             defaultValue={user.data[0].name}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            Email Address
-                          </h3>
-                          <Input
-                            name="email"
+                          <Label htmlFor="email" className="text-sm font-medium text-gray-500">
+  Email Address
+</Label>
+<Input
+                            id="email" name="email"
                             className="mt-1"
                             defaultValue={user.data[0].email}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            Phone Number
-                          </h3>
-                          <Input
-                            name="phone"
+                          <Label htmlFor="phone" className="text-sm font-medium text-gray-500">
+  Phone Number
+</Label>
+<Input
+                            id="phone" name="phone"
                             className="mt-1"
                             defaultValue={user.data[0].phone}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            Date of Birth
-                          </h3>
-                          <Input
-                            name="dob"
+                          <Label htmlFor="dob" className="text-sm font-medium text-gray-500">
+  Date of Birth
+</Label>
+<Input
+                            id="dob" name="dob"
                             className="mt-1"
                             type="date"
                             defaultValue={
@@ -185,61 +197,61 @@ export default function UserProfilePage() {
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            Address
-                          </h3>
-                          <Input
-                            name="address"
+                          <Label htmlFor="address" className="text-sm font-medium text-gray-500">
+  Address
+</Label>
+<Input
+                            id="address" name="address"
                             className="mt-1"
                             defaultValue={user.data[0].address ?? ""}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            City
-                          </h3>
-                          <Input
-                            name="city"
+                          <Label htmlFor="city" className="text-sm font-medium text-gray-500">
+  City
+</Label>
+<Input
+                            id="city" name="city"
                             className="mt-1"
                             defaultValue={user.data[0].city ?? ""}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            State
-                          </h3>
-                          <Input
-                            name="state"
+                          <Label htmlFor="state" className="text-sm font-medium text-gray-500">
+  State
+</Label>
+<Input
+                            id="state" name="state"
                             className="mt-1"
                             defaultValue={user.data[0].state ?? ""}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            PIN
-                          </h3>
-                          <Input
-                            name="pin"
+                          <Label htmlFor="pin" className="text-sm font-medium text-gray-500">
+  PIN
+</Label>
+<Input
+                            id="pin" name="pin"
                             className="mt-1"
                             defaultValue={user.data[0].pin ?? ""}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            Guardian Name
-                          </h3>
-                          <Input
-                            name="guardianName"
+                          <Label htmlFor="guardianName" className="text-sm font-medium text-gray-500">
+  Guardian Name
+</Label>
+<Input
+                            id="guardianName" name="guardianName"
                             className="mt-1"
                             defaultValue={user.data[0].guardianName ?? ""}
                           />
                         </div>
                         <div>
-                          <h3 className="text-sm font-medium text-gray-500">
-                            Guardian Phone
-                          </h3>
-                          <Input
-                            name="guardianPhone"
+                          <Label htmlFor="guardianPhone" className="text-sm font-medium text-gray-500">
+  Guardian Phone
+</Label>
+<Input
+                            id="guardianPhone" name="guardianPhone"
                             className="mt-1"
                             defaultValue={user.data[0].guardianPhone ?? ""}
                           />
