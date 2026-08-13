@@ -278,7 +278,7 @@ export const AddToCartStep2 = ({
             <Separator className="my-8" />
             <span className="text-center">
               <b className="mr-1">NOTE:</b>
-              Only you will have to pay for the first month in advance
+              You only pay for the first month in advance
             </span>
             <div className="flex justify-between w-full">
               <span>

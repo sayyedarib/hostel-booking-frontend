@@ -1,4 +1,12 @@
-"use server";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How Khan Group of PG collects, uses and protects the personal information of residents and applicants.",
+  alternates: { canonical: "/privacy-policy" },
+};
+
 import Link from "next/link";
 
 export default async function PrivacyPolicy() {

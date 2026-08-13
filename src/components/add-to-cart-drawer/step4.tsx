@@ -131,7 +131,7 @@ export const AddToCartStep4 = ({
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (!e.target.files || e.target.files.length === 0) {
-      console.error("No file selected");
+      logger("error", "No file selected");
       return;
     }
 
@@ -163,7 +163,7 @@ export const AddToCartStep4 = ({
         });
       }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      logger("error", "Error uploading file", { error: error });
       toast({
         variant: "destructive",
         title: "Error uploading file",
@@ -178,7 +178,7 @@ export const AddToCartStep4 = ({
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (!e.target.files || e.target.files.length === 0) {
-      console.error("No file selected");
+      logger("error", "No file selected");
       return;
     }
 
@@ -209,7 +209,7 @@ export const AddToCartStep4 = ({
         });
       }
     } catch (error) {
-      console.error("Error uploading file:", error);
+      logger("error", "Error uploading file", { error: error });
       toast({
         variant: "destructive",
         title: "Error uploading file",
@@ -237,7 +237,7 @@ export const AddToCartStep4 = ({
       handleAddToCart(data?.data!);
     },
     onError: (error) => {
-      console.error("Error creating guest:", error);
+      logger("error", "Error creating guest", { error: error });
       toast({
         variant: "destructive",
         title: "Error creating guest",

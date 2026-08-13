@@ -73,21 +73,32 @@ export const generateToken = (length = 16) => {
   return crypto.randomBytes(length).toString("hex").substring(0, length);
 };
 
+/**
+ * Structured console logger.
+ *
+ * Info-level output is suppressed outside development so that request-path
+ * logging (which previously ran on every overlap check and every query) does
+ * not flood production logs or test output. Errors always surface.
+ */
 export const logger = (
   level: LogLevel,
   message: string,
   context: LogContext | Error = {},
 ) => {
-  const time = new Date().toLocaleTimeString();
-  const date = new Date().toLocaleDateString();
-  const dir = process.cwd();
-  const logLevel = level.toUpperCase();
+  const isVerbose = process.env.NODE_ENV === "development";
+  if (level !== "error" && !isVerbose) return;
 
-  const contextString = Object.keys(context)?.length
-    ? JSON.stringify(context)
+  const timestamp = new Date().toISOString();
+  const contextString = Object.keys(context).length
+    ? ` ${JSON.stringify(context)}`
     : "";
+  const line = `[${timestamp}] [${level.toUpperCase()}] ${message}${contextString}`;
 
-  console.log(`[${date} ${time}] [${logLevel}] ${message} ${contextString}`);
+  if (level === "error") {
+    console.error(line);
+    return;
+  }
+  console.log(line);
 };
 
 export const checkOverlap = (

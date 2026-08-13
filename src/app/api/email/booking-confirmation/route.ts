@@ -1,7 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
-import { transporter } from "@/lib/server-utils";
+import { sendEmail } from "@/lib/server-utils";
 import { getBookingDetails } from "@/db/queries";
 import { logger } from "@/lib/utils";
+import { siteConfig } from "@/config/site";
 // import axios from "axios";
 
 export const maxDuration = 55;
@@ -68,14 +69,12 @@ export async function POST(request: NextRequest) {
     try {
       logger("info", "Sending emails to owner");
 
-      await transporter.sendMail({
-        from: "support@aligarhhostel.com",
-        to: ["sayyedaribhussain4321@gmail.com", "support@aligarhhostel.com"],
+      await sendEmail({
+        to: [...siteConfig.contact.notificationRecipients],
         subject: `Booking Verification for ${userName}`,
         html: mailContent,
       });
     } catch (error) {
-      console.log("error in sending email ", error);
       logger("error", "Error sending emails to owner", error as Error);
       return NextResponse.json(
         { message: "COULD NOT SEND MESSAGES TO OWNER" },
@@ -107,8 +106,7 @@ export async function POST(request: NextRequest) {
       logger("info", "Sending emails to user", {
         email: userEmail,
       });
-      await transporter.sendMail({
-        from: "support@aligarhhostel.com",
+      await sendEmail({
         to: userEmail,
         subject: "Booking Confirmation",
         html: userMailContent,

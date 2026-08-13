@@ -17,12 +17,10 @@ export default async function InvoicePage({
   // here params.id = bookingId and searchParams = userId
   const userId = Number(searchParams.userId);
 
-  console.log("userId in invoice page", userId);
   const { data: invoiceDetails } = await getInvoiceDetails(
     Number(params.id),
     userId,
   );
-  console.log("invoice details: ", invoiceDetails);
 
   return (
     <div

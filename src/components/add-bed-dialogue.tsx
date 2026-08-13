@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { addBedToRoom } from "@/db/queries";
+import { logger } from "@/lib/utils";
 
 const AddBedDialog = ({ roomId }: { roomId: number }) => {
   const [bedCode, setBedCode] = useState("");
@@ -30,10 +31,9 @@ const AddBedDialog = ({ roomId }: { roomId: number }) => {
     );
     setIsLoading(false);
     if (response.status === "success") {
-      console.log("Bed added successfully");
       setIsOpen(false);
     } else {
-      console.error("Error adding bed");
+      logger("error", "Error adding bed");
     }
   };
 

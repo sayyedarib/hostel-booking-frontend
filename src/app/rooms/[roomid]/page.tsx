@@ -38,7 +38,6 @@ export default function Room({ params }: { params: { roomid: string } }) {
         return;
       }
 
-      console.log("particular room data: ", result.data);
 
       if (result.status === "success") {
         setRoomData(result.data);

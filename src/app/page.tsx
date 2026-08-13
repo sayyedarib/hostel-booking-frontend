@@ -1,157 +1,98 @@
-"use client";
+import type { Metadata } from "next";
 
-import { useInView } from "react-intersection-observer";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import Link from "next/link";
-
-import { Button } from "@/components/ui/button";
-import HeroSection from "@/components/landing-page/hero-section";
 import Header from "@/components/header";
-import Footer from "@/components/landing-page/footer";
-import Carousel from "@/components/ui/carousel-2";
+import HeroSection from "@/components/landing-page/hero-section";
 import FAQ from "@/components/landing-page/faq";
+import Footer from "@/components/landing-page/footer";
+import { JsonLd } from "@/components/seo/json-ld";
+import { faqs } from "@/config/faq";
+import { siteConfig } from "@/config/site";
+import { faqSchema } from "@/lib/structured-data";
+
+export const metadata: Metadata = {
+  title: "Hostel & PG in Aligarh — Furnished Rooms Near AMU",
+  description: siteConfig.description,
+  alternates: { canonical: "/" },
+};
+
+const highlights = [
+  {
+    title: "Private rooms & shared dorms",
+    body: "Two, three and four-sharing rooms with sturdy bunk beds, personal storage and a study desk for every resident.",
+  },
+  {
+    title: "Built for studying",
+    body: "Quiet floors, 24/7 power backup and dedicated study areas — the environment that has produced AMUEEE, NEET and JEE toppers.",
+  },
+  {
+    title: "Everything included",
+    body: "Wi-Fi, purified drinking water, daily room cleaning, laundry and in-house hygienic meals, all covered in one predictable monthly rent.",
+  },
+];
 
 export default function Home() {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-
-  const router = useRouter();
-
-  const carouselItems = [
-    { src: "/bg.webp", alt: "Events at Wombat&apos;s", overlayText: "events" },
-    {
-      src: "/bg.webp",
-      alt: "Rooms and Facilities",
-      overlayText: "rooms & facilities",
-    },
-  ];
-
   return (
     <>
-      <Header className="fixed top-0 left-0 right-0 z-10" />
+      <Header className="fixed left-0 right-0 top-0 z-30" />
 
-      <section className="flex flex-col gap-3 min-w-screen min-h-[90vh] items-center justify-center px-6 text-center mt-20">
-         <HeroSection />
-      </section>
+      <main id="main-content">
+        <HeroSection />
 
-
-      <section className="flex flex-col items-center justify-center py-8 px-4 bg-white text-[#212529]">
-        <div className="max-w-4xl text-center space-y-20">
-          <h2 className="text-5xl lg:text-9xl font-bold mb-6">
-            Aligarh <br />
-            City&apos;s PG
-          </h2>
-          <p className="text-lg mb-8">
-            We have <span className="font-semibold">private rooms</span>, we
-            have <span className="font-semibold">dorms</span>, we have{" "}
-            <span className="font-semibold">study environment</span>...{" "}
-            <span className="font-bold">but above all: we have the vibe</span>.
-            Khan&apos;s PG is the right place to{" "}
-            <span className="font-semibold">
-              meet people from around the world
-            </span>
-            , share travel stories, get in contact with locals, enjoy great food
-            & drinks, and experience unforgettable moments.
-          </p>
-        </div>
-      </section>
-
-      {/* <section className="py-16 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold mb-8 text-center">Our Locations</h2>
-          <div className="relative">
-            <div className="flex overflow-x-hidden">
-              <div 
-                className="flex transition-transform duration-300 ease-in-out"
-                style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-              >
-                {[
-                  { name: "budapest", image: "/bg.webp" },
-                  { name: "vienna", image: "/bg.webp" },
-                  { name: "munich", image: "/bg.webp" },
-                  { name: "london", image: "/bg.webp" },
-                ].map((location, index) => (
-                  <div key={index} className="w-full flex-shrink-0 px-2">
-                    <div className="bg-white rounded-lg overflow-hidden shadow-lg">
-                      <img
-                        src={location.image}
-                        alt={`Wombat&apos;s City Hostel ${location.name}`}
-                        className="w-full h-64 object-cover"
-                      />
-                      <div className="p-4">
-                        <h3 className="text-2xl font-bold mb-2 capitalize">{location.name}</h3>
-                        <p className="text-gray-600">Wombat&apos;s City Hostel {location.name}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex justify-center mt-4">
-              {[0, 1, 2, 3].map((index) => (
-                <button
-                  key={index}
-                  className={`w-3 h-3 rounded-full mx-1 focus:outline-none ${
-                    index === activeIndex ? &apos;bg-blue-500&apos; : &apos;bg-gray-300&apos;
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section> */}
-
-      <section className="flex flex-col lg:flex-row py-16 px-4 bg-black text-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-5xl font-extrabold mb-8 lg:text-8xl text-center">
-            Why Khan&apos;s PG? <br className="hidden lg:block" /> 
-           
-           </h2>
-          <p className="text-lg mb-8 max-w-3xl">
-             It&apos;s about more than just a bed. Khan&apos;s PG is your city
-             host, offering lovingly put-together breakfast variations,as well as
-             events on a regular basis. </p>
-          
-        </div>
-        {/*<div className="w-full md:w-1/2 lg:w-1/3 ">
-          <Carousel items={carouselItems} />
-    </div> */}
-      </section>
-
-      <div className="my-8 mx-4 md:mx-10">
-        <FAQ />
-      </div>
-
-      <div className="w-full flex flex-col items-center justify-cetner px-4 md:px-14 py-4 md:pb-4 pb-24 gap-4 bg-neutral-100 backdrop-blur-3xl shadow-md">
-        <Footer />
-        <div className="mt-2 pt-2 border-gray-700">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0">
-              <Image
-                src="/logo.png"
-                alt="Khan Group of PG Logo"
-                width={100}
-                height={50}
-              />
-            </div>
-            <div className="text-sm">
-              <Link href="/privacy-policy" className="mr-4 hover:underline">
-                Privacy Policy
-              </Link>
-              <Link href="/terms-of-service" className="hover:underline">
-                Terms of Service
-              </Link>
-            </div>
-            <p className="text-sm mt-4 md:mt-0">
-              &copy; 2024 Khan Group of PG. All rights reserved.
+        <section className="bg-white px-4 py-16 text-[#212529] md:py-24">
+          <div className="mx-auto max-w-4xl space-y-8 text-center">
+            <h2 className="text-5xl font-bold lg:text-8xl">
+              Aligarh <br /> City&apos;s PG
+            </h2>
+            <p className="text-lg leading-relaxed">
+              We have <span className="font-semibold">private rooms</span>, we
+              have <span className="font-semibold">shared dorms</span>, we have
+              a <span className="font-semibold">study environment</span>
+              &nbsp;&mdash;{" "}
+              <span className="font-bold">but above all: we have the vibe</span>
+              . Khan&apos;s PG is where students from across the country live,
+              study together and actually enjoy the years they spend in Aligarh.
             </p>
           </div>
-        </div>
-      </div>
+        </section>
+
+        <section
+          aria-labelledby="why-heading"
+          className="bg-black px-4 py-16 text-white md:py-24"
+        >
+          <div className="mx-auto max-w-6xl">
+            <h2
+              id="why-heading"
+              className="mb-6 text-center text-5xl font-extrabold lg:text-7xl"
+            >
+              Why Khan&apos;s PG?
+            </h2>
+            <p className="mx-auto mb-12 max-w-3xl text-center text-lg text-gray-200">
+              It&apos;s about more than just a bed. We look after the daily
+              details — meals, cleaning, safety and power — so residents can put
+              their energy into their studies.
+            </p>
+
+            <ul className="grid grid-cols-1 gap-8 md:grid-cols-3">
+              {highlights.map((item) => (
+                <li
+                  key={item.title}
+                  className="rounded-2xl border border-white/15 bg-white/5 p-6"
+                >
+                  <h3 className="mb-3 text-xl font-bold text-primary">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-200">{item.body}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
+        <FAQ />
+      </main>
+
+      <Footer />
+      <JsonLd data={faqSchema(faqs)} />
     </>
   );
 }

@@ -1,18 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { format, startOfMonth, subMonths } from "date-fns";
+import { AlertCircle, BedDouble, IndianRupee, UserCheck, Users } from "lucide-react";
+
+import { StatTile } from "@/components/admin/stat-tile";
 import {
-  Activity,
-  ArrowUpRight,
-  CreditCard,
-  DollarSign,
-  Users,
-} from "lucide-react";
-import { format, subMonths } from "date-fns";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+  TrendChart,
+  TrendTable,
+  type TrendPoint,
+} from "@/components/admin/trend-chart";
 import {
   Card,
   CardContent,
@@ -20,157 +18,190 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { getAnalyticsData, getRevenueAndBookingsData } from "@/db/queries";
-import { BarChartComponent } from "@/components/ui/chart/bar-chart";
-import { AreaChartComponent } from "@/components/ui/chart/area-chart";
-import { PieChartComponent } from "@/components/ui/chart/pie-chart";
-import { LineChartComponent } from "@/components/ui/chart/line-chart";
-import { useQuery } from "@tanstack/react-query";
+import { fillMissingMonths } from "@/lib/time-series";
 
-interface Analytics {
-  totalRevenue: number;
-  totalBookings: number;
-  totalUsers: number;
-  totalGuests: number;
-}
+/**
+ * Categorical hues, slots 1 and 3 of the validated palette. Revenue and
+ * bookings are separate charts, so these carry identity between each chart and
+ * its matching stat tile rather than separating series within one plot.
+ */
+const SERIES_COLOR = { revenue: "#2a78d6", bookings: "#1baf7a" } as const;
 
-interface AnalyticsResponse {
-  status?: string;
-  data?: Analytics | null;
-}
+const RANGE_OPTIONS = [
+  { label: "6 months", months: 6 },
+  { label: "12 months", months: 12 },
+  { label: "24 months", months: 24 },
+] as const;
 
-const description =
-  "An application shell with a header and main content area. The header has a navbar, a search input and and a user nav dropdown. The user nav is toggled by a button with an avatar image.";
+const inr = (value: number) =>
+  new Intl.NumberFormat("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 0,
+  }).format(value);
+
+const count = (value: number) => new Intl.NumberFormat("en-IN").format(value);
 
 export default function AdminDashboard() {
-  const [dateRange, setDateRange] = useState({
-    startDate: subMonths(new Date(), 6),
-    endDate: new Date(),
-  });
+  const [months, setMonths] = useState<number>(6);
 
-  const {
-    data: analytics,
-    isLoading: analyticsLoading,
-    error: analyticsError,
-  } = useQuery<Analytics>({
+  const { startDate, endDate } = useMemo(() => {
+    const now = new Date();
+    return { startDate: startOfMonth(subMonths(now, months - 1)), endDate: now };
+  }, [months]);
+
+  const analytics = useQuery({
     queryKey: ["analytics"],
     queryFn: async () => {
-      const response: AnalyticsResponse = await getAnalyticsData();
-      console.log(response);
-      if (response.status === "success" && response.data !== undefined) {
-        return (
-          response.data || {
-            totalRevenue: 0,
-            totalBookings: 0,
-            totalUsers: 0,
-            totalGuests: 0,
-          }
-        );
+      const response = await getAnalyticsData();
+      if (response.status !== "success" || !response.data) {
+        throw new Error("Could not load dashboard totals.");
       }
-      throw new Error("Failed to fetch analytics data");
+      return response.data;
     },
   });
 
-  const {
-    data: revenueAndBookingsData,
-    isLoading: revenueAndBookingsLoading,
-    error: revenueAndBookingsError,
-  } = useQuery({
-    queryKey: ["revenueAndBookings", dateRange.startDate, dateRange.endDate],
+  const trend = useQuery({
+    queryKey: ["revenueAndBookings", startDate.toISOString(), months],
     queryFn: async () => {
-      const response: {
-        status: string;
-        data: { month: string; revenue: number; bookings: number }[] | null;
-      } = await getRevenueAndBookingsData(
-        new Date("2024-09-01"),
-        new Date("2024-09-30"),
-      );
-      console.log(response);
-      if (response.status === "success" && response.data !== null) {
-        return response.data;
+      const response = await getRevenueAndBookingsData(startDate, endDate);
+      if (response.status !== "success" || !response.data) {
+        throw new Error("Could not load the revenue and bookings trend.");
       }
-      throw new Error("Failed to fetch revenue and bookings data");
+      return response.data as TrendPoint[];
     },
   });
 
-  if (analyticsLoading || revenueAndBookingsLoading)
-    return <div>Loading...</div>;
-  if (analyticsError)
-    return <div>An error occurred: {analyticsError.message}</div>;
-  if (revenueAndBookingsError)
-    return <div>An error occurred: {revenueAndBookingsError.message}</div>;
+  const rangeLabel = `${format(startDate, "MMMM yyyy")} – ${format(endDate, "MMMM yyyy")}`;
 
-  const formattedDateRange = `${format(
-    dateRange.startDate,
-    "MMMM yyyy",
-  )} - ${format(dateRange.endDate, "MMMM yyyy")}`;
+  // Zero-fill months with no transactions so the line does not imply growth
+  // across periods that had none.
+  const series = useMemo(
+    () => (trend.data ? fillMissingMonths(trend.data, startDate, endDate) : []),
+    [trend.data, startDate, endDate],
+  );
 
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-      <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">₹{analytics?.totalRevenue}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Bookings
-            </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics?.totalBookings}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics?.totalUsers}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Guests</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{analytics?.totalGuests}</div>
-          </CardContent>
-        </Card>
+    <div className="flex flex-1 flex-col gap-6 p-4 md:p-8">
+      <div>
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">
+          Overview of occupancy, revenue and registrations.
+        </p>
       </div>
-      <div className="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <CardHeader className="flex flex-row items-center">
-            <div className="grid gap-2">
-              <CardTitle>Revenue and Bookings</CardTitle>
-              <CardDescription>{formattedDateRange}</CardDescription>
+
+      {analytics.error ? (
+        <ErrorCard message={(analytics.error as Error).message} />
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatTile
+            label="Total revenue"
+            value={inr(analytics.data?.totalRevenue ?? 0)}
+            icon={IndianRupee}
+            isLoading={analytics.isLoading}
+          />
+          <StatTile
+            label="Total bookings"
+            value={count(analytics.data?.totalBookings ?? 0)}
+            icon={BedDouble}
+            isLoading={analytics.isLoading}
+          />
+          <StatTile
+            label="Registered users"
+            value={count(analytics.data?.totalUsers ?? 0)}
+            icon={Users}
+            isLoading={analytics.isLoading}
+          />
+          <StatTile
+            label="Guests"
+            value={count(analytics.data?.totalGuests ?? 0)}
+            icon={UserCheck}
+            isLoading={analytics.isLoading}
+          />
+        </div>
+      )}
+
+      <Card>
+        <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="grid gap-1">
+            <CardTitle>Revenue and bookings</CardTitle>
+            <CardDescription>{rangeLabel}</CardDescription>
+          </div>
+
+          {/* Filters sit in one row above the charts and drive both of them. */}
+          <div
+            role="group"
+            aria-label="Time range"
+            className="inline-flex rounded-lg border p-1"
+          >
+            {RANGE_OPTIONS.map((option) => (
+              <button
+                key={option.months}
+                type="button"
+                onClick={() => setMonths(option.months)}
+                aria-pressed={months === option.months}
+                className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
+                  months === option.months
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </CardHeader>
+
+        <CardContent>
+          {trend.isLoading ? (
+            <div className="grid gap-8 lg:grid-cols-2">
+              <div className="h-[260px] animate-pulse rounded bg-gray-100" />
+              <div className="h-[260px] animate-pulse rounded bg-gray-100" />
             </div>
-          </CardHeader>
-          <CardContent>
-            <BarChartComponent />
-            <LineChartComponent />
-            <PieChartComponent />
-            <AreaChartComponent />
-          </CardContent>
-        </Card>
-      </div>
-    </main>
+          ) : trend.error ? (
+            <ErrorCard message={(trend.error as Error).message} />
+          ) : (
+            <>
+              {/* Two charts, not one dual-axis chart: rupees and counts do not
+                  share a scale, and overlaying them invents crossings that do
+                  not mean anything. */}
+              <div className="grid gap-8 lg:grid-cols-2">
+                <figure className="m-0">
+                  <figcaption className="mb-2 text-sm font-medium">
+                    Revenue per month
+                  </figcaption>
+                  <TrendChart
+                    data={series}
+                    measure="revenue"
+                    color={SERIES_COLOR.revenue}
+                  />
+                </figure>
+                <figure className="m-0">
+                  <figcaption className="mb-2 text-sm font-medium">
+                    Bookings per month
+                  </figcaption>
+                  <TrendChart
+                    data={series}
+                    measure="bookings"
+                    color={SERIES_COLOR.bookings}
+                  />
+                </figure>
+              </div>
+              <TrendTable data={series} />
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function ErrorCard({ message }: { message: string }) {
+  return (
+    <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+      <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
+      <p>{message}</p>
+    </div>
   );
 }

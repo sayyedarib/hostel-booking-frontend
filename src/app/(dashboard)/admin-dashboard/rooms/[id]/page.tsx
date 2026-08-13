@@ -46,6 +46,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/components/ui/use-toast";
 import AddBedDialogue from "@/components/add-bed-dialogue";
 import EditBedDialogue from "@/components/edit-bed-dialogue";
+import { logger } from "@/lib/utils";
 
 export default function RoomPage({ params }: { params: { id: string } }) {
   const { id } = params;
@@ -78,7 +79,7 @@ export default function RoomPage({ params }: { params: { id: string } }) {
       .upload(filename, file);
 
     if (error) {
-      console.error(error);
+      logger("error", "Failed to update room", { error });
       return;
     }
 
@@ -88,7 +89,6 @@ export default function RoomPage({ params }: { params: { id: string } }) {
 
     if (file) {
       const result = await addRoomImage(Number(id), publicUrl.data.publicUrl);
-      console.log(result);
     }
   };
 

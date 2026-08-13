@@ -1,111 +1,133 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import Image from "next/image";
-import Link from "next/link";
-import { ShoppingCart, Loader2 } from "lucide-react";
+import { AlertCircle, BedDouble } from "lucide-react";
 
 import Header from "@/components/header";
-import { getAllRoomCards, getCartItemsCount } from "@/db/queries";
 import { RoomCardComponent } from "@/components/room-card";
+import { CartFab } from "@/components/rooms/cart-fab";
+import { RoomGridSkeleton } from "@/components/rooms/room-grid-skeleton";
 import { Button } from "@/components/ui/button";
+import { getAllRoomCards, getCartItemsCount } from "@/db/queries";
 import { logger } from "@/lib/utils";
-import { useToast } from "@/components/ui/use-toast";
 
 export default function Rooms() {
-  const { toast } = useToast();
-
   const {
     isLoading,
     error,
     data: rooms,
+    refetch,
   } = useQuery({
     queryKey: ["rooms"],
     queryFn: async () => {
       const { status, data } = await getAllRoomCards();
       if (status === "error" || !data) {
-        toast({
-          variant: "destructive",
-          title: "Something went wrong",
-          description: "Failed to fetch rooms, Please try again later",
-        });
         logger("error", "Failed to fetch rooms");
-        throw new Error("Failed to fetch rooms");
+        throw new Error("We couldn't load rooms right now.");
       }
       return data;
     },
+    staleTime: 60_000,
   });
 
   const {
-    isLoading: isCartItemsCountLoading,
-    error: cartItemsCountError,
+    isLoading: isCartCountLoading,
+    error: cartCountError,
     data: cartItemsCount,
   } = useQuery({
     queryKey: ["cartItemsCount"],
     queryFn: async () => {
       const { status, data } = await getCartItemsCount();
       if (status === "error") {
-        toast({
-          variant: "destructive",
-          title: "Something went wrong",
-          description: "Failed to fetch cart items, Please try again later",
-        });
         logger("error", "Failed to fetch cart items count");
+        throw new Error("Failed to fetch cart items count");
       }
-      return data;
+      return data ?? 0;
     },
-    enabled: true,
     refetchOnWindowFocus: false,
+    retry: 1,
   });
+
+  const availableCount =
+    rooms?.filter((room) => room.availableForBooking).length ?? 0;
 
   return (
     <>
-      <Header className="fixed top-0 left-0 right-0 z-10" />
+      <Header className="fixed left-0 right-0 top-0 z-30" />
 
-      <div className="flex justify-center items-center min-h-[80vh] max-w-screen mt-20 relative -z-1">
-        {isLoading ? (
-          <Image
-            src="/Loading.gif"
-            width={100}
-            height={100}
-            alt="loading"
-            unoptimized={true}
-          />
-        ) : error ? (
-          <div>Error: {error.message}</div>
-        ) : rooms?.length === 0 ? (
-          <div>No rooms found</div>
-        ) : (
-          <div className="my-12 md:my-20 relative flex flex-wrap gap-10 items-center justify-center -z-1">
-            {rooms?.map((room) => (
-              <RoomCardComponent key={room.roomCode} roomData={room} />
-            ))}
-          </div>
-        )}
-        <Button className="fixed bottom-3 right-3 md:bottom-6 md:right-6 rounded-full h-14 w-14 md:h-16 md:w-16 bg-yellow-400 hover:bg-yellow-500 text-white shadow-lg transition duration-300 ease-in-out transform hover:scale-105">
-          <Link
-            href="/cart"
-            className="flex items-center justify-center relative"
-          >
-            <ShoppingCart size={48} color="black" strokeWidth={1.5} />
-            {cartItemsCountError ? (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-7 h-7 flex items-center justify-center z-2">
-                !
-              </span>
-            ) : (
-              cartItemsCount != 0 && (
-                <span className="absolute -top-3 -right-2 bg-black text-white text-lg rounded-full w-5 h-5 flex items-center justify-center z-2">
-                  {isCartItemsCountLoading ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    cartItemsCount
-                  )}
-                </span>
-              )
-            )}
-          </Link>
-        </Button>
-      </div>
+      <main
+        id="main-content"
+        className="min-h-screen bg-gray-50 pb-24 pt-28 md:pt-36"
+      >
+        <div className="mx-auto max-w-7xl px-4 md:px-8">
+          <header className="mb-8">
+            <h1 className="text-3xl font-extrabold text-[#212529] md:text-4xl">
+              Rooms &amp; Beds
+            </h1>
+            <p className="mt-2 text-gray-600">
+              {isLoading
+                ? "Checking live availability…"
+                : `${availableCount} of ${rooms?.length ?? 0} rooms currently accepting bookings.`}
+            </p>
+          </header>
+
+          {isLoading ? (
+            <RoomGridSkeleton />
+          ) : error ? (
+            <EmptyState
+              icon={<AlertCircle className="h-8 w-8" aria-hidden="true" />}
+              title="Something went wrong"
+              body={error.message}
+              action={
+                <Button onClick={() => refetch()} className="mt-4">
+                  Try again
+                </Button>
+              }
+            />
+          ) : !rooms?.length ? (
+            <EmptyState
+              icon={<BedDouble className="h-8 w-8" aria-hidden="true" />}
+              title="No rooms listed yet"
+              body="Please check back soon — new rooms are added regularly."
+            />
+          ) : (
+            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {rooms.map((room) => (
+                <li key={room.id}>
+                  <RoomCardComponent roomData={room} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </main>
+
+      <CartFab
+        count={cartItemsCount}
+        isLoading={isCartCountLoading}
+        hasError={Boolean(cartCountError)}
+      />
     </>
+  );
+}
+
+function EmptyState({
+  icon,
+  title,
+  body,
+  action,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="flex min-h-[40vh] flex-col items-center justify-center rounded-xl border border-dashed border-gray-300 bg-white p-8 text-center">
+      <div className="mb-3 text-gray-400">{icon}</div>
+      <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+      <p className="mt-1 max-w-md text-sm text-gray-600">{body}</p>
+      {action}
+    </div>
   );
 }

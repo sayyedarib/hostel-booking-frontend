@@ -31,11 +31,18 @@ const ENV_EXAMPLE = join(ROOT, ".env.example");
  * their `NEXT_PUBLIC_` prefix.
  */
 const SERVER_ONLY = new Set([
+  "DATABASE_URL",
+  "CLERK_SECRET_KEY",
+  "CLERK_WEBHOOK_SECRET",
+  "EMAIL_USER",
+  "EMAIL_PASSWORD",
+  // Deprecated NEXT_PUBLIC_-prefixed spellings, still read as a fallback in
+  // src/env.ts so existing deployments keep working. Listed here so they are
+  // treated as secrets for as long as they are supported.
   "NEXT_PUBLIC_DATABASE_URL",
   "NEXT_PUBLIC_CLERK_WEBHOOK_SECRET",
   "NEXT_PUBLIC_EMAIL_USR",
   "NEXT_PUBLIC_EMAIL_PWD",
-  "CLERK_SECRET_KEY",
 ]);
 
 /**

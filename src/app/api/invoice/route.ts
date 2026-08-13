@@ -4,11 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer-core";
 import chromium from "@sparticuz/chromium-min";
 import { createClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/utils";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   const { userId, bookingId } = await req.json();
-  console.log("userID in api route: ", userId);
-  console.log("bookingId in api route: ", bookingId);
 
   const url = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/invoice/${bookingId}?userId=${userId}`;
 
@@ -20,11 +19,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     ),
     headless: true,
   });
-  console.log("opening page");
   const page = await browser.newPage();
   await page.goto(url);
   try {
-    console.log("generating pdf");
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
@@ -45,7 +42,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       });
 
     if (error) {
-      console.error("Error uploading PDF:", error);
+      logger("error", "Error uploading PDF", { error: error });
       return NextResponse.json(
         { error: "Failed to upload PDF" },
         { status: 500 },
@@ -58,7 +55,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       .getPublicUrl(fileName);
 
     if (!publicUrlData) {
-      console.error("Failed to get public URL of uploaded PDF");
+      logger("error", "Failed to get public URL of uploaded PDF");
       return NextResponse.json(
         { error: "Failed to get public URL of uploaded PDF" },
         { status: 500 },
@@ -70,7 +67,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       { status: 200 },
     );
   } catch (error) {
-    console.error(error);
+    logger("error", "Invoice generation failed", { error });
     return NextResponse.json(
       { error: "An error occurred while processing the request" },
       { status: 500 },

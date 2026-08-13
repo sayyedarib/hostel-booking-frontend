@@ -1,3 +1,6 @@
+/** Shown when a room has no uploaded photos yet. */
+export const FALLBACK_ROOM_IMAGE = "/img/fall_back_room.png";
+
 export const services = [
   {
     title: "Tiffin Service",
@@ -63,3 +66,11 @@ export const gallery = [
   "/img/rooms/room4.webp",
   "/img/rooms/room5.webp",
 ];
+
+/**
+ * How far ahead a booking makes a bed unavailable, in days.
+ *
+ * Shared by the room cards, the availability queries and the booking drawer so
+ * all three agree on what "available" means.
+ */
+export const BOOKING_LEAD_DAYS = 15;

@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 
 import { createClient } from "@/lib/supabase/client";
+import { logger } from "@/lib/utils";
 import {
   updateUserSignatureByUserId,
   updateUserIdImage,
@@ -34,7 +35,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
       const userId = data;
 
       if (!userId) {
-        console.error("User ID not found");
+        logger("error", "User ID not found");
         return;
       }
 
@@ -46,9 +47,8 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
           .upload(fileName, file);
 
         if (error) {
-          console.error("Error uploading image:", error);
+          logger("error", "Error uploading image", { error: error });
         } else {
-          console.log("Image uploaded successfully:", data);
 
           const { data: publicUrlData } = supabase.storage
             .from(field)
@@ -56,10 +56,6 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
 
           const imageUrl = publicUrlData.publicUrl;
 
-          console.log("Updating user image URL:", { userId, field, imageUrl });
-          console.log("User image URL:", {
-            [field]: imageUrl,
-          });
 
           switch (field) {
             case "user_id_image":
@@ -77,7 +73,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({
           }
         }
       } catch (error) {
-        console.error("Error uploading image:", error);
+        logger("error", "Error uploading image", { error: error });
       }
     } else {
       setPreviewUrl(null);
