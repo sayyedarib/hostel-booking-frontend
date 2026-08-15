@@ -200,7 +200,7 @@ export const getCartItems = async () => {
 
 export const getCheckoutData = async () => {
   try {
-    await requireUser();
+    const user = await requireUser();
     const checkoutData = await db
       .select({
         id: CartTable.id,
@@ -213,7 +213,8 @@ export const getCheckoutData = async () => {
       })
       .from(CartTable)
       .innerJoin(GuestTable, eq(CartTable.guestId, GuestTable.id))
-      .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id));
+      .innerJoin(BedTable, eq(CartTable.bedId, BedTable.id))
+      .where(eq(CartTable.userId, user.id));
 
     return { status: "success", data: checkoutData };
   } catch (error) {
